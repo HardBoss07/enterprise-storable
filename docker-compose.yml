@@ -1,0 +1,58 @@
+version: '3.8'
+
+services:
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: unless-stopped
+    env_file: ./.env.example
+    environment:
+      MYSQL_DATABASE: storable
+      MYSQL_ROOT_PASSWORD: ${DB_PASS}
+    ports:
+      - "3307:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+    networks:
+      - storable-net
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    container_name: backend_app
+    restart: on-failure
+    depends_on:
+      - db
+    env_file: ./.env.example
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/storable?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_USERNAME: ${DB_USER}
+      SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
+    ports:
+      - "8080:8080"
+    networks:
+      - storable-net
+
+  frontend:
+    build:
+      context: ./web
+      dockerfile: Dockerfile
+    container_name: frontend_app
+    restart: on-failure
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      NEXT_PUBLIC_API_URL: http://localhost:8080
+    networks:
+      - storable-net
+
+networks:
+  storable-net:
+    driver: bridge
+
+volumes:
+  db-data:
+    driver: local

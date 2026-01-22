@@ -1,0 +1,34 @@
+# Stage 1: Build the application using Maven
+FROM maven:3.9-eclipse-temurin-21 AS build
+WORKDIR /app
+
+# Copy pom files and download dependencies to leverage Docker cache
+COPY pom.xml .
+COPY storable-api/pom.xml ./storable-api/
+COPY storable-core/pom.xml ./storable-core/
+COPY storable-data/pom.xml ./storable-data/
+
+# Download dependencies
+RUN mvn dependency:go-offline
+
+# Copy the rest of the source code
+COPY storable-api/src ./storable-api/src
+COPY storable-core/src ./storable-core/src
+COPY storable-data/src ./storable-data/src
+
+
+# Build the application
+RUN mvn clean install
+
+# Stage 2: Create the runtime image
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+
+# Copy the executable jar from the build stage
+COPY --from=build /app/storable-api/target/storable-api-*.jar app.jar
+
+# Expose the port the application runs on
+EXPOSE 8080
+
+# Command to run the application
+ENTRYPOINT ["java", "-jar", "app.jar"]
