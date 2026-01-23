@@ -5,7 +5,7 @@ services:
     image: mysql:8.0
     container_name: mysql_db
     restart: unless-stopped
-    env_file: ./.env.example
+    env_file: ./.env
     environment:
       MYSQL_DATABASE: storable
       MYSQL_ROOT_PASSWORD: ${DB_PASS}
@@ -24,11 +24,12 @@ services:
     restart: on-failure
     depends_on:
       - db
-    env_file: ./.env.example
+    env_file: ./.env
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/storable?createDatabaseIfNotExist=true
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/storable?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       SPRING_DATASOURCE_USERNAME: ${DB_USER}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASS}
+      SPRING_JPA_DATABASE_PLATFORM: org.hibernate.dialect.MySQLDialect
     ports:
       - "8080:8080"
     networks:
