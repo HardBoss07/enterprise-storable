@@ -10,9 +10,10 @@ services:
       MYSQL_DATABASE: storable
       MYSQL_ROOT_PASSWORD: ${DB_PASS}
     ports:
-      - "3307:3306"
+      - "3306:3306"
     volumes:
       - db-data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
     networks:
       - storable-net
 
