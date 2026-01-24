@@ -25,3 +25,7 @@ CREATE TABLE nodes (
     UNIQUE KEY node_unique_per_parent (parent_id, name),
     KEY node_parent_idx (parent_id)
 );
+
+CREATE USER 'backend_user'@'%' IDENTIFIED BY 'backend_password';
+GRANT SELECT, INSERT, UPDATE, DELETE ON storable.* TO 'backend_user'@'%';
+FLUSH PRIVILEGES;
