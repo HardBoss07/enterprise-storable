@@ -7,6 +7,7 @@ import java.time.OffsetDateTime;
 public class FileMetadataDto {
     private String id;
     private String name;
+    private String path;
     private long size;
     private OffsetDateTime createdAt;
     private OffsetDateTime modifiedAt;
