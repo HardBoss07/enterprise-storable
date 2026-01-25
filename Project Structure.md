@@ -2,6 +2,9 @@
 
 ```
 ./
+├── db/
+│   ├── schema.sql
+│   └── test-data.sql
 ├── storable-api/
 │   ├── src/
 │   │   ├── main/
@@ -42,18 +45,22 @@
 │   │                           └── repository/
 │   │                               └── FileNodeRepository.java
 │   └── pom.xml
+├── storage/
+│   ├── documents/
+│   │   ├── projects/
+│   │   │   └── project-plan.txt
+│   │   └── document1.txt
+│   └── root-file.txt
 ├── web/
 │   ├── app/
 │   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   └── page.tsx
+│   ├── components/
+│   │   ├── Footer.tsx
+│   │   └── Header.tsx
 │   ├── public/
-│   │   ├── file.svg
-│   │   ├── globe.svg
-│   │   ├── next.svg
-│   │   ├── vercel.svg
-│   │   └── window.svg
 │   ├── Dockerfile
 │   ├── README.md
 │   ├── eslint.config.mjs
@@ -64,6 +71,7 @@
 │   └── tsconfig.json
 ├── Dockerfile.backend
 ├── LICENSE
+├── Project Structure.md
 ├── docker-compose.yml
 └── pom.xml
 ```

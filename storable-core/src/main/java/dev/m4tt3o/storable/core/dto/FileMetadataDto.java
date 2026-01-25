@@ -5,13 +5,13 @@ import java.time.OffsetDateTime;
 
 @Data
 public class FileMetadataDto {
-    private String id;
+    private long id;
     private String name;
     private String path;
-    private long size;
+    private Long size;
     private OffsetDateTime createdAt;
     private OffsetDateTime modifiedAt;
-    private String ownerId;
-    private String parentId;
+    private long ownerId;
+    private Long parentId;
     private boolean isFolder;
 }
