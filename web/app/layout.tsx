@@ -1,8 +1,9 @@
 import type {Metadata} from "next";
 import {Roboto} from "next/font/google";
 import "./globals.css";
-import Header from "@/components/Header";
-import Footer from "@/components/Footer";
+import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
+import Sidebar from "@/components/layout/Sidebar";
 
 const robotoSans = Roboto({
     variable: "--font-roboto-sans",
@@ -22,10 +23,15 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body
-            className={`${robotoSans.variable} antialiased`}
+            className={`${robotoSans.variable} antialiased flex flex-col min-h-screen bg-gray-900 text-white`}
         >
         <Header/>
-        {children}
+        <div className="flex flex-1">
+            <Sidebar/>
+            <main className="flex-1 p-4">
+                {children}
+            </main>
+        </div>
         <Footer/>
         </body>
         </html>
