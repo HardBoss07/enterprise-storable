@@ -1,7 +1,7 @@
+import FileBrowser from "@/components/file-browser/FileBrowser";
+
 export default function Home() {
     return (
-        <>
-            <h1>Storable</h1>
-        </>
+        <FileBrowser />
     );
 }
