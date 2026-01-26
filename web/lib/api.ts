@@ -11,4 +11,9 @@ export async function getFiles(nodeId: number): Promise<FileNode[]> {
 }
 
 export async function getFileMetadata(nodeId: number): Promise<FileNode> {
-    const response = await fetch(`${API_...
+    const response = await fetch(`${API_BASE_URL}/files/${nodeId}`);
+    if (!response.ok) {
+        throw new Error('Failed to fetch file metadata');
+    }
+    return response.json();
+}

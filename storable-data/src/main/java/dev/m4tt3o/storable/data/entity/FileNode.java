@@ -14,6 +14,7 @@ public class FileNode {
     @Id
     private Long id;
     private String name;
+    private String path;
     private Long size;
     private OffsetDateTime createdAt;
     private OffsetDateTime modifiedAt;
