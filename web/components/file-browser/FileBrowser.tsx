@@ -16,7 +16,7 @@ export default function FileBrowser({ initialPath }: FileBrowserProps) {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    const currentFolderId = initialPath ? initialPath.split('/').pop() : '1';
+    const currentFolderId = initialPath ? parseInt(initialPath.split('/').pop() || '1', 10) : 1;
 
     useEffect(() => {
         setLoading(true);
@@ -24,15 +24,15 @@ export default function FileBrowser({ initialPath }: FileBrowserProps) {
 
         const fetchFilesAndPath = async () => {
             try {
-                const files = await getFiles(currentFolderId || '1');
+                const files = await getFiles(currentFolderId || 1);
                 setFiles(files);
 
                 const pathArr: FileNode[] = [];
-                let currentId: string | null = currentFolderId;
+                let currentId: number | null = currentFolderId;
                 while (currentId) {
                     const node = await getFileMetadata(currentId);
                     pathArr.unshift(node);
-                    currentId = node.parentId ? node.parentId.toString() : null;
+                    currentId = node.parentId;
                 }
                 setPath(pathArr);
 
