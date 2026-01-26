@@ -7,15 +7,15 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface FileNodeRepository extends JpaRepository<FileNode, String> {
-    List<FileNode> findByParentId(String parentId);
+public interface FileNodeRepository extends JpaRepository<FileNode, Long> {
+    List<FileNode> findByParentId(Long parentId);
 
-    List<FileNode> findByOwnerIdAndParentIdIsNull(String ownerId);
+    List<FileNode> findByOwnerIdAndParentIdIsNull(Long ownerId);
 
-    List<FileNode> findByOwnerIdAndNameContainingIgnoreCase(String ownerId, String name);
+    List<FileNode> findByOwnerIdAndNameContainingIgnoreCase(Long ownerId, String name);
 
-    List<FileNode> findByOwnerIdAndIsFolderOrderByModifiedAtDesc(String ownerId, boolean isFolder);
+    List<FileNode> findByOwnerIdAndIsFolderOrderByModifiedAtDesc(Long ownerId, boolean isFolder);
 
     @Query("SELECT COALESCE(SUM(n.size), 0) FROM FileNode n WHERE n.ownerId = :ownerId AND n.isFolder = false")
-    long sumSizeByOwnerId(@Param("ownerId") String ownerId);
+    long sumSizeByOwnerId(@Param("ownerId") Long ownerId);
 }

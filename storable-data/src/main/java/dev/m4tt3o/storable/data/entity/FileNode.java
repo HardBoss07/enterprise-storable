@@ -12,12 +12,12 @@ import java.time.OffsetDateTime;
 @Table(name = "nodes")
 public class FileNode {
     @Id
-    private String id;
+    private Long id;
     private String name;
-    private long size;
+    private Long size;
     private OffsetDateTime createdAt;
     private OffsetDateTime modifiedAt;
-    private String ownerId;
-    private String parentId;
+    private Long ownerId;
+    private Long parentId;
     private boolean isFolder;
 }
