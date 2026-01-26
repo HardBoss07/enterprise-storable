@@ -15,8 +15,7 @@ export default function FileBrowser({ initialPath }: FileBrowserProps) {
     const [path, setPath] = useState<FileNode[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
-
-    const currentFolderId = initialPath ? parseInt(initialPath.split('/').pop() || '1', 10) : 1;
+    const [currentFolderId, setCurrentFolderId] = useState<number>(initialPath ? parseInt(initialPath.split('/').pop() || '1', 10) : 1);
 
     useEffect(() => {
         setLoading(true);
@@ -24,7 +23,7 @@ export default function FileBrowser({ initialPath }: FileBrowserProps) {
 
         const fetchFilesAndPath = async () => {
             try {
-                const files = await getFiles(currentFolderId || 1);
+                const files = await getFiles(currentFolderId);
                 setFiles(files);
 
                 const pathArr: FileNode[] = [];
@@ -46,13 +45,16 @@ export default function FileBrowser({ initialPath }: FileBrowserProps) {
         fetchFilesAndPath();
     }, [currentFolderId]);
 
+    const handleFolderClick = (folderId: number) => {
+        setCurrentFolderId(folderId);
+    };
 
     return (
         <div className="bg-gray-800 text-white rounded-lg p-4">
             <Breadcrumbs path={path} />
             {loading && <div>Loading...</div>}
             {error && <div className="text-red-500">{error}</div>}
-            {!loading && !error && <FileList files={files} />}
+            {!loading && !error && <FileList files={files} onFolderClick={handleFolderClick} />}
         </div>
     );
 }

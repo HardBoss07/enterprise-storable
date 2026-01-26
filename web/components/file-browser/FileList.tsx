@@ -5,9 +5,10 @@ import FileListItem from './FileListItem';
 
 interface FileListProps {
   files: FileNode[];
+  onFolderClick: (folderId: number) => void;
 }
 
-export default function FileList({ files }: FileListProps) {
+export default function FileList({ files, onFolderClick }: FileListProps) {
   return (
     <div className="space-y-1">
       <div className="flex items-center p-2 text-gray-400 text-sm font-bold">
@@ -16,7 +17,7 @@ export default function FileList({ files }: FileListProps) {
         <div className="w-24">File Size</div>
       </div>
       {files.map((file) => (
-        <FileListItem key={file.id} node={file} />
+        <FileListItem key={file.id} node={file} onFolderClick={onFolderClick} />
       ))}
     </div>
   );
