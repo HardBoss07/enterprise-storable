@@ -1,10 +1,11 @@
 export interface FileNode {
-  id: string;
+  id: number;
   name: string;
-  size: number;
+  path: string;
+  size: number | null;
   createdAt: string;
   modifiedAt: string;
-  ownerId: string;
-  parentId: string | null;
+  ownerId: number;
+  parentId: number | null;
   isFolder: boolean;
 }

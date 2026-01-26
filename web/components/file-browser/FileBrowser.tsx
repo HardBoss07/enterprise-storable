@@ -1,37 +1,31 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { FileNode } from '@/types/FileNode';
-import { mockFileTree } from '@/lib/mock-data';
+import { getFiles } from '@/lib/api';
 import Breadcrumbs from './Breadcrumbs';
 import FileList from './FileList';
 
 interface FileBrowserProps {
-  initialPath?: string;
+    initialPath?: string;
 }
 
 export default function FileBrowser({ initialPath }: FileBrowserProps) {
-  const currentFolderId = initialPath ? initialPath.split('/').pop() : null;
+    const [files, setFiles] = useState<FileNode[]>([]);
+    const currentFolderId = initialPath ? initialPath.split('/').pop() : '1';
 
-  const files = mockFileTree.filter(
-    (file) => file.parentId === (currentFolderId || null)
-  );
+    useEffect(() => {
+        getFiles(currentFolderId || '1').then(setFiles);
+    }, [currentFolderId]);
 
-  const path: FileNode[] = [];
-  let folderId = currentFolderId;
-  while (folderId) {
-    const folder = mockFileTree.find((f) => f.id === folderId);
-    if (folder) {
-      path.unshift(folder);
-      folderId = folder.parentId;
-    } else {
-      folderId = null;
-    }
-  }
 
-  return (
-    <div className="bg-gray-800 text-white rounded-lg p-4">
-      <Breadcrumbs path={path} />
-      <FileList files={files} />
-    </div>
-  );
+    const path: FileNode[] = [];
+
+
+    return (
+        <div className="bg-gray-800 text-white rounded-lg p-4">
+            <Breadcrumbs path={path} />
+            <FileList files={files} />
+        </div>
+    );
 }
