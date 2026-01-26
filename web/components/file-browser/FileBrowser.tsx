@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { FileNode } from '@/types/FileNode';
-import { getFiles } from '@/lib/api';
+import { getFiles, getFileMetadata } from '@/lib/api';
 import Breadcrumbs from './Breadcrumbs';
 import FileList from './FileList';
 
@@ -12,6 +12,7 @@ interface FileBrowserProps {
 
 export default function FileBrowser({ initialPath }: FileBrowserProps) {
     const [files, setFiles] = useState<FileNode[]>([]);
+    const [path, setPath] = useState<FileNode[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
@@ -20,14 +21,30 @@ export default function FileBrowser({ initialPath }: FileBrowserProps) {
     useEffect(() => {
         setLoading(true);
         setError(null);
-        getFiles(currentFolderId || '1')
-            .then(setFiles)
-            .catch(() => setError('Failed to fetch files.'))
-            .finally(() => setLoading(false));
+
+        const fetchFilesAndPath = async () => {
+            try {
+                const files = await getFiles(currentFolderId || '1');
+                setFiles(files);
+
+                const pathArr: FileNode[] = [];
+                let currentId: string | null = currentFolderId;
+                while (currentId) {
+                    const node = await getFileMetadata(currentId);
+                    pathArr.unshift(node);
+                    currentId = node.parentId ? node.parentId.toString() : null;
+                }
+                setPath(pathArr);
+
+            } catch (error) {
+                setError('Failed to fetch file data.');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchFilesAndPath();
     }, [currentFolderId]);
-
-
-    const path: FileNode[] = [];
 
 
     return (
