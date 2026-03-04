@@ -1,14 +1,23 @@
 @import "tailwindcss";
 
+@theme {
+  --color-primary-accent: #3b82f6;
+  --color-bg-main: #171717; /* neutral-900 equivalent for deeper dark */
+  --color-bg-sidebar: #262626; /* neutral-800 equivalent */
+  --color-text-muted: #a3a3a3; /* neutral-400 equivalent */
+}
+
 :root {
-    --background: theme(colors.zinc.900);
-    --background-muted: theme(colors.zinc.800);
+    --background: var(--color-bg-main);
+    --background-muted: var(--color-bg-sidebar);
 
-    --text: theme(colors.zinc.200);
-    --text-muted: theme(colors.zinc.400);
+    --text: #e5e5e5;
+    --text-muted: var(--color-text-muted);
 
-    --border: theme(colors.zinc.700);
-    --link: theme(colors.zinc.100);
+    --border: #404040;
+    --link: #f5f5f5;
+    
+    --primary-accent: var(--color-primary-accent);
 }
 
 html {
