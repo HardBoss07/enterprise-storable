@@ -15,6 +15,8 @@ enterprise-storable/
 │   │   │                   └── api/
 │   │   │                       ├── controller/
 │   │   │                       │   └── FileController.java
+│   │   │                       ├── security/
+│   │   │                       │   └── CorsConfig.java
 │   │   │                       └── StorableApiApplication.java
 │   │   └── test/
 │   │       └── java/
@@ -91,5 +93,7 @@ enterprise-storable/
 ├── LICENSE
 ├── Project Structure.md
 ├── docker-compose.yml
-└── pom.xml
+├── pom.xml
+├── run.ps1
+└── run.sh
 ```
