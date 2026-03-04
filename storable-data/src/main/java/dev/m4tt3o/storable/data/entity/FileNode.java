@@ -19,14 +19,17 @@ public class FileNode {
     @Column(name = "parent_id")
     private Long parentId;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
+    @Column(name = "kind", nullable = false, columnDefinition = "ENUM('file','folder')")
     private NodeKind kind;
 
+    @Column(name = "size")
     private Long size;
+
+    @Column(name = "mime")
     private String mime;
 
     @Column(name = "storage_key")

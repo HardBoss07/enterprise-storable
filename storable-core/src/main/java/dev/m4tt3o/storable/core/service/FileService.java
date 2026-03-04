@@ -6,4 +6,5 @@ import java.util.List;
 public interface FileService {
     List<FileMetadataDto> getChildren(Long nodeId);
     FileMetadataDto getMetadata(Long nodeId);
+    long getTotalSize(String ownerId);
 }

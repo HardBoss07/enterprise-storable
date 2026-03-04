@@ -19,13 +19,26 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<FileMetadataDto> getChildren(Long parentId) {
-        return fileNodeRepository.findByParentId(parentId).stream()
+        List<FileNode> nodes;
+        if (parentId == null || parentId == 0) {
+            nodes = fileNodeRepository.findByParentIdIsNull();
+        } else {
+            nodes = fileNodeRepository.findByParentId(parentId);
+        }
+        
+        return nodes.stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
 
     @Override
+    public long getTotalSize(String ownerId) {
+        return fileNodeRepository.sumSizeByOwnerId(ownerId, FileNode.NodeKind.file);
+    }
+
+    @Override
     public FileMetadataDto getMetadata(Long nodeId) {
+        if (nodeId == null || nodeId == 0) return null;
         Optional<FileNode> fileNodeOptional = fileNodeRepository.findById(nodeId);
         return fileNodeOptional.map(this::convertToDto).orElse(null);
     }
