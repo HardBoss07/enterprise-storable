@@ -11,7 +11,6 @@ import java.util.Map;
 @RestController
 @RequestMapping("/api/files")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*") // Allow all for debugging, can tighten later
 public class FileController {
 
     private final FileService fileService;

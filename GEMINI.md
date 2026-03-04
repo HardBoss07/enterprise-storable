@@ -48,7 +48,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 1: Foundations (In Progress) | **Last Updated:** 2026-03-04
+> **Status:** Phase 2: Core File Management (In Progress) | **Last Updated:** 2026-03-04
 
 ### [ ] Phase 1: Infrastructure & Skeleton
 
@@ -62,7 +62,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [ ] **Service:** Local storage provider (Write/Read from disk).
 - [ ] **API:** Recursive folder creation.
 - [ ] **API:** File upload (Multipart) and Download.
-- [ ] **UI:** File Explorer grid/list view with navigation (breadcrumbs).
+- [x] **UI:** File Explorer grid/list view with navigation (breadcrumbs).
 
 ### [ ] Phase 3: Access Control & Permissions
 
