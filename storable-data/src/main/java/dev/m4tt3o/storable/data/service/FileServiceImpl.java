@@ -34,13 +34,15 @@ public class FileServiceImpl implements FileService {
         FileMetadataDto dto = new FileMetadataDto();
         dto.setId(fileNode.getId());
         dto.setName(fileNode.getName());
-        dto.setPath(fileNode.getPath());
         dto.setSize(fileNode.getSize());
+        dto.setMime(fileNode.getMime());
+        dto.setStorageKey(fileNode.getStorageKey());
         dto.setCreatedAt(fileNode.getCreatedAt());
         dto.setModifiedAt(fileNode.getModifiedAt());
+        dto.setDeletedAt(fileNode.getDeletedAt());
         dto.setOwnerId(fileNode.getOwnerId());
         dto.setParentId(fileNode.getParentId());
-        dto.setFolder(fileNode.isFolder());
+        dto.setFolder(fileNode.getKind() == FileNode.NodeKind.folder);
         return dto;
     }
 }

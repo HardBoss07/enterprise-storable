@@ -1,17 +1,19 @@
 package dev.m4tt3o.storable.core.dto;
 
 import lombok.Data;
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
 
 @Data
 public class FileMetadataDto {
-    private long id;
+    private Long id;
     private String name;
-    private String path;
     private Long size;
-    private OffsetDateTime createdAt;
-    private OffsetDateTime modifiedAt;
-    private long ownerId;
+    private String mime;
+    private String storageKey;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
+    private LocalDateTime deletedAt;
+    private String ownerId;
     private Long parentId;
-    private boolean isFolder;
+    private boolean folder;
 }

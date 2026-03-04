@@ -1,7 +1,7 @@
 USE storable;
 
 CREATE TABLE users (
-    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    id VARCHAR(36) PRIMARY KEY,
     username VARCHAR(255) NOT NULL,
     password_hash VARCHAR(255) NOT NULL,
     is_admin BOOLEAN NOT NULL DEFAULT FALSE,
@@ -11,7 +11,7 @@ CREATE TABLE users (
 
 CREATE TABLE nodes (
     id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    owner_id BIGINT UNSIGNED NOT NULL,
+    owner_id VARCHAR(36) NOT NULL,
     parent_id BIGINT UNSIGNED NULL,
     name VARCHAR(255) NOT NULL,
     kind ENUM ('file','folder') NOT NULL,
@@ -20,6 +20,7 @@ CREATE TABLE nodes (
     storage_key VARCHAR(1024) NULL,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     modified_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    deleted_at DATETIME NULL,
     FOREIGN KEY (owner_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (parent_id) REFERENCES nodes (id) ON DELETE CASCADE,
     UNIQUE KEY node_unique_per_parent (parent_id, name),

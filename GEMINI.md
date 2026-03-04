@@ -20,6 +20,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 - `storable-core`: Services & DTOs. **Rule:** All business logic lives here.
 - `storable-data`: JPA Entities & Repositories.
 - **Persistence:** MySQL 8.0.
+- **Auth Strategy:** Phase 1-3 uses a fixed Guest UUID (`00000000-0000-0000-0000-000000000000`) for data ownership, toggleable in `StorableAuthConfig`.
 
 ### Frontend (Next.js 16 - App Router)
 
@@ -27,6 +28,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 - **Styling:** Tailwind CSS + Lucide Icons (for file/folder icons).
 - **UI Components:** Modular, functional-first.
 - **Component Structure:** **Atomic Composition.** Use "Components of Components" (e.g., a `FileList` is composed of `FileRow`, which is composed of `FileIcon`, `FileName`, and `ActionMenu`). Avoid large, monolithic component files.
+- **Data Fetching:** **Server Actions** for mutations (create, rename, delete); **Client-side Fetching** for navigation and viewing.
 
 ### Infrastructure
 
@@ -52,8 +54,8 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 - [x] Define multi-module Maven structure.
 - [x] Configure Docker Compose (App + DB).
-- [ ] Implement `schema.sql` for `FileNode` (File/Folder metadata).
-- [ ] Frontend: Basic layout with Sidebar and Header.
+- [x] Implement `schema.sql` for `FileNode` (File/Folder metadata).
+- [x] Frontend: Basic layout with Sidebar and Header.
 
 ### [ ] Phase 2: Core File Management (No-Auth)
 
