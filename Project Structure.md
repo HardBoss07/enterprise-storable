@@ -1,7 +1,7 @@
 # Project Structure
 
 ```
-./
+enterprise-storable/
 ├── db/
 │   ├── schema.sql
 │   └── test-data.sql
@@ -42,8 +42,10 @@
 │   │                       └── data/
 │   │                           ├── entity/
 │   │                           │   └── FileNode.java
-│   │                           └── repository/
-│   │                               └── FileNodeRepository.java
+│   │                           ├── repository/
+│   │                           │   └── FileNodeRepository.java
+│   │                           └── service/
+│   │                               └── FileServiceImpl.java
 │   └── pom.xml
 ├── storage/
 │   ├── documents/
@@ -58,9 +60,24 @@
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
-│   │   ├── Footer.tsx
-│   │   └── Header.tsx
+│   │   ├── file-browser/
+│   │   │   ├── Breadcrumbs.tsx
+│   │   │   ├── FileBrowser.tsx
+│   │   │   ├── FileList.tsx
+│   │   │   └── FileListItem.tsx
+│   │   ├── icons/
+│   │   │   ├── FileIcon.tsx
+│   │   │   └── FolderIcon.tsx
+│   │   └── layout/
+│   │       ├── Footer.tsx
+│   │       ├── Header.tsx
+│   │       └── Sidebar.tsx
+│   ├── lib/
+│   │   ├── api.ts
+│   │   └── mock-data.ts
 │   ├── public/
+│   ├── types/
+│   │   └── FileNode.ts
 │   ├── Dockerfile
 │   ├── README.md
 │   ├── eslint.config.mjs
@@ -70,6 +87,7 @@
 │   ├── postcss.config.mjs
 │   └── tsconfig.json
 ├── Dockerfile.backend
+├── GEMINI.md
 ├── LICENSE
 ├── Project Structure.md
 ├── docker-compose.yml
