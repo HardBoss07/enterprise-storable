@@ -28,19 +28,19 @@ export default function FileListItem({ node, onFolderClick }: FileListItemProps)
 
   return (
       <div
-          className="flex items-center space-x-4 p-2 rounded-md hover:bg-gray-700/50 cursor-pointer transition-colors"
+          className="flex items-center space-x-4 p-2 rounded-md hover:bg-neutral-700/50 cursor-pointer transition-colors"
           onClick={handleClick}
       >
           <div className="flex items-center justify-center w-8 h-8 text-blue-400">
               {node.folder ? <FolderIcon /> : <FileIcon />}
           </div>
           <div className="flex-1 min-w-0">
-              <p className="text-gray-100 font-medium truncate">{node.name}</p>
+              <p className="text-neutral-100 font-medium truncate">{node.name}</p>
           </div>
-          <div className="w-40 text-gray-400 text-sm hidden sm:block">
+          <div className="w-40 text-neutral-400 text-sm hidden sm:block">
               {format(new Date(node.modifiedAt), "MMM d, yyyy HH:mm")}
           </div>
-          <div className="w-24 text-gray-400 text-sm text-right">
+          <div className="w-24 text-neutral-400 text-sm text-right">
               {!node.folder && node.size !== null ? formatBytes(node.size) : '--'}
           </div>
       </div>

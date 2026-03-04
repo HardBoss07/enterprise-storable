@@ -64,7 +64,7 @@ export default function FileBrowser({ initialFolderId = null }: FileBrowserProps
     };
 
     return (
-        <div className="bg-gray-800 text-white rounded-lg p-4 shadow-xl border border-gray-700">
+        <div className="bg-neutral-800 text-white rounded-lg p-4 shadow-xl border border-neutral-700">
             <div className="mb-4">
                 <Breadcrumbs path={path} onBreadcrumbClick={handleBreadcrumbClick} />
             </div>

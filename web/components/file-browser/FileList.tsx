@@ -27,14 +27,14 @@ export default function FileList({ files, onFolderClick }: FileListProps) {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center p-2 text-gray-400 text-sm font-bold border-b border-gray-700/50 mb-2">
+      <div className="flex items-center p-2 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2">
         <div className="flex-1 min-w-0 ml-10">Name</div>
         <div className="w-40 hidden sm:block">Last Modified</div>
         <div className="w-24 text-right">File Size</div>
       </div>
       
       {sortedFiles.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 text-gray-500">
+        <div className="flex flex-col items-center justify-center h-48 text-neutral-500">
            <p>This folder is empty</p>
         </div>
       ) : (

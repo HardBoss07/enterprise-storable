@@ -23,7 +23,7 @@ export default function RootLayout({
     return (
         <html lang="en">
         <body
-            className={`${robotoSans.variable} antialiased flex flex-col min-h-screen bg-gray-900 text-white`}
+            className={`${robotoSans.variable} antialiased flex flex-col min-h-screen bg-neutral-900 text-white`}
         >
         <Header/>
         <div className="flex flex-1">
