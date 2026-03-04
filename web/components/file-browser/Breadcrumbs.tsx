@@ -1,29 +1,38 @@
 'use client';
 
 import { FileNode } from '@/types/FileNode';
-import Link from 'next/link';
+import { Home } from 'lucide-react';
 
 interface BreadcrumbsProps {
   path: FileNode[];
+  onBreadcrumbClick: (folderId: number | null) => void;
 }
 
-export default function Breadcrumbs({ path }: BreadcrumbsProps) {
+export default function Breadcrumbs({ path, onBreadcrumbClick }: BreadcrumbsProps) {
   return (
-    <nav className="mb-4 text-sm text-gray-400">
-      <Link href="/" className="hover:underline">
-        Home
-      </Link>
+    <nav className="flex items-center space-x-2 text-sm text-gray-400">
+      <button 
+        onClick={() => onBreadcrumbClick(null)}
+        className="flex items-center hover:text-white transition-colors p-1 rounded hover:bg-gray-700"
+        title="Home"
+      >
+        <Home size={18} />
+      </button>
+      
       {path.map((node, index) => (
-        <span key={node.id}>
-          {' / '}
+        <div key={node.id} className="flex items-center space-x-2">
+          <span className="text-gray-600">/</span>
           {index === path.length - 1 ? (
-            <span>{node.name}</span>
+            <span className="text-gray-100 font-medium px-1">{node.name}</span>
           ) : (
-            <Link href={`/browse/${node.id}`} className="hover:underline">
+            <button 
+              onClick={() => onBreadcrumbClick(node.id)}
+              className="hover:text-white hover:underline transition-colors px-1 rounded hover:bg-gray-700"
+            >
               {node.name}
-            </Link>
+            </button>
           )}
-        </span>
+        </div>
       ))}
     </nav>
   );
