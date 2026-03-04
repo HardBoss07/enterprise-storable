@@ -19,6 +19,8 @@ server:
   port: 8080
 
 storable:
+  storage:
+    upload-dir: "storage"
   auth:
     guest-user-id: "00000000-0000-0000-0000-000000000000"
     guest-mode-enabled: true

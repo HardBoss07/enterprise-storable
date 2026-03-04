@@ -15,6 +15,8 @@ enterprise-storable/
 │   │   │   │               └── api/
 │   │   │   │                   ├── controller/
 │   │   │   │                   │   └── FileController.java
+│   │   │   │                   ├── request/
+│   │   │   │                   │   └── CreateFolderRequest.java
 │   │   │   │                   ├── security/
 │   │   │   │                   │   └── CorsConfig.java
 │   │   │   │                   └── StorableApiApplication.java
@@ -32,11 +34,14 @@ enterprise-storable/
 │   │                   └── storable/
 │   │                       └── core/
 │   │                           ├── config/
-│   │                           │   └── StorableAuthConfig.java
+│   │                           │   ├── StorableAuthConfig.java
+│   │                           │   └── StorageProperties.java
 │   │                           ├── dto/
 │   │                           │   └── FileMetadataDto.java
 │   │                           └── service/
-│   │                               └── FileService.java
+│   │                               ├── FileService.java
+│   │                               ├── LocalStorageService.java
+│   │                               └── StorageService.java
 │   └── pom.xml
 ├── storable-data/
 │   ├── src/

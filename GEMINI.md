@@ -59,9 +59,9 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ### [ ] Phase 2: Core File Management (No-Auth)
 
-- [ ] **Service:** Local storage provider (Write/Read from disk).
-- [ ] **API:** Recursive folder creation.
-- [ ] **API:** File upload (Multipart) and Download.
+- [x] **Service:** Local storage provider (Write/Read from disk).
+- [x] **API:** Recursive folder creation.
+- [x] **API:** File upload (Multipart) and Download.
 - [x] **UI:** File Explorer grid/list view with navigation (breadcrumbs).
 
 ### [ ] Phase 3: Access Control & Permissions
