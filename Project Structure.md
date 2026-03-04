@@ -8,16 +8,18 @@ enterprise-storable/
 ├── storable-api/
 │   ├── src/
 │   │   ├── main/
-│   │   │   └── java/
-│   │   │       └── dev/
-│   │   │           └── m4tt3o/
-│   │   │               └── storable/
-│   │   │                   └── api/
-│   │   │                       ├── controller/
-│   │   │                       │   └── FileController.java
-│   │   │                       ├── security/
-│   │   │                       │   └── CorsConfig.java
-│   │   │                       └── StorableApiApplication.java
+│   │   │   ├── java/
+│   │   │   │   └── dev/
+│   │   │   │       └── m4tt3o/
+│   │   │   │           └── storable/
+│   │   │   │               └── api/
+│   │   │   │                   ├── controller/
+│   │   │   │                   │   └── FileController.java
+│   │   │   │                   ├── security/
+│   │   │   │                   │   └── CorsConfig.java
+│   │   │   │                   └── StorableApiApplication.java
+│   │   │   └── resources/
+│   │   │       └── application.yml
 │   │   └── test/
 │   │       └── java/
 │   └── pom.xml
@@ -29,6 +31,8 @@ enterprise-storable/
 │   │               └── m4tt3o/
 │   │                   └── storable/
 │   │                       └── core/
+│   │                           ├── config/
+│   │                           │   └── StorableAuthConfig.java
 │   │                           ├── dto/
 │   │                           │   └── FileMetadataDto.java
 │   │                           └── service/
@@ -57,6 +61,12 @@ enterprise-storable/
 │   └── root-file.txt
 ├── web/
 │   ├── app/
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── recent/
+│   │   │   └── page.tsx
+│   │   ├── trash/
+│   │   │   └── page.tsx
 │   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   ├── layout.tsx
