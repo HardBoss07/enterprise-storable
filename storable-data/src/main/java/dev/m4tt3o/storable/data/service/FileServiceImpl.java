@@ -56,7 +56,9 @@ public class FileServiceImpl implements FileService {
         folder.setKind(FileNode.NodeKind.folder);
         folder.setParentId(parentId == null || parentId == 0 ? null : parentId);
         folder.setOwnerId(ownerId);
-        folder.setSize(0L);
+        folder.setSize(null);
+        folder.setMime("directory");
+        folder.setStorageKey(UUID.randomUUID().toString());
         
         FileNode saved = fileNodeRepository.save(folder);
         return convertToDto(saved);
@@ -92,7 +94,9 @@ public class FileServiceImpl implements FileService {
                 newFolder.setKind(FileNode.NodeKind.folder);
                 newFolder.setParentId(currentParentId);
                 newFolder.setOwnerId(ownerId);
-                newFolder.setSize(0L);
+                newFolder.setSize(null);
+                newFolder.setMime("directory");
+                newFolder.setStorageKey(UUID.randomUUID().toString());
                 lastFolder = fileNodeRepository.save(newFolder);
                 currentParentId = lastFolder.getId();
             }
