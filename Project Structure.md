@@ -88,13 +88,20 @@ enterprise-storable/
 │   │   │   └── FileListItem.tsx
 │   │   ├── icons/
 │   │   │   └── FileIcon.tsx
-│   │   └── layout/
-│   │       ├── Footer.tsx
-│   │       ├── Header.tsx
-│   │       └── Sidebar.tsx
+│   │   ├── layout/
+│   │   │   ├── Footer.tsx
+│   │   │   ├── Header.tsx
+│   │   │   └── Sidebar.tsx
+│   │   └── ui/
+│   │       ├── Button.tsx
+│   │       ├── IconButton.tsx
+│   │       └── Spinner.tsx
+│   ├── hooks/
+│   │   └── useFileBrowser.ts
 │   ├── lib/
 │   │   ├── api.ts
-│   │   └── mock-data.ts
+│   │   ├── mock-data.ts
+│   │   └── utils.ts
 │   ├── public/
 │   ├── types/
 │   │   └── FileNode.ts

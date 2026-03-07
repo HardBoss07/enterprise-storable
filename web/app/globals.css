@@ -124,6 +124,24 @@ html {
     }
 }
 
+@layer utilities {
+    .card-surface {
+        @apply bg-bg-sidebar rounded-xl p-6 shadow-2xl border border-neutral-800;
+    }
+
+    .interactive-surface {
+        @apply rounded-lg hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-neutral-700/50;
+    }
+
+    .text-muted {
+        @apply text-neutral-400;
+    }
+
+    .glass-nav {
+        @apply bg-neutral-900/40 backdrop-blur-sm border border-neutral-800 rounded-lg;
+    }
+}
+
 * {
     border-color: var(--border);
 }
