@@ -63,17 +63,11 @@ enterprise-storable/
 │   │                               └── FileServiceImpl.java
 │   └── pom.xml
 ├── storage/
-│   └── root/
-│       ├── guest/
-│       │   ├── documents/
-│       │   │   ├── projects/
-│       │   │   │   └── project-plan.txt
-│       │   │   └── document1.txt
-│       │   └── random-guest-file.txt
-│       └── m4tt3o/
-│           ├── files/
-│           │   └── some-document.txt
-│           └── test-file.txt
+│   ├── 0c739db5-8341-4e5f-b639-01af13e12dc8
+│   ├── 6c5106ff-54e6-4f8f-a159-85195763fc10
+│   ├── 8ae365c8-b2dc-44d8-968f-05f3fc1fe097
+│   ├── a92fffd8-8286-4ac3-8c90-5488b105587f
+│   └── dffd5f1b-9b77-409a-a126-3be1e8e41351
 ├── web/
 │   ├── app/
 │   │   ├── login/

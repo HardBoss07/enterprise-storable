@@ -49,7 +49,7 @@ public class LocalStorageService implements StorageService {
             Path file = rootLocation.resolve(storageKey);
             return Files.newInputStream(file);
         } catch (IOException e) {
-            throw new RuntimeException("Could not read file.", e);
+            throw new RuntimeException("Could not read file: " + storageKey, e);
         }
     }
 

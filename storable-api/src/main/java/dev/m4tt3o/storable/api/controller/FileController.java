@@ -71,12 +71,26 @@ public class FileController {
     @GetMapping("/{nodeId}/download")
     public ResponseEntity<Resource> downloadFile(@PathVariable Long nodeId) {
         FileMetadataDto metadata = fileService.getMetadata(nodeId);
-        InputStream inputStream = fileService.downloadFile(nodeId);
-        Resource resource = new InputStreamResource(inputStream);
+        if (metadata == null) {
+            return ResponseEntity.notFound().build();
+        }
 
-        return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(metadata.getMime() != null ? metadata.getMime() : "application/octet-stream"))
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + metadata.getName() + "\"")
-                .body(resource);
+        try {
+            InputStream inputStream = fileService.downloadFile(nodeId);
+            Resource resource = new InputStreamResource(inputStream);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(metadata.getMime() != null ? metadata.getMime() : "application/octet-stream"))
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + metadata.getName() + "\"")
+                    .contentLength(metadata.getSize() != null ? metadata.getSize() : 0)
+                    .body(resource);
+        } catch (Exception e) {
+            return ResponseEntity.status(500).body(new InputStreamResource(new java.io.ByteArrayInputStream(e.getMessage().getBytes())));
+        }
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<String> handleRuntimeException(RuntimeException e) {
+        return ResponseEntity.status(500).body(e.getMessage());
     }
 }
