@@ -3,14 +3,22 @@
 import { FileNode } from '@/types/FileNode';
 import FileListItem from './FileListItem';
 import { useMemo } from 'react';
+import { cn } from '@/lib/utils';
 
 interface FileListProps {
   files: FileNode[];
   onFolderClick: (folderId: number) => void;
 }
 
+/**
+ * Renders a list of files and folders with sorting.
+ * @param files The list of file nodes to display.
+ * @param onFolderClick Callback when a folder is clicked.
+ */
 export default function FileList({ files, onFolderClick }: FileListProps) {
-  // Sort files: Folders first, then alphabetically
+  /**
+   * Sorts files: Folders first, then alphabetically.
+   */
   const sortedFiles = useMemo(() => {
     return [...files].sort((a, b) => {
       // 1. Folders before files
@@ -27,7 +35,9 @@ export default function FileList({ files, onFolderClick }: FileListProps) {
 
   return (
     <div className="space-y-1">
-      <div className="flex items-center p-2 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2">
+      <div className={cn(
+        "flex items-center p-2 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2"
+      )}>
         <div className="flex-1 min-w-0 ml-10">Name</div>
         <div className="w-40 hidden sm:block">Last Modified</div>
         <div className="w-24 text-right">File Size</div>

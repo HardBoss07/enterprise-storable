@@ -5,21 +5,19 @@ import { FileIcon } from '@/components/icons/FileIcon';
 import { format } from 'date-fns';
 import { Download } from 'lucide-react';
 import { downloadFileUrl } from '@/lib/api';
+import { formatBytes, cn } from '@/lib/utils';
+import { IconButton } from '@/components/ui/IconButton';
 
 interface FileListItemProps {
   node: FileNode;
   onFolderClick: (folderId: number) => void;
 }
 
-function formatBytes(bytes: number, decimals = 2) {
-    if (!bytes || bytes === 0) return '0 Bytes';
-    const k = 1024;
-    const dm = decimals < 0 ? 0 : decimals;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
-    const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
-}
-
+/**
+ * Renders a single row in the file list.
+ * @param node The file or folder data.
+ * @param onFolderClick Callback when a folder is clicked.
+ */
 export default function FileListItem({ node, onFolderClick }: FileListItemProps) {
   const handleClick = (e: React.MouseEvent) => {
     // Prevent click if we're clicking the download button
@@ -39,7 +37,7 @@ export default function FileListItem({ node, onFolderClick }: FileListItemProps)
 
   return (
       <div
-          className="flex items-center space-x-4 p-2 rounded-lg hover:bg-white/5 cursor-pointer transition-all duration-200 group border border-transparent hover:border-neutral-700/50"
+          className={cn("flex items-center space-x-4 p-2 interactive-surface group")}
           onClick={handleClick}
       >
           <div className="flex items-center justify-center w-10 h-10">
@@ -52,13 +50,15 @@ export default function FileListItem({ node, onFolderClick }: FileListItemProps)
           <div className="flex items-center space-x-2">
               <div className="hidden group-hover:flex px-2">
                   {!node.folder && (
-                      <button 
+                      <IconButton 
+                          icon={Download}
                           onClick={handleDownload}
-                          className="download-btn p-1.5 hover:bg-neutral-700 rounded-md text-neutral-400 hover:text-white transition-colors"
+                          className="download-btn"
+                          variant="secondary"
+                          size="sm"
+                          iconSize={16}
                           title="Download"
-                      >
-                          <Download size={16} />
-                      </button>
+                      />
                   )}
               </div>
 
