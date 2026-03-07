@@ -35,7 +35,7 @@ services:
     ports:
       - "8080:8080"
     volumes:
-      - ./storage:/storage
+      - ./storage:/app/storage
     networks:
       - storable-net
 

@@ -85,7 +85,7 @@ public class FileController {
                     .contentLength(metadata.getSize() != null ? metadata.getSize() : 0)
                     .body(resource);
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(new InputStreamResource(new java.io.ByteArrayInputStream(e.getMessage().getBytes())));
+            return ResponseEntity.internalServerError().build();
         }
     }
 
