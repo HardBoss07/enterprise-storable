@@ -24,6 +24,10 @@ enterprise-storable/
 │   │   │       └── application.yml
 │   │   └── test/
 │   │       └── java/
+│   │           └── dev/
+│   │               └── m4tt3o/
+│   │                   └── storable/
+│   │                       └── api/
 │   └── pom.xml
 ├── storable-core/
 │   ├── src/
@@ -59,6 +63,17 @@ enterprise-storable/
 │   │                               └── FileServiceImpl.java
 │   └── pom.xml
 ├── storage/
+│   └── root/
+│       ├── guest/
+│       │   ├── documents/
+│       │   │   ├── projects/
+│       │   │   │   └── project-plan.txt
+│       │   │   └── document1.txt
+│       │   └── random-guest-file.txt
+│       └── m4tt3o/
+│           ├── files/
+│           │   └── some-document.txt
+│           └── test-file.txt
 ├── web/
 │   ├── app/
 │   │   ├── login/
