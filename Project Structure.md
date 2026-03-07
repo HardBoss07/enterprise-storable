@@ -59,11 +59,6 @@ enterprise-storable/
 │   │                               └── FileServiceImpl.java
 │   └── pom.xml
 ├── storage/
-│   ├── documents/
-│   │   ├── projects/
-│   │   │   └── project-plan.txt
-│   │   └── document1.txt
-│   └── root-file.txt
 ├── web/
 │   ├── app/
 │   │   ├── login/
@@ -83,8 +78,7 @@ enterprise-storable/
 │   │   │   ├── FileList.tsx
 │   │   │   └── FileListItem.tsx
 │   │   ├── icons/
-│   │   │   ├── FileIcon.tsx
-│   │   │   └── FolderIcon.tsx
+│   │   │   └── FileIcon.tsx
 │   │   └── layout/
 │   │       ├── Footer.tsx
 │   │       ├── Header.tsx

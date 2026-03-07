@@ -64,17 +64,25 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **API:** File upload (Multipart) and Download.
 - [x] **UI:** File Explorer grid/list view with navigation (breadcrumbs).
 
-### [ ] Phase 3: Access Control & Permissions
+### [ ] Phase 3: Base File Structure (Virtual Pathing)
 
-- [ ] **Data:** Add `AccessPrivilege` table (VIEW, EDIT, OWNER).
-- [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
-- [ ] **UI:** "Share" modal mock-up.
+- [ ] **Logic:** Implement `UserHome` resolution logic (Maps `UUID` to `/home/{username}`).
+- [ ] **Security:** Implement "Jailbreak" prevention (Ensure users cannot navigate `..` or traverse above their assigned home directory).
+- [ ] **Admin Privileges:** Define `IsAdmin` flag for the Guest UUID to allow global directory traversal.
+- [ ] **API:** Update File Discovery endpoints to default to the User's home directory instead of the system root.
 
 ### [ ] Phase 4: Authentication & Security
 
 - [ ] **Logic:** Implement JWT and User Session management.
 - [ ] **Logic:** Secure all endpoints behind Spring Security.
 - [ ] **UI:** Login/Register pages and Route Guards.
+- [ ] **Password:** BCrypt for hashing
+
+### [ ] Phase 5: Access Control & Permissions
+
+- [ ] **Data:** Add `AccessPrivilege` table (VIEW, EDIT, OWNER).
+- [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
+- [ ] **UI:** "Share" modal mock-up.
 
 ---
 
