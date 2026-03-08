@@ -46,6 +46,36 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ---
 
+## Development & Refactoring Standards
+
+### 1. General Code Quality (All Layers)
+
+- **Atomic Functions:** Every function/method must perform exactly **one** discrete task. If a logic block exceeds 20 lines, it must be refactored into sub-methods.
+- **Self-Documentation:** _ **Java:** Every public method requires a concise, one-line Javadoc (`/\*\* ... _/`).
+- **TypeScript:** Every exported component/utility requires a one-line JSDoc comment.
+
+- **Naming:** Use descriptive, "verb-first" names (e.g., `executeFileDeletion` instead of `delete`).
+- **Clean Transitions:** Never leak Implementation/Database Entities to the Frontend; always map to Records/DTOs.
+
+### 2. Java (Spring Boot 3.2.2 + Java 21) Standards
+
+- **Modern Features:** Use **Java 21** syntax: **Records** for all DTOs, **Pattern Matching** for `switch`, and `SequencedCollections` where applicable.
+- **Dependency Injection:** Use **Constructor Injection** via Lombok's `@RequiredArgsConstructor`. **Field injection (`@Autowired`) is strictly forbidden.**
+- **Virtual Threads:** Since we are on Java 21, prefer `Executors.newVirtualThreadPerTaskExecutor()` for blocking I/O operations (like disk writes).
+- **Module Scopes & Boundaries:**
+- **`storable-api` (The Gateway):** Handles REST controllers and `@RestControllerAdvice`. **Logic-free zone.**
+- **`storable-core` (The Brain):** Contains `@Service` classes and business logic. This is the only module that understands the "Virtual File System."
+- **`storable-data` (The Library):** Contains `@Entity` classes (MySQL) and Spring Data Repositories. It provides data to `core` but is isolated from the Web layer.
+
+### 3. Frontend (Next.js 16 + Tailwind) Standards
+
+- **Atomic Composition:** Build UI from small, stateless atoms. Avoid "Mega-Components."
+- **Tailwind Refactoring:** Consolidate repetitive Tailwind strings into centralized CSS classes in `globals.css` using `@apply` for high-frequency patterns.
+- **Type Safety:** Strict TypeScript. Use `interface` for API contracts and `type` for internal shapes. No `any`.
+- **Logic Extraction:** Complex UI state or data processing must be moved into custom `hooks` or `utils`.
+
+---
+
 ## Interactive Roadmap
 
 > **Status:** Phase 2: Core File Management (In Progress) | **Last Updated:** 2026-03-04
