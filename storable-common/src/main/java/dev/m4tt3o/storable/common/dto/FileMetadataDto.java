@@ -1,4 +1,4 @@
-package dev.m4tt3o.storable.core.dto;
+package dev.m4tt3o.storable.common.dto;
 
 import java.time.LocalDateTime;
 
