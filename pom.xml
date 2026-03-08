@@ -21,13 +21,19 @@
     </properties>
 
     <modules>
-        <module>storable-core</module>
+        <module>storable-common</module>
         <module>storable-data</module>
+        <module>storable-core</module>
         <module>storable-api</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>dev.m4tt3o.storable</groupId>
+                <artifactId>storable-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
             <dependency>
                 <groupId>dev.m4tt3o.storable</groupId>
                 <artifactId>storable-core</artifactId>
