@@ -15,8 +15,11 @@ enterprise-storable/
 │   │   │   │               └── api/
 │   │   │   │                   ├── controller/
 │   │   │   │                   │   └── FileController.java
+│   │   │   │                   ├── exception/
+│   │   │   │                   │   └── GlobalExceptionHandler.java
 │   │   │   │                   ├── request/
-│   │   │   │                   │   └── CreateFolderRequest.java
+│   │   │   │                   │   ├── CreateFolderRequest.java
+│   │   │   │                   │   └── RecursiveFolderRequest.java
 │   │   │   │                   ├── security/
 │   │   │   │                   │   └── CorsConfig.java
 │   │   │   │                   └── StorableApiApplication.java
@@ -28,6 +31,7 @@ enterprise-storable/
 │   │               └── m4tt3o/
 │   │                   └── storable/
 │   │                       └── api/
+│   ├── target/
 │   └── pom.xml
 ├── storable-core/
 │   ├── src/
@@ -42,10 +46,14 @@ enterprise-storable/
 │   │                           │   └── StorageProperties.java
 │   │                           ├── dto/
 │   │                           │   └── FileMetadataDto.java
+│   │                           ├── repository/
+│   │                           │   └── FileNodePersistence.java
 │   │                           └── service/
 │   │                               ├── FileService.java
+│   │                               ├── FileServiceImpl.java
 │   │                               ├── LocalStorageService.java
 │   │                               └── StorageService.java
+│   ├── target/
 │   └── pom.xml
 ├── storable-data/
 │   ├── src/
@@ -60,7 +68,8 @@ enterprise-storable/
 │   │                           ├── repository/
 │   │                           │   └── FileNodeRepository.java
 │   │                           └── service/
-│   │                               └── FileServiceImpl.java
+│   │                               └── FileNodePersistenceImpl.java
+│   ├── target/
 │   └── pom.xml
 ├── storage/
 │   ├── 0c739db5-8341-4e5f-b639-01af13e12dc8
