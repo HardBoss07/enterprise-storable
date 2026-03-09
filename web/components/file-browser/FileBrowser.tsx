@@ -26,20 +26,16 @@ export default function FileBrowser({ initialFolderId = null }: FileBrowserProps
         navigateToFolder,
         refresh,
         createFolder,
-        uploadFile
+        uploadFile,
+        isCreatingFolder,
+        triggerCreateFolder,
+        cancelCreateFolder
     } = useFileBrowser(initialFolderId);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const handleCreateFolder = async () => {
-        const name = prompt('Enter folder name:');
-        if (name) {
-            try {
-                await createFolder(name);
-            } catch (err) {
-                alert('Failed to create folder');
-            }
-        }
+    const handleCreateFolder = () => {
+        triggerCreateFolder();
     };
 
     const handleUploadClick = () => {
@@ -105,7 +101,13 @@ export default function FileBrowser({ initialFolderId = null }: FileBrowserProps
                     {error}
                 </div>
             ) : (
-                <FileList files={files} onFolderClick={navigateToFolder} />
+                <FileList 
+                files={files} 
+                onFolderClick={navigateToFolder} 
+                isCreatingFolder={isCreatingFolder}
+                onCreateFolder={createFolder}
+                onCancelCreateFolder={cancelCreateFolder}
+            />
             )}
         </div>
     );

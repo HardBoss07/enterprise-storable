@@ -16,6 +16,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
   const [error, setError] = useState<string | null>(null);
   const [currentFolderId, setCurrentFolderId] = useState<number | null>(initialFolderId);
   const [homeFolderId, setHomeFolderId] = useState<number | null>(null);
+  const [isCreatingFolder, setIsCreatingFolder] = useState<boolean>(false);
 
   /**
    * Fetches the home folder ID.
@@ -53,6 +54,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       setError('Failed to fetch file data.');
     } finally {
       setLoading(false);
+      setIsCreatingFolder(false); // Reset when navigating/refreshing
     }
   }, [currentFolderId]);
 
@@ -69,12 +71,27 @@ export function useFileBrowser(initialFolderId: number | null = null) {
   };
 
   /**
+   * Triggers the inline folder creation mode.
+   */
+  const triggerCreateFolder = () => {
+    setIsCreatingFolder(true);
+  };
+
+  /**
+   * Cancels the inline folder creation.
+   */
+  const cancelCreateFolder = () => {
+    setIsCreatingFolder(false);
+  };
+
+  /**
    * Creates a new folder in the current directory.
    * @param name The name of the new folder.
    */
   const handleCreateFolder = async (name: string) => {
     try {
       await createFolder(name, currentFolderId);
+      setIsCreatingFolder(false);
       await fetchData();
     } catch (err) {
       console.error('Failed to create folder:', err);
@@ -104,7 +121,10 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     loading,
     error,
     currentFolderId,
+    isCreatingFolder,
     navigateToFolder,
+    triggerCreateFolder,
+    cancelCreateFolder,
     refresh: fetchData,
     createFolder: handleCreateFolder,
     uploadFile: handleUploadFile,

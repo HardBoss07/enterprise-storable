@@ -5,9 +5,15 @@ import FileListItem from './FileListItem';
 import { useMemo } from 'react';
 import { cn } from '@/lib/utils';
 
+import { FileIcon } from '@/components/icons/FileIcon';
+import { useState, useEffect, useRef } from 'react';
+
 interface FileListProps {
   files: FileNode[];
   onFolderClick: (folderId: number) => void;
+  isCreatingFolder?: boolean;
+  onCreateFolder?: (name: string) => void;
+  onCancelCreateFolder?: () => void;
 }
 
 /**
@@ -15,7 +21,31 @@ interface FileListProps {
  * @param files The list of file nodes to display.
  * @param onFolderClick Callback when a folder is clicked.
  */
-export default function FileList({ files, onFolderClick }: FileListProps) {
+export default function FileList({ 
+  files, 
+  onFolderClick, 
+  isCreatingFolder, 
+  onCreateFolder, 
+  onCancelCreateFolder 
+}: FileListProps) {
+  const [newFolderName, setNewFolderName] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isCreatingFolder) {
+      setNewFolderName('');
+      inputRef.current?.focus();
+    }
+  }, [isCreatingFolder]);
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && newFolderName.trim()) {
+      onCreateFolder?.(newFolderName.trim());
+    } else if (e.key === 'Escape') {
+      onCancelCreateFolder?.();
+    }
+  };
+
   /**
    * Sorts files: Folders first, then alphabetically.
    */
@@ -43,7 +73,29 @@ export default function FileList({ files, onFolderClick }: FileListProps) {
         <div className="w-24 text-right">File Size</div>
       </div>
       
-      {sortedFiles.length === 0 ? (
+      {isCreatingFolder && (
+        <div className="flex items-center space-x-4 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+          <div className="flex items-center justify-center w-10 h-10">
+            <FileIcon isFolder={true} size={22} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <input
+              ref={inputRef}
+              type="text"
+              value={newFolderName}
+              onChange={(e) => setNewFolderName(e.target.value)}
+              onKeyDown={handleKeyDown}
+              onBlur={() => !newFolderName.trim() && onCancelCreateFolder?.()}
+              placeholder="Folder name..."
+              className="bg-neutral-800 text-neutral-100 px-2 py-1 rounded border border-neutral-700 focus:outline-none focus:border-blue-500 w-full max-w-sm"
+            />
+          </div>
+          <div className="hidden sm:block w-40" />
+          <div className="w-24 text-right text-neutral-500">--</div>
+        </div>
+      )}
+
+      {sortedFiles.length === 0 && !isCreatingFolder ? (
         <div className="flex flex-col items-center justify-center h-48 text-neutral-500">
            <p>This folder is empty</p>
         </div>
