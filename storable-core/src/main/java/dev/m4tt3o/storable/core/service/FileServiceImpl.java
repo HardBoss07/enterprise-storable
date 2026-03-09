@@ -1,7 +1,7 @@
 package dev.m4tt3o.storable.core.service;
 
-import dev.m4tt3o.storable.core.dto.FileMetadataDto;
-import dev.m4tt3o.storable.core.repository.FileNodePersistence;
+import dev.m4tt3o.storable.common.dto.FileMetadataDto;
+import dev.m4tt3o.storable.common.repository.FileNodePersistence;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -25,17 +25,17 @@ public class FileServiceImpl implements FileService {
     private final StorageService storageService;
 
     @Override
-    /** Retrieves children of a given node. */
-    public List<FileMetadataDto> getChildren(Long nodeId) {
-        log.info("Retrieving children for node ID: {}", nodeId);
-        return persistence.findChildren(nodeId);
+    /** Retrieves children of a given node for a specific owner. */
+    public List<FileMetadataDto> getChildren(Long nodeId, String ownerId) {
+        log.info("Retrieving children for node ID: {} and owner: {}", nodeId, ownerId);
+        return persistence.findChildren(nodeId, ownerId);
     }
 
     @Override
-    /** Retrieves metadata for a specific node. */
-    public FileMetadataDto getMetadata(Long nodeId) {
-        log.info("Retrieving metadata for node ID: {}", nodeId);
-        return persistence.findById(nodeId).orElse(null);
+    /** Retrieves metadata for a specific node and owner. */
+    public FileMetadataDto getMetadata(Long nodeId, String ownerId) {
+        log.info("Retrieving metadata for node ID: {} and owner: {}", nodeId, ownerId);
+        return persistence.findByIdAndOwner(nodeId, ownerId).orElse(null);
     }
 
     @Override
@@ -51,6 +51,13 @@ public class FileServiceImpl implements FileService {
     public FileMetadataDto createFolder(String name, Long parentId, String ownerId) {
         log.info("Creating folder: {} in parent ID: {}", name, parentId);
         String storageKey = UUID.randomUUID().toString();
+        // Validation: Ensure parent belongs to owner if parentId provided
+        if (parentId != null && parentId != 0) {
+             Optional<FileMetadataDto> parent = persistence.findByIdAndOwner(parentId, ownerId);
+             if (parent.isEmpty()) {
+                 throw new RuntimeException("Parent folder not found or access denied.");
+             }
+        }
         return persistence.saveFolder(name, parentId, ownerId, storageKey);
     }
 
@@ -58,7 +65,7 @@ public class FileServiceImpl implements FileService {
     @Transactional
     /** Creates folders recursively for a given path. */
     public FileMetadataDto createFolderRecursive(String path, String ownerId) {
-        log.info("Creating recursive folders for path: {}", path);
+        log.info("Creating recursive folders for path: {} and owner: {}", path, ownerId);
         if (path == null || path.isBlank()) {
             return null;
         }
@@ -89,6 +96,15 @@ public class FileServiceImpl implements FileService {
     /** Uploads a file and stores its metadata. */
     public FileMetadataDto uploadFile(InputStream inputStream, String name, String mime, Long size, Long parentId, String ownerId) {
         log.info("Uploading file: {} for owner: {}", name, ownerId);
+        
+        // Validation: Ensure parent belongs to owner
+        if (parentId != null && parentId != 0) {
+             Optional<FileMetadataDto> parent = persistence.findByIdAndOwner(parentId, ownerId);
+             if (parent.isEmpty()) {
+                 throw new RuntimeException("Parent folder not found or access denied.");
+             }
+        }
+
         String storageKey = UUID.randomUUID().toString();
         
         // Physical storage
@@ -99,11 +115,11 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    /** Retrieves an input stream for downloading a file. */
-    public InputStream downloadFile(Long nodeId) {
-        log.info("Downloading file with node ID: {}", nodeId);
-        FileMetadataDto metadata = persistence.findById(nodeId)
-                .orElseThrow(() -> new RuntimeException("File not found: " + nodeId));
+    /** Retrieves an input stream for downloading a file for a specific owner. */
+    public InputStream downloadFile(Long nodeId, String ownerId) {
+        log.info("Downloading file with node ID: {} for owner: {}", nodeId, ownerId);
+        FileMetadataDto metadata = persistence.findByIdAndOwner(nodeId, ownerId)
+                .orElseThrow(() -> new RuntimeException("File not found or access denied: " + nodeId));
         
         if (!metadata.folder()) {
              return storageService.load(metadata.storageKey());

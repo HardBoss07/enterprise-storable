@@ -1,0 +1,64 @@
+package dev.m4tt3o.storable.core.service;
+
+import dev.m4tt3o.storable.core.dto.AuthRequest;
+import dev.m4tt3o.storable.core.dto.AuthResponse;
+import dev.m4tt3o.storable.core.dto.RegisterRequest;
+import dev.m4tt3o.storable.core.security.JwtService;
+import dev.m4tt3o.storable.common.entity.User;
+import dev.m4tt3o.storable.common.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Map;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class AuthService {
+
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
+    private final JwtService jwtService;
+
+    @Transactional
+    public AuthResponse register(RegisterRequest request) {
+        log.info("Registering user: {}", request.username());
+        
+        if (userRepository.existsByUsername(request.username())) {
+            throw new RuntimeException("Username already exists");
+        }
+        if (userRepository.existsByEmail(request.email())) {
+            throw new RuntimeException("Email already exists");
+        }
+
+        User user = new User();
+        user.setUsername(request.username());
+        user.setEmail(request.email());
+        user.setPassword(passwordEncoder.encode(request.password()));
+        user.setRole("USER"); // Default role
+
+        User savedUser = userRepository.save(user);
+        
+        String token = jwtService.generateToken(savedUser.getUsername(), Map.of("role", savedUser.getRole(), "id", savedUser.getId()));
+        
+        return new AuthResponse(token, savedUser.getUsername(), savedUser.getRole());
+    }
+
+    public AuthResponse login(AuthRequest request) {
+        log.info("Logging in user: {}", request.username());
+        
+        User user = userRepository.findByUsername(request.username())
+                .orElseThrow(() -> new RuntimeException("Invalid username or password"));
+
+        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        String token = jwtService.generateToken(user.getUsername(), Map.of("role", user.getRole(), "id", user.getId()));
+        
+        return new AuthResponse(token, user.getUsername(), user.getRole());
+    }
+}
