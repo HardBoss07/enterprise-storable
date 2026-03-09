@@ -1,9 +1,9 @@
 package dev.m4tt3o.storable.data.service;
 
-import dev.m4tt3o.storable.core.dto.FileMetadataDto;
-import dev.m4tt3o.storable.core.repository.FileNodePersistence;
-import dev.m4tt3o.storable.data.entity.FileNode;
-import dev.m4tt3o.storable.data.repository.FileNodeRepository;
+import dev.m4tt3o.storable.common.dto.FileMetadataDto;
+import dev.m4tt3o.storable.common.repository.FileNodePersistence;
+import dev.m4tt3o.storable.common.entity.FileNode;
+import dev.m4tt3o.storable.common.repository.FileNodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
@@ -23,12 +23,12 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     private final FileNodeRepository repository;
 
     @Override
-    /** Retrieves children of a given parent node. */
-    public List<FileMetadataDto> findChildren(Long parentId) {
-        log.debug("Finding children for parent ID: {}", parentId);
+    /** Retrieves children of a given parent node for a specific owner. */
+    public List<FileMetadataDto> findChildren(Long parentId, String ownerId) {
+        log.debug("Finding children for parent ID: {} and owner: {}", parentId, ownerId);
         List<FileNode> nodes = (parentId == null || parentId == 0) 
-            ? repository.findByParentIdIsNull() 
-            : repository.findByParentId(parentId);
+            ? repository.findByOwnerIdAndParentIdIsNull(ownerId)
+            : repository.findByOwnerIdAndParentId(ownerId, parentId);
             
         return nodes.stream()
                 .map(this::toDto)
@@ -36,11 +36,16 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     }
 
     @Override
-    /** Finds a node by its ID. */
-    public Optional<FileMetadataDto> findById(Long id) {
-        log.debug("Finding node by ID: {}", id);
-        return repository.findById(id).map(this::toDto);
+    /** Finds a node by its ID and owner. */
+    public Optional<FileMetadataDto> findByIdAndOwner(Long id, String ownerId) {
+        log.debug("Finding node by ID: {} and owner: {}", id, ownerId);
+        return repository.findByIdAndOwnerId(id, ownerId).map(this::toDto);
     }
+    
+    // Note: Older methods kept for compatibility if needed, but updated interface requires implementation.
+    // The interface updated findChildren(Long) to findChildren(Long, String).
+    // So the old method signature is gone from interface, I must implement new one.
+    // I already did above.
 
     @Override
     /** Calculates the total size of files for an owner. */
@@ -88,6 +93,10 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
             ? repository.findByOwnerIdAndParentIdIsNullAndNameAndKind(ownerId, name, FileNode.NodeKind.folder).map(this::toDto)
             : repository.findByOwnerIdAndParentIdAndNameAndKind(ownerId, parentId, name, FileNode.NodeKind.folder).map(this::toDto);
     }
+    
+    // Needed to fulfill interface if I missed any?
+    // Interface: findChildren, findByIdAndOwner, sumSizeByOwnerId, saveFolder, saveFile, findFolder.
+    // I have all of them.
 
     /**
      * Maps a FileNode entity to a FileMetadataDto record.
