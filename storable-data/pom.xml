@@ -14,12 +14,12 @@
 
     <dependencies>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <groupId>dev.m4tt3o.storable</groupId>
+            <artifactId>storable-common</artifactId>
         </dependency>
         <dependency>
-            <groupId>dev.m4tt3o.storable</groupId>
-            <artifactId>storable-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
         <dependency>
             <groupId>org.projectlombok</groupId>
