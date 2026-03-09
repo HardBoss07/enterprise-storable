@@ -2,23 +2,25 @@
 FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 
-# Copy pom files and download dependencies to leverage Docker cache
+# 1. Copy pom files and download dependencies to leverage Docker cache
 COPY pom.xml .
-COPY storable-api/pom.xml ./storable-api/
-COPY storable-core/pom.xml ./storable-core/
+COPY storable-common/pom.xml ./storable-common/
 COPY storable-data/pom.xml ./storable-data/
+COPY storable-core/pom.xml ./storable-core/
+COPY storable-api/pom.xml ./storable-api/
 
-# Download dependencies
-RUN mvn dependency:go-offline
+# 2. Download dependencies
+RUN mvn dependency:go-offline -B
 
-# Copy the rest of the source code
-COPY storable-api/src ./storable-api/src
-COPY storable-core/src ./storable-core/src
+# 3. Copy the rest of the source code
+COPY storable-common/src ./storable-common/src
 COPY storable-data/src ./storable-data/src
+COPY storable-core/src ./storable-core/src
+COPY storable-api/src ./storable-api/src
 
-
-# Build the application
-RUN mvn clean install
+# 4. Build the application
+# Use -DskipTests to speed up the Docker build if you run tests elsewhere
+RUN mvn clean install -DskipTests
 
 # Stage 2: Create the runtime image
 FROM eclipse-temurin:21-jre
