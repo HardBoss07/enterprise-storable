@@ -25,4 +25,7 @@ public interface FileNodePersistence {
     
     /** Finds a folder by owner, parent, and name. */
     Optional<FileMetadataDto> findFolder(String ownerId, Long parentId, String name);
+
+    /** Finds a node by its name, parent, and owner. */
+    Optional<FileMetadataDto> findByNameParentAndOwner(String name, Long parentId, String ownerId);
 }

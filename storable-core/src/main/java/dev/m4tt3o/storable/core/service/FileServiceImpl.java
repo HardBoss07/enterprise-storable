@@ -139,4 +139,58 @@ public class FileServiceImpl implements FileService {
              throw new RuntimeException("Cannot download a folder: " + nodeId);
         }
     }
+
+    @Override
+    /** Retrieves the home folder for a specific user. */
+    public FileMetadataDto getHomeNode(String ownerId, String username) {
+        log.info("Retrieving home node for owner: {} and username: {}", ownerId, username);
+        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)) {
+            return persistence.findByIdAndOwner(1L, ownerId).orElseThrow();
+        }
+        return persistence.findByNameParentAndOwner(username, 1L, ownerId)
+                .orElseThrow(() -> new RuntimeException("Home folder not found for user: " + username));
+    }
+
+    @Override
+    /** Retrieves the path (breadcrumbs) for a specific node, virtualized for the user. */
+    public List<FileMetadataDto> getPath(Long nodeId, String ownerId, String username) {
+        log.info("Retrieving path for node: {} and user: {}", nodeId, username);
+        List<FileMetadataDto> pathArr = new java.util.ArrayList<>();
+        Long tempId = (nodeId == null || nodeId == 0) ? 1L : nodeId;
+
+        while (tempId != null) {
+            final Long currentId = tempId;
+            FileMetadataDto node = persistence.findByIdAndOwner(currentId, ownerId)
+                    .orElseGet(() -> {
+                         if (currentId == 1L) {
+                             return persistence.findByIdAndOwner(1L, "f43c0bcf-11e4-4629-b072-321ccd04e72a").orElse(null);
+                         }
+                         return null;
+                    });
+            
+            if (node == null) break;
+            pathArr.add(0, node);
+            tempId = node.parentId();
+        }
+
+        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)) {
+            return pathArr;
+        }
+
+        // Truncate path for regular users: everything after the home folder (ID where name=username, parent=1)
+        int homeIndex = -1;
+        for (int i = 0; i < pathArr.size(); i++) {
+            FileMetadataDto node = pathArr.get(i);
+            if (username.equals(node.name()) && node.parentId() != null && node.parentId() == 1L) {
+                homeIndex = i;
+                break;
+            }
+        }
+
+        if (homeIndex != -1) {
+            return pathArr.subList(homeIndex + 1, pathArr.size());
+        }
+
+        return pathArr;
+    }
 }

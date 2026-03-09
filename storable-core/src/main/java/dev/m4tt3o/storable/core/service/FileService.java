@@ -28,4 +28,10 @@ public interface FileService {
     
     /** Retrieves an input stream for downloading a file for a specific owner. */
     InputStream downloadFile(Long nodeId, String ownerId);
+
+    /** Retrieves the home folder for a specific user. */
+    FileMetadataDto getHomeNode(String ownerId, String username);
+
+    /** Retrieves the path (breadcrumbs) for a specific node, virtualized for the user. */
+    List<FileMetadataDto> getPath(Long nodeId, String ownerId, String username);
 }

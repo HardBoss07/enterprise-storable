@@ -93,6 +93,13 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
             ? repository.findByOwnerIdAndParentIdIsNullAndNameAndKind(ownerId, name, FileNode.NodeKind.folder).map(this::toDto)
             : repository.findByOwnerIdAndParentIdAndNameAndKind(ownerId, parentId, name, FileNode.NodeKind.folder).map(this::toDto);
     }
+
+    @Override
+    /** Finds a node by its name, parent, and owner. */
+    public Optional<FileMetadataDto> findByNameParentAndOwner(String name, Long parentId, String ownerId) {
+        log.debug("Finding node: {} by parent: {} and owner: {}", name, parentId, ownerId);
+        return repository.findByNameAndParentIdAndOwnerId(name, parentId, ownerId).map(this::toDto);
+    }
     
     // Needed to fulfill interface if I missed any?
     // Interface: findChildren, findByIdAndOwner, sumSizeByOwnerId, saveFolder, saveFile, findFolder.

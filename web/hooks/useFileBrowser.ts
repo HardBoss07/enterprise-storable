@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileNode } from '@/types/FileNode';
-import { getFiles, getFileMetadata, createFolder, uploadFile } from '@/lib/api';
+import { getFiles, getFileMetadata, createFolder, uploadFile, getPath, getHomeFolder } from '@/lib/api';
 
 /**
  * Hook for managing the file browser state and operations.
@@ -15,26 +15,38 @@ export function useFileBrowser(initialFolderId: number | null = null) {
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [currentFolderId, setCurrentFolderId] = useState<number | null>(initialFolderId);
+  const [homeFolderId, setHomeFolderId] = useState<number | null>(null);
+
+  /**
+   * Fetches the home folder ID.
+   */
+  useEffect(() => {
+    const fetchHome = async () => {
+      try {
+        const home = await getHomeFolder();
+        setHomeFolderId(home.id);
+        if (!currentFolderId) {
+          setCurrentFolderId(home.id);
+        }
+      } catch (err) {
+        console.error('Failed to fetch home folder:', err);
+      }
+    };
+    fetchHome();
+  }, []);
 
   /**
    * Fetches files and path metadata for the current folder.
    */
   const fetchData = useCallback(async () => {
+    if (currentFolderId === null) return;
     setLoading(true);
     setError(null);
     try {
       const children = await getFiles(currentFolderId);
       setFiles(children);
 
-      const pathArr: FileNode[] = [];
-      let tempId: number | null = currentFolderId;
-
-      while (tempId && tempId !== 0) {
-        const node = await getFileMetadata(tempId);
-        pathArr.unshift(node);
-        tempId = node.parentId;
-      }
-
+      const pathArr = await getPath(currentFolderId);
       setPath(pathArr);
     } catch (err) {
       console.error('Error fetching file data:', err);
@@ -53,7 +65,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
    * @param folderId The ID of the folder to navigate to.
    */
   const navigateToFolder = (folderId: number | null) => {
-    setCurrentFolderId(folderId);
+    setCurrentFolderId(folderId || homeFolderId);
   };
 
   /**

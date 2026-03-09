@@ -54,6 +54,20 @@ public class FileController {
         return fileService.getChildren(id, user.id());
     }
 
+    @GetMapping("/home")
+    /** Retrieves the home folder for the current user. */
+    public FileMetadataDto getHome(@AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to get home folder for user: {}", user.getUsername());
+        return fileService.getHomeNode(user.id(), user.getUsername());
+    }
+
+    @GetMapping("/{nodeId}/path")
+    /** Retrieves the virtualized path for a given node. */
+    public List<FileMetadataDto> getPath(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to get path for node: {} by user: {}", nodeId, user.getUsername());
+        return fileService.getPath(nodeId, user.id(), user.getUsername());
+    }
+
     @PostMapping("/folders")
     /** Creates a new folder. */
     public FileMetadataDto createFolder(@RequestBody CreateFolderRequest request, @AuthenticationPrincipal CustomUserDetails user) {

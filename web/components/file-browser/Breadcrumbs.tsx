@@ -50,15 +50,6 @@ export default function Breadcrumbs({ path, onBreadcrumbClick }: BreadcrumbsProp
           </div>
         );
       })}
-      
-      {path.length === 0 && (
-          <div className="flex items-center">
-               <ChevronRight size={16} className="mx-1 text-neutral-600 shrink-0" />
-               <span className="text-white font-semibold text-sm px-2 py-1 bg-neutral-800/50 rounded-md border border-neutral-700/30">
-                  Home
-              </span>
-          </div>
-      )}
     </nav>
   );
 }

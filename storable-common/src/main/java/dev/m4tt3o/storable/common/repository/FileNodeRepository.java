@@ -17,6 +17,8 @@ public interface FileNodeRepository extends JpaRepository<FileNode, Long> {
     @Query("SELECT f FROM FileNode f WHERE f.id = :id AND (f.ownerId = :ownerId OR :ownerId = 'f43c0bcf-11e4-4629-b072-321ccd04e72a')")
     Optional<FileNode> findByIdAndAuthorizedOwner(Long id, String ownerId);
     
+    Optional<FileNode> findByNameAndParentIdAndOwnerId(String name, Long parentId, String ownerId);
+    
     @Query("SELECT COALESCE(SUM(f.size), 0) FROM FileNode f WHERE f.ownerId = :ownerId AND f.kind = :kind")
     long sumSizeByOwnerId(String ownerId, FileNode.NodeKind kind);
 

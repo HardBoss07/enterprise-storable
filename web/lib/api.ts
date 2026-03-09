@@ -73,6 +73,23 @@ export async function getFileMetadata(nodeId: number): Promise<FileNode> {
 }
 
 /**
+ * Fetches the home folder for the current user.
+ * @returns The home folder node.
+ */
+export async function getHomeFolder(): Promise<FileNode> {
+  return apiRequest<FileNode>('/api/files/home');
+}
+
+/**
+ * Fetches the virtualized path for a given node.
+ * @param nodeId The ID of the node.
+ * @returns The list of nodes in the virtualized path.
+ */
+export async function getPath(nodeId: number): Promise<FileNode[]> {
+  return apiRequest<FileNode[]>(`/api/files/${nodeId}/path`);
+}
+
+/**
  * Creates a new folder.
  * @param name The name of the new folder.
  * @param parentId The ID of the parent folder, or null for root.
