@@ -2,8 +2,8 @@ package dev.m4tt3o.storable.api.controller;
 
 import dev.m4tt3o.storable.api.request.CreateFolderRequest;
 import dev.m4tt3o.storable.api.request.RecursiveFolderRequest;
-import dev.m4tt3o.storable.core.config.StorableAuthConfig;
-import dev.m4tt3o.storable.core.dto.FileMetadataDto;
+import dev.m4tt3o.storable.common.dto.FileMetadataDto;
+import dev.m4tt3o.storable.core.security.CustomUserDetails;
 import dev.m4tt3o.storable.core.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,6 +12,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -30,7 +31,6 @@ import java.util.Map;
 public class FileController {
 
     private final FileService fileService;
-    private final StorableAuthConfig authConfig;
 
     @GetMapping("/health")
     /** Simple health check endpoint. */
@@ -40,61 +40,62 @@ public class FileController {
 
     @GetMapping("/{nodeId}")
     /** Retrieves metadata for a specific node. */
-    public FileMetadataDto getMetadata(@PathVariable Long nodeId) {
-        log.info("Request to get metadata for node: {}", nodeId);
+    public FileMetadataDto getMetadata(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to get metadata for node: {} by user: {}", nodeId, user.getUsername());
         if (nodeId == null || nodeId == 0) return null;
-        return fileService.getMetadata(nodeId);
+        return fileService.getMetadata(nodeId, user.id());
     }
 
     @GetMapping("/{nodeId}/children")
     /** Retrieves children for a given parent node ID. */
-    public List<FileMetadataDto> getChildren(@PathVariable Long nodeId) {
-        log.info("Request to get children for node: {}", nodeId);
+    public List<FileMetadataDto> getChildren(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to get children for node: {} by user: {}", nodeId, user.getUsername());
         Long id = (nodeId == null || nodeId == 0) ? null : nodeId;
-        return fileService.getChildren(id);
+        return fileService.getChildren(id, user.id());
     }
 
     @PostMapping("/folders")
     /** Creates a new folder. */
-    public FileMetadataDto createFolder(@RequestBody CreateFolderRequest request) {
-        log.info("Request to create folder: {}", request.name());
-        return fileService.createFolder(request.name(), request.parentId(), authConfig.getGuestUserId());
+    public FileMetadataDto createFolder(@RequestBody CreateFolderRequest request, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to create folder: {} by user: {}", request.name(), user.getUsername());
+        return fileService.createFolder(request.name(), request.parentId(), user.id());
     }
 
     @PostMapping("/folders/recursive")
     /** Creates folders recursively based on a path. */
-    public FileMetadataDto createFolderRecursive(@RequestBody RecursiveFolderRequest request) {
-        log.info("Request to recursively create folders for path: {}", request.path());
-        return fileService.createFolderRecursive(request.path(), authConfig.getGuestUserId());
+    public FileMetadataDto createFolderRecursive(@RequestBody RecursiveFolderRequest request, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to recursively create folders for path: {} by user: {}", request.path(), user.getUsername());
+        return fileService.createFolderRecursive(request.path(), user.id());
     }
 
     @PostMapping("/upload")
     /** Uploads a file. */
     public FileMetadataDto uploadFile(
             @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "parentId", required = false) Long parentId) throws IOException {
+            @RequestParam(value = "parentId", required = false) Long parentId,
+            @AuthenticationPrincipal CustomUserDetails user) throws IOException {
         
-        log.info("Request to upload file: {}", file.getOriginalFilename());
+        log.info("Request to upload file: {} by user: {}", file.getOriginalFilename(), user.getUsername());
         return fileService.uploadFile(
                 file.getInputStream(),
                 file.getOriginalFilename(),
                 file.getContentType(),
                 file.getSize(),
                 parentId,
-                authConfig.getGuestUserId()
+                user.id()
         );
     }
 
     @GetMapping("/{nodeId}/download")
     /** Downloads a file. */
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long nodeId) {
-        log.info("Request to download node: {}", nodeId);
-        FileMetadataDto metadata = fileService.getMetadata(nodeId);
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to download node: {} by user: {}", nodeId, user.getUsername());
+        FileMetadataDto metadata = fileService.getMetadata(nodeId, user.id());
         if (metadata == null) {
             return ResponseEntity.notFound().build();
         }
 
-        InputStream inputStream = fileService.downloadFile(nodeId);
+        InputStream inputStream = fileService.downloadFile(nodeId, user.id());
         Resource resource = new InputStreamResource(inputStream);
 
         return ResponseEntity.ok()
