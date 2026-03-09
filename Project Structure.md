@@ -148,6 +148,7 @@ enterprise-storable/
 ├── GEMINI.md
 ├── LICENSE
 ├── Project Structure.md
+├── Refactoring Prompts.md
 ├── docker-compose.yml
 ├── pom.xml
 ├── run.ps1
