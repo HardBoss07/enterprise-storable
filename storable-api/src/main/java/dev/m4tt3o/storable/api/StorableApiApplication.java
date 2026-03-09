@@ -7,8 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @SpringBootApplication
-@EntityScan("dev.m4tt3o.storable.data.entity")
-@EnableJpaRepositories("dev.m4tt3o.storable.data.repository")
+@EntityScan("dev.m4tt3o.storable.common.entity")
+@EnableJpaRepositories("dev.m4tt3o.storable.common.repository")
 @ComponentScan("dev.m4tt3o.storable") // Broaden component scan
 public class StorableApiApplication {
 
