@@ -78,7 +78,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 4: Authentication & Security (In Progress) | **Last Updated:** 2026-03-08
+> **Status:** Phase 4: Authentication & Security (In Progress) | **Last Updated:** 2026-03-09
 
 ### [ ] Phase 1: Infrastructure & Skeleton
 
@@ -144,5 +144,5 @@ Whenever you ask me to "Implement X," my first task (if successful) is to run a 
 ---
 
 ## Current Issues:
-- [ ] Guest User still gets created and that means i have double entries per ID
-- [ ] Downloading doesn't work, gives me a 403 Error but i think this will be fixed with the removal of the double entries
+- [x] Guest User still gets created but no file entires for guest user are created
+- [x] Downloading doesn't work, gives me a 403 Error 

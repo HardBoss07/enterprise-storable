@@ -26,9 +26,9 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     /** Retrieves children of a given parent node for a specific owner. */
     public List<FileMetadataDto> findChildren(Long parentId, String ownerId) {
         log.debug("Finding children for parent ID: {} and owner: {}", parentId, ownerId);
-        List<FileNode> nodes = (parentId == null || parentId == 0) 
-            ? repository.findByOwnerIdAndParentIdIsNull(ownerId)
-            : repository.findByOwnerIdAndParentId(ownerId, parentId);
+        // If parentId is null or 0, we treat it as root (ID 1)
+        Long targetParentId = (parentId == null || parentId == 0) ? 1L : parentId;
+        List<FileNode> nodes = repository.findByParentIdAndAuthorizedOwner(targetParentId, ownerId);
             
         return nodes.stream()
                 .map(this::toDto)
@@ -39,7 +39,7 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     /** Finds a node by its ID and owner. */
     public Optional<FileMetadataDto> findByIdAndOwner(Long id, String ownerId) {
         log.debug("Finding node by ID: {} and owner: {}", id, ownerId);
-        return repository.findByIdAndOwnerId(id, ownerId).map(this::toDto);
+        return repository.findByIdAndAuthorizedOwner(id, ownerId).map(this::toDto);
     }
     
     // Note: Older methods kept for compatibility if needed, but updated interface requires implementation.

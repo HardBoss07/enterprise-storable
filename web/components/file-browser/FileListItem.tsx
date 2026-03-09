@@ -4,7 +4,7 @@ import { FileNode } from '@/types/FileNode';
 import { FileIcon } from '@/components/icons/FileIcon';
 import { format } from 'date-fns';
 import { Download } from 'lucide-react';
-import { downloadFileUrl } from '@/lib/api';
+import { downloadFileBlob } from '@/lib/api';
 import { formatBytes, cn } from '@/lib/utils';
 import { IconButton } from '@/components/ui/IconButton';
 
@@ -30,9 +30,22 @@ export default function FileListItem({ node, onFolderClick }: FileListItemProps)
     }
   };
 
-  const handleDownload = (e: React.MouseEvent) => {
+  const handleDownload = async (e: React.MouseEvent) => {
       e.stopPropagation();
-      window.open(downloadFileUrl(node.id), '_blank');
+      try {
+          const blob = await downloadFileBlob(node.id);
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = node.name;
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+      } catch (error) {
+          console.error('Download failed:', error);
+          alert('Failed to download file. Please try again.');
+      }
   };
 
   return (
