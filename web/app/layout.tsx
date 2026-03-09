@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/layout/Header";
-import Footer from "@/components/layout/Footer";
-import Sidebar from "@/components/layout/Sidebar";
 import { cn } from "@/lib/utils";
+import { Providers } from "./Providers";
+import AppLayout from "@/components/layout/AppLayout";
 
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",
   subsets: ["latin"],
+  weight: ["400", "500", "700"],
 });
 
 export const metadata: Metadata = {
@@ -16,9 +16,6 @@ export const metadata: Metadata = {
   description: "Storable - A Place to store your documents",
 };
 
-/**
- * Root layout component for the application.
- */
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -26,20 +23,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" className="dark">
-      <body
-        className={cn(
-          robotoSans.variable,
-          "antialiased flex flex-col min-h-screen bg-bg-main text-white"
-        )}
-      >
-        <Header />
-        <div className="flex flex-1">
-          <Sidebar />
-          <main className="flex-1 p-6 overflow-auto">
+      <body className={cn(robotoSans.variable, "antialiased")}>
+        <Providers>
+          <AppLayout>
             {children}
-          </main>
-        </div>
-        <Footer />
+          </AppLayout>
+        </Providers>
       </body>
     </html>
   );

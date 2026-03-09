@@ -10,14 +10,48 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
  */
 async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  const response = await fetch(url, options);
+  
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  
+  const headers = {
+    ...options?.headers,
+    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+  } as HeadersInit;
+
+  const response = await fetch(url, { ...options, headers });
 
   if (!response.ok) {
+    if (response.status === 401 && typeof window !== 'undefined') {
+        // Redirect to login if unauthorized and client-side
+        window.location.href = '/login';
+    }
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.message || `API request failed with status ${response.status}`);
+    throw new Error(errorData.error || errorData.message || `API request failed with status ${response.status}`);
   }
 
   return response.json();
+}
+
+export interface AuthResponse {
+    token: string;
+    username: string;
+    role: string;
+}
+
+export async function login(username: string, password: string): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+    });
+}
+
+export async function register(username: string, email: string, password: string): Promise<AuthResponse> {
+    return apiRequest<AuthResponse>('/api/auth/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+    });
 }
 
 /**
@@ -79,5 +113,22 @@ export async function uploadFile(file: File, parentId: number | null): Promise<F
  * @returns The full download URL.
  */
 export function downloadFileUrl(nodeId: number): string {
-  return `${API_BASE_URL}/api/files/${nodeId}/download`;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  // If token required for download, passing via query param or using fetch+blob is needed.
+  // Standard href download with Bearer token is tricky.
+  // For now, let's assume query param or cookie? But API expects Header.
+  // Option: Use a short-lived token in query param, or fetch blob in client and create object URL.
+  // Let's implement fetch blob in component if needed, or update API to accept token in query param.
+  // Updating API to accept token in query param is easiest for "direct download link".
+  return `${API_BASE_URL}/api/files/${nodeId}/download`; 
+}
+
+// Helper to fetch blob with auth
+export async function downloadFileBlob(nodeId: number): Promise<Blob> {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const response = await fetch(`${API_BASE_URL}/api/files/${nodeId}/download`, {
+        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    if (!response.ok) throw new Error('Download failed');
+    return response.blob();
 }
