@@ -78,7 +78,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 2: Core File Management (In Progress) | **Last Updated:** 2026-03-04
+> **Status:** Phase 4: Authentication & Security (In Progress) | **Last Updated:** 2026-03-08
 
 ### [ ] Phase 1: Infrastructure & Skeleton
 
@@ -94,25 +94,38 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **API:** File upload (Multipart) and Download.
 - [x] **UI:** File Explorer grid/list view with navigation (breadcrumbs).
 
-### [ ] Phase 3: Base File Structure (Virtual Pathing)
+### [ ] Phase 3: Base File Structure (Virtual Pathing) - DEFERRED
 
 - [ ] **Logic:** Implement `UserHome` resolution logic (Maps `UUID` to `/home/{username}`).
 - [ ] **Security:** Implement "Jailbreak" prevention (Ensure users cannot navigate `..` or traverse above their assigned home directory).
 - [ ] **Admin Privileges:** Define `IsAdmin` flag for the Guest UUID to allow global directory traversal.
 - [ ] **API:** Update File Discovery endpoints to default to the User's home directory instead of the system root.
 
-### [ ] Phase 4: Authentication & Security
+### [x] Phase 4: Authentication & Security
 
-- [ ] **Logic:** Implement JWT and User Session management.
-- [ ] **Logic:** Secure all endpoints behind Spring Security.
-- [ ] **UI:** Login/Register pages and Route Guards.
-- [ ] **Password:** BCrypt for hashing
+- [x] **Logic:** Implement JWT and User Session management.
+- [x] **Logic:** Secure all endpoints behind Spring Security.
+- [x] **UI:** Login/Register pages and Route Guards.
+- [x] **Password:** BCrypt for hashing
 
 ### [ ] Phase 5: Access Control & Permissions
 
 - [ ] **Data:** Add `AccessPrivilege` table (VIEW, EDIT, OWNER).
 - [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
 - [ ] **UI:** "Share" modal mock-up.
+
+---
+
+## Technical Decisions & Architecture (Updated)
+
+### Circular Dependency Resolution
+- **Shared Module:** Created `storable-common` to hold DTOs, Entities, and shared Interfaces.
+- **Dependency Flow:** `storable-api` -> `storable-core` -> `storable-common` and `storable-api` -> `storable-data` -> `storable-common`. This breaks the cycle between `core` and `data`.
+
+### Database Schema Alignment
+- **Table Names:** Unified all SQL and Java Entities to use `users` and `nodes` table names.
+- **Column Mapping:** Ensured `User` entity matches `users` table (`id`, `username`, `email`, `password`, `role`).
+- **Initialization:** Fixed `test-data.sql` to use correct column names (`password`, `role`) instead of deprecated/incorrect ones.
 
 ---
 
@@ -127,3 +140,9 @@ This file is the **Source of Truth** for the project. Every session should begin
 ### How I will edit this file:
 
 Whenever you ask me to "Implement X," my first task (if successful) is to run a `write_file` command to update the `[ ]` to `[x]` in the roadmap above and add any new technical decisions to the **Tech Stack** section.
+
+---
+
+## Current Issues:
+- [ ] Guest User still gets created and that means i have double entries per ID
+- [ ] Downloading doesn't work, gives me a 403 Error but i think this will be fixed with the removal of the double entries

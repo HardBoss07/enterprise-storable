@@ -14,6 +14,7 @@ enterprise-storable/
 │   │   │   │           └── storable/
 │   │   │   │               └── api/
 │   │   │   │                   ├── controller/
+│   │   │   │                   │   ├── AuthController.java
 │   │   │   │                   │   └── FileController.java
 │   │   │   │                   ├── exception/
 │   │   │   │                   │   └── GlobalExceptionHandler.java
@@ -21,7 +22,8 @@ enterprise-storable/
 │   │   │   │                   │   ├── CreateFolderRequest.java
 │   │   │   │                   │   └── RecursiveFolderRequest.java
 │   │   │   │                   ├── security/
-│   │   │   │                   │   └── CorsConfig.java
+│   │   │   │                   │   ├── JwtAuthenticationFilter.java
+│   │   │   │                   │   └── SecurityConfig.java
 │   │   │   │                   └── StorableApiApplication.java
 │   │   │   └── resources/
 │   │   │       └── application.yml
@@ -33,6 +35,24 @@ enterprise-storable/
 │   │                       └── api/
 │   ├── target/
 │   └── pom.xml
+├── storable-common/
+│   ├── src/
+│   │   └── main/
+│   │       └── java/
+│   │           └── dev/
+│   │               └── m4tt3o/
+│   │                   └── storable/
+│   │                       └── common/
+│   │                           ├── dto/
+│   │                           │   └── FileMetadataDto.java
+│   │                           ├── entity/
+│   │                           │   ├── FileNode.java
+│   │                           │   └── User.java
+│   │                           └── repository/
+│   │                               ├── FileNodePersistence.java
+│   │                               ├── FileNodeRepository.java
+│   │                               └── UserRepository.java
+│   └── pom.xml
 ├── storable-core/
 │   ├── src/
 │   │   └── main/
@@ -42,13 +62,19 @@ enterprise-storable/
 │   │                   └── storable/
 │   │                       └── core/
 │   │                           ├── config/
-│   │                           │   ├── StorableAuthConfig.java
+│   │                           │   ├── CoreSecurityConfig.java
 │   │                           │   └── StorageProperties.java
 │   │                           ├── dto/
-│   │                           │   └── FileMetadataDto.java
+│   │                           │   ├── AuthRequest.java
+│   │                           │   ├── AuthResponse.java
+│   │                           │   └── RegisterRequest.java
 │   │                           ├── repository/
-│   │                           │   └── FileNodePersistence.java
+│   │                           ├── security/
+│   │                           │   ├── CustomUserDetails.java
+│   │                           │   └── JwtService.java
 │   │                           └── service/
+│   │                               ├── AuthService.java
+│   │                               ├── CustomUserDetailsService.java
 │   │                               ├── FileService.java
 │   │                               ├── FileServiceImpl.java
 │   │                               ├── LocalStorageService.java
@@ -64,9 +90,7 @@ enterprise-storable/
 │   │                   └── storable/
 │   │                       └── data/
 │   │                           ├── entity/
-│   │                           │   └── FileNode.java
 │   │                           ├── repository/
-│   │                           │   └── FileNodeRepository.java
 │   │                           └── service/
 │   │                               └── FileNodePersistenceImpl.java
 │   ├── target/
@@ -83,8 +107,11 @@ enterprise-storable/
 │   │   │   └── page.tsx
 │   │   ├── recent/
 │   │   │   └── page.tsx
+│   │   ├── register/
+│   │   │   └── page.tsx
 │   │   ├── trash/
 │   │   │   └── page.tsx
+│   │   ├── Providers.tsx
 │   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   ├── layout.tsx
@@ -98,6 +125,7 @@ enterprise-storable/
 │   │   ├── icons/
 │   │   │   └── FileIcon.tsx
 │   │   ├── layout/
+│   │   │   ├── AppLayout.tsx
 │   │   │   ├── Footer.tsx
 │   │   │   ├── Header.tsx
 │   │   │   └── Sidebar.tsx
@@ -105,6 +133,8 @@ enterprise-storable/
 │   │       ├── Button.tsx
 │   │       ├── IconButton.tsx
 │   │       └── Spinner.tsx
+│   ├── context/
+│   │   └── AuthContext.tsx
 │   ├── hooks/
 │   │   └── useFileBrowser.ts
 │   ├── lib/
