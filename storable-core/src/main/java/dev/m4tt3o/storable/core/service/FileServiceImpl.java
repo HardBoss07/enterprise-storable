@@ -1,16 +1,21 @@
 package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
+import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
 import dev.m4tt3o.storable.common.repository.FileNodePersistence;
+import dev.m4tt3o.storable.core.config.StorageProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.InputStream;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 /**
@@ -23,6 +28,7 @@ public class FileServiceImpl implements FileService {
 
     private final FileNodePersistence persistence;
     private final StorageService storageService;
+    private final ConfigService configService;
 
     @Override
     /** Retrieves children of a given node for a specific owner. */
@@ -192,5 +198,64 @@ public class FileServiceImpl implements FileService {
         }
 
         return pathArr;
+    }
+
+    @Override
+    @Transactional
+    public void softDelete(Long nodeId, String ownerId) {
+        log.info("Soft deleting node: {} for owner: {}", nodeId, ownerId);
+        persistence.softDelete(nodeId, ownerId);
+    }
+
+    @Override
+    @Transactional
+    public void restore(Long nodeId, String ownerId) {
+        log.info("Restoring node: {} for owner: {}", nodeId, ownerId);
+        persistence.restore(nodeId, ownerId);
+    }
+
+    @Override
+    public List<TrashMetadataDto> getTrash(String ownerId) {
+        log.info("Retrieving trash for owner: {}", ownerId);
+        return persistence.findTrash(ownerId).stream()
+                .map(this::toTrashDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<TrashMetadataDto> getAllTrash() {
+        log.info("Retrieving all trash for ADMIN");
+        return persistence.findAllTrash().stream()
+                .map(this::toTrashDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public void permanentlyDelete(Long nodeId, String ownerId) {
+        log.info("Permanently deleting node: {} for owner: {}", nodeId, ownerId);
+        persistence.permanentlyDelete(nodeId, ownerId);
+    }
+
+    @Override
+    @Transactional
+    public void emptyTrash(String ownerId) {
+        log.info("Emptying trash for owner: {}", ownerId);
+        persistence.emptyTrash(ownerId);
+    }
+
+    @Override
+    public int getTrashRetentionDays() {
+        return configService.getTrashRetentionDays();
+    }
+
+    private TrashMetadataDto toTrashDto(FileMetadataDto metadata) {
+        long daysRemaining = 0;
+        if (metadata.deletedAt() != null) {
+            LocalDateTime expiryDate = metadata.deletedAt().plusDays(configService.getTrashRetentionDays());
+            daysRemaining = ChronoUnit.DAYS.between(LocalDateTime.now(), expiryDate);
+            if (daysRemaining < 0) daysRemaining = 0;
+        }
+        return new TrashMetadataDto(metadata, daysRemaining);
     }
 }

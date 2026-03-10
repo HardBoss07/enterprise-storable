@@ -1,6 +1,7 @@
 package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
+import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
 import java.io.InputStream;
 import java.util.List;
 
@@ -34,4 +35,25 @@ public interface FileService {
 
     /** Retrieves the path (breadcrumbs) for a specific node, virtualized for the user. */
     List<FileMetadataDto> getPath(Long nodeId, String ownerId, String username);
+
+    /** Soft deletes a node. */
+    void softDelete(Long nodeId, String ownerId);
+
+    /** Restores a soft-deleted node. */
+    void restore(Long nodeId, String ownerId);
+
+    /** Retrieves all soft-deleted nodes for an owner. */
+    List<TrashMetadataDto> getTrash(String ownerId);
+
+    /** Retrieves all soft-deleted nodes (for ADMIN). */
+    List<TrashMetadataDto> getAllTrash();
+
+    /** Permanently deletes a node. */
+    void permanentlyDelete(Long nodeId, String ownerId);
+
+    /** Permanently deletes all nodes in trash for an owner. */
+    void emptyTrash(String ownerId);
+
+    /** Retrieves the global trash retention days. */
+    int getTrashRetentionDays();
 }
