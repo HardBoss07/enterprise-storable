@@ -38,8 +38,14 @@ public class FileNode {
     @Column(name = "modified_at")
     private LocalDateTime modifiedAt;
 
+    @Column(name = "is_deleted", nullable = false)
+    private boolean isDeleted = false;
+
     @Column(name = "deleted_at")
     private LocalDateTime deletedAt;
+
+    @Column(name = "original_path")
+    private String originalPath;
 
     @Column(name = "owner_id", nullable = false)
     private String ownerId;

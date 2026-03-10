@@ -13,7 +13,9 @@ public record FileMetadataDto(
     String storageKey,
     LocalDateTime createdAt,
     LocalDateTime modifiedAt,
+    boolean isDeleted,
     LocalDateTime deletedAt,
+    String originalPath,
     String ownerId,
     Long parentId,
     boolean folder

@@ -9,4 +9,5 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "storable.storage")
 public class StorageProperties {
     private String uploadDir = "storage";
+    private int trashRetentionDays = 30;
 }

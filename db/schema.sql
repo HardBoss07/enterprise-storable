@@ -2,6 +2,7 @@ USE storable;
 
 DROP TABLE IF EXISTS nodes;
 DROP TABLE IF EXISTS users;
+DROP TABLE IF EXISTS system_settings;
 
 CREATE TABLE users (
     id VARCHAR(36) PRIMARY KEY,
@@ -23,12 +24,21 @@ CREATE TABLE nodes (
     storage_key VARCHAR(1024) NULL,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     modified_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at DATETIME NULL,
+    original_path VARCHAR(1024) NULL,
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (parent_id) REFERENCES nodes(id) ON DELETE CASCADE,
     UNIQUE KEY node_unique_per_parent (parent_id, name),
     KEY node_parent_idx (parent_id)
 );
+
+CREATE TABLE system_settings (
+    setting_key VARCHAR(255) PRIMARY KEY,
+    setting_value VARCHAR(255) NOT NULL
+);
+
+INSERT INTO system_settings (setting_key, setting_value) VALUES ('trash_retention_days', '30');
 
 INSERT INTO users (id, username, email, password, role)
 VALUES ('f43c0bcf-11e4-4629-b072-321ccd04e72a', 'root', 'root@m4tt3o.dev', '$2a$10$dA.gkjzVGZRgDOpwy63lfOIUtCpflbX8hKav4z55PiSNdILBPsHhq', 'ADMIN')
