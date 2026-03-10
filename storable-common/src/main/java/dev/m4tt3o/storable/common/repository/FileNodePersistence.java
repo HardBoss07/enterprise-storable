@@ -28,4 +28,22 @@ public interface FileNodePersistence {
 
     /** Finds a node by its name, parent, and owner. */
     Optional<FileMetadataDto> findByNameParentAndOwner(String name, Long parentId, String ownerId);
+
+    /** Soft deletes a node and all its children. */
+    void softDelete(Long id, String ownerId);
+
+    /** Restores a soft-deleted node and all its children. */
+    void restore(Long id, String ownerId);
+
+    /** Retrieves all soft-deleted nodes for an owner. */
+    List<FileMetadataDto> findTrash(String ownerId);
+
+    /** Retrieves all soft-deleted nodes (for ADMIN). */
+    List<FileMetadataDto> findAllTrash();
+
+    /** Permanently deletes a node. */
+    void permanentlyDelete(Long id, String ownerId);
+
+    /** Permanently deletes all nodes in trash for an owner. */
+    void emptyTrash(String ownerId);
 }

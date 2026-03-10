@@ -11,17 +11,27 @@ import java.util.Optional;
 @Repository
 public interface FileNodeRepository extends JpaRepository<FileNode, Long> {
     
-    @Query("SELECT f FROM FileNode f WHERE f.parentId = :parentId AND (f.ownerId = :ownerId OR :ownerId = 'f43c0bcf-11e4-4629-b072-321ccd04e72a')")
+    @Query("SELECT f FROM FileNode f WHERE f.parentId = :parentId AND f.isDeleted = false AND (f.ownerId = :ownerId OR :ownerId = 'f43c0bcf-11e4-4629-b072-321ccd04e72a')")
     List<FileNode> findByParentIdAndAuthorizedOwner(Long parentId, String ownerId);
 
-    @Query("SELECT f FROM FileNode f WHERE f.id = :id AND (f.ownerId = :ownerId OR :ownerId = 'f43c0bcf-11e4-4629-b072-321ccd04e72a')")
+    @Query("SELECT f FROM FileNode f WHERE f.id = :id AND f.isDeleted = false AND (f.ownerId = :ownerId OR :ownerId = 'f43c0bcf-11e4-4629-b072-321ccd04e72a')")
     Optional<FileNode> findByIdAndAuthorizedOwner(Long id, String ownerId);
     
-    Optional<FileNode> findByNameAndParentIdAndOwnerId(String name, Long parentId, String ownerId);
+    @Query("SELECT f FROM FileNode f WHERE f.id = :id AND (f.ownerId = :ownerId OR :ownerId = 'f43c0bcf-11e4-4629-b072-321ccd04e72a')")
+    Optional<FileNode> findByIdAndAuthorizedOwnerIncludingDeleted(Long id, String ownerId);
+
+    Optional<FileNode> findByNameAndParentIdAndOwnerIdAndIsDeletedFalse(String name, Long parentId, String ownerId);
     
-    @Query("SELECT COALESCE(SUM(f.size), 0) FROM FileNode f WHERE f.ownerId = :ownerId AND f.kind = :kind")
+    @Query("SELECT COALESCE(SUM(f.size), 0) FROM FileNode f WHERE f.ownerId = :ownerId AND f.kind = :kind AND f.isDeleted = false")
     long sumSizeByOwnerId(String ownerId, FileNode.NodeKind kind);
 
-    Optional<FileNode> findByOwnerIdAndParentIdAndNameAndKind(String ownerId, Long parentId, String name, FileNode.NodeKind kind);
-    Optional<FileNode> findByOwnerIdAndParentIdIsNullAndNameAndKind(String ownerId, String name, FileNode.NodeKind kind);
+    Optional<FileNode> findByOwnerIdAndParentIdAndNameAndKindAndIsDeletedFalse(String ownerId, Long parentId, String name, FileNode.NodeKind kind);
+    Optional<FileNode> findByOwnerIdAndParentIdIsNullAndNameAndKindAndIsDeletedFalse(String ownerId, String name, FileNode.NodeKind kind);
+
+    List<FileNode> findByOwnerIdAndIsDeletedTrue(String ownerId);
+
+    @Query("SELECT f FROM FileNode f WHERE f.isDeleted = true")
+    List<FileNode> findAllDeleted();
+
+    List<FileNode> findByParentId(Long parentId);
 }
