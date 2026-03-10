@@ -3,6 +3,7 @@ package dev.m4tt3o.storable.api.controller;
 import dev.m4tt3o.storable.api.request.CreateFolderRequest;
 import dev.m4tt3o.storable.api.request.RecursiveFolderRequest;
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
+import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
 import dev.m4tt3o.storable.core.security.CustomUserDetails;
 import dev.m4tt3o.storable.core.service.FileService;
 import lombok.RequiredArgsConstructor;
@@ -10,8 +11,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -117,5 +120,61 @@ public class FileController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + metadata.name() + "\"")
                 .contentLength(metadata.size() != null ? metadata.size() : 0)
                 .body(resource);
+    }
+
+    @DeleteMapping("/{nodeId}")
+    /** Soft deletes a node. */
+    public ResponseEntity<Void> softDelete(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to soft delete node: {} by user: {}", nodeId, user.getUsername());
+        fileService.softDelete(nodeId, user.id());
+        return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping("/{nodeId}/restore")
+    /** Restores a soft-deleted node. */
+    public ResponseEntity<Void> restore(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to restore node: {} by user: {}", nodeId, user.getUsername());
+        fileService.restore(nodeId, user.id());
+        return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/trash")
+    /** Retrieves all soft-deleted nodes for the current user. */
+    public List<TrashMetadataDto> getTrash(@AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to get trash for user: {}", user.getUsername());
+        return fileService.getTrash(user.id());
+    }
+
+    @GetMapping("/admin/trash")
+    @PreAuthorize("hasRole('ADMIN')")
+    /** Retrieves all soft-deleted nodes for all users (Admin only). */
+    public List<TrashMetadataDto> getAllTrash(@AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Admin request to get all trash by: {}", user.getUsername());
+        return fileService.getAllTrash();
+    }
+
+    @DeleteMapping("/{nodeId}/permanent")
+    /** Permanently deletes a node. */
+    public ResponseEntity<Void> permanentlyDelete(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to permanently delete node: {} by user: {}", nodeId, user.getUsername());
+        fileService.permanentlyDelete(nodeId, user.id());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/trash/empty")
+    /** Permanently deletes all nodes in trash for the current user. */
+    public ResponseEntity<Void> emptyTrash(@AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to empty trash by user: {}", user.getUsername());
+        fileService.emptyTrash(user.id());
+        return ResponseEntity.noContent().build();
+    }
+
+    @GetMapping("/trash/retention")
+    /** Retrieves the global trash retention days. */
+    public ResponseEntity<Map<String, Integer>> getTrashRetention() {
+        // This uses the configService via a new method in FileService or injecting it here.
+        // Actually, let's just use the AdminController's logic but without Admin restriction.
+        // I will need to inject ConfigService into FileController as well.
+        return ResponseEntity.ok(Map.of("days", fileService.getTrashRetentionDays()));
     }
 }
