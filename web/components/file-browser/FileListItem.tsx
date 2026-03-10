@@ -62,11 +62,11 @@ export default function FileListItem({ node, onFolderClick, onDelete }: FileList
           className={cn("flex items-center space-x-4 p-2 interactive-surface group")}
           onClick={handleClick}
       >
-          <div className="flex items-center justify-center w-10 h-10">
+          <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
               <FileIcon mime={node.mime} isFolder={node.folder} size={22} />
           </div>
-          <div className="flex-1 min-w-0">
-              <p className="text-neutral-100 font-medium truncate">{node.name}</p>
+          <div className="flex-1 min-w-0 flex items-center h-10"> 
+              <p className="text-neutral-100 font-medium m-0 truncate leading-none">{node.name}</p>
           </div>
           
           <div className="flex items-center space-x-2">

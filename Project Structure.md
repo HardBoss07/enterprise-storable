@@ -7,26 +7,33 @@ enterprise-storable/
 │   └── test-data.sql
 ├── storable-api/
 │   ├── src/
-│   │   └── main/
-│   │       ├── java/
-│   │       │   └── dev/
-│   │       │       └── m4tt3o/
-│   │       │           └── storable/
-│   │       │               └── api/
-│   │       │                   ├── controller/
-│   │       │                   │   ├── AuthController.java
-│   │       │                   │   └── FileController.java
-│   │       │                   ├── exception/
-│   │       │                   │   └── GlobalExceptionHandler.java
-│   │       │                   ├── request/
-│   │       │                   │   ├── CreateFolderRequest.java
-│   │       │                   │   └── RecursiveFolderRequest.java
-│   │       │                   ├── security/
-│   │       │                   │   ├── JwtAuthenticationFilter.java
-│   │       │                   │   └── SecurityConfig.java
-│   │       │                   └── StorableApiApplication.java
-│   │       └── resources/
-│   │           └── application.yml
+│   │   ├── main/
+│   │   │   ├── java/
+│   │   │   │   └── dev/
+│   │   │   │       └── m4tt3o/
+│   │   │   │           └── storable/
+│   │   │   │               └── api/
+│   │   │   │                   ├── controller/
+│   │   │   │                   │   ├── AdminController.java
+│   │   │   │                   │   ├── AuthController.java
+│   │   │   │                   │   └── FileController.java
+│   │   │   │                   ├── exception/
+│   │   │   │                   │   └── GlobalExceptionHandler.java
+│   │   │   │                   ├── request/
+│   │   │   │                   │   ├── CreateFolderRequest.java
+│   │   │   │                   │   └── RecursiveFolderRequest.java
+│   │   │   │                   ├── security/
+│   │   │   │                   │   ├── JwtAuthenticationFilter.java
+│   │   │   │                   │   └── SecurityConfig.java
+│   │   │   │                   └── StorableApiApplication.java
+│   │   │   └── resources/
+│   │   │       └── application.yml
+│   │   └── test/
+│   │       └── java/
+│   │           └── dev/
+│   │               └── m4tt3o/
+│   │                   └── storable/
+│   │                       └── api/
 │   ├── target/
 │   └── pom.xml
 ├── storable-common/
@@ -38,15 +45,17 @@ enterprise-storable/
 │   │                   └── storable/
 │   │                       └── common/
 │   │                           ├── dto/
-│   │                           │   └── FileMetadataDto.java
+│   │                           │   ├── FileMetadataDto.java
+│   │                           │   └── TrashMetadataDto.java
 │   │                           ├── entity/
 │   │                           │   ├── FileNode.java
+│   │                           │   ├── SystemSetting.java
 │   │                           │   └── User.java
 │   │                           └── repository/
 │   │                               ├── FileNodePersistence.java
 │   │                               ├── FileNodeRepository.java
+│   │                               ├── SystemSettingRepository.java
 │   │                               └── UserRepository.java
-│   ├── target/
 │   └── pom.xml
 ├── storable-core/
 │   ├── src/
@@ -63,16 +72,19 @@ enterprise-storable/
 │   │                           │   ├── AuthRequest.java
 │   │                           │   ├── AuthResponse.java
 │   │                           │   └── RegisterRequest.java
+│   │                           ├── repository/
 │   │                           ├── security/
 │   │                           │   ├── CustomUserDetails.java
 │   │                           │   └── JwtService.java
 │   │                           └── service/
 │   │                               ├── AuthService.java
+│   │                               ├── ConfigService.java
 │   │                               ├── CustomUserDetailsService.java
 │   │                               ├── FileService.java
 │   │                               ├── FileServiceImpl.java
 │   │                               ├── LocalStorageService.java
-│   │                               └── StorageService.java
+│   │                               ├── StorageService.java
+│   │                               └── TrashCleanupService.java
 │   ├── target/
 │   └── pom.xml
 ├── storable-data/
@@ -83,6 +95,8 @@ enterprise-storable/
 │   │               └── m4tt3o/
 │   │                   └── storable/
 │   │                       └── data/
+│   │                           ├── entity/
+│   │                           ├── repository/
 │   │                           └── service/
 │   │                               └── FileNodePersistenceImpl.java
 │   ├── target/
@@ -109,6 +123,11 @@ enterprise-storable/
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
+│   │   ├── features/
+│   │   │   └── trash/
+│   │   │       ├── RetentionSettings.tsx
+│   │   │       ├── TrashTable.tsx
+│   │   │       └── TrashTableRow.tsx
 │   │   ├── file-browser/
 │   │   │   ├── Breadcrumbs.tsx
 │   │   │   ├── FileBrowser.tsx
@@ -121,6 +140,9 @@ enterprise-storable/
 │   │   │   ├── Footer.tsx
 │   │   │   ├── Header.tsx
 │   │   │   └── Sidebar.tsx
+│   │   ├── shared/
+│   │   │   ├── EmptyState.tsx
+│   │   │   └── StatusBadge.tsx
 │   │   └── ui/
 │   │       ├── Button.tsx
 │   │       ├── IconButton.tsx
@@ -128,7 +150,8 @@ enterprise-storable/
 │   ├── context/
 │   │   └── AuthContext.tsx
 │   ├── hooks/
-│   │   └── useFileBrowser.ts
+│   │   ├── useFileBrowser.ts
+│   │   └── useTrash.ts
 │   ├── lib/
 │   │   ├── api.ts
 │   │   ├── mock-data.ts
