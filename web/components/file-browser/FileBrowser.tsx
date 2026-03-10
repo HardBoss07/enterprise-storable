@@ -27,6 +27,7 @@ export default function FileBrowser({ initialFolderId = null }: FileBrowserProps
         refresh,
         createFolder,
         uploadFile,
+        deleteFile,
         isCreatingFolder,
         triggerCreateFolder,
         cancelCreateFolder
@@ -104,6 +105,7 @@ export default function FileBrowser({ initialFolderId = null }: FileBrowserProps
                 <FileList 
                 files={files} 
                 onFolderClick={navigateToFolder} 
+                onDelete={deleteFile}
                 isCreatingFolder={isCreatingFolder}
                 onCreateFolder={createFolder}
                 onCancelCreateFolder={cancelCreateFolder}

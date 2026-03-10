@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { FileNode } from '@/types/FileNode';
-import { getFiles, getFileMetadata, createFolder, uploadFile, getPath, getHomeFolder } from '@/lib/api';
+import { getFiles, getFileMetadata, createFolder, uploadFile, getPath, getHomeFolder, softDelete } from '@/lib/api';
 
 /**
  * Hook for managing the file browser state and operations.
@@ -115,6 +115,20 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     }
   };
 
+  /**
+   * Soft deletes a file node.
+   * @param nodeId The ID of the node to delete.
+   */
+  const handleDelete = async (nodeId: number) => {
+    try {
+      await softDelete(nodeId);
+      await fetchData();
+    } catch (err) {
+      console.error('Failed to delete file:', err);
+      throw new Error('Failed to delete file');
+    }
+  };
+
   return {
     files,
     path,
@@ -128,5 +142,6 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     refresh: fetchData,
     createFolder: handleCreateFolder,
     uploadFile: handleUploadFile,
+    deleteFile: handleDelete,
   };
 }

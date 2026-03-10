@@ -8,13 +8,14 @@
 
 ### 1. Architectural Mandates (The "How")
 
-- **Atomic Hierarchy:** \* `components/atoms`: Stateless, single-purpose UI (Buttons, Inputs, Icons). No business logic.
-- `components/molecules`: Combinations of 2-3 atoms (SearchField, FileBreadcrumb).
-- `components/organisms`: Complex UI blocks (Sidebar, FileGrid, UploadModal).
+- **Logic-Based Hierarchy (Refined Atomic):**
+- `components/ui/` (**Atoms**): Stateless, single-purpose primitives (Buttons, Inputs, Icons). These are your design system "atoms." No business logic.
+- `components/shared/` (**Molecules**): Combinations of 2-3 UI primitives (SearchField, FileBreadcrumb, UserAvatar). These are "molecules" used across the entire app.
+- `components/features/` (**Organisms**): Complex, domain-specific UI blocks (Sidebar, FileGrid, UploadModal). These are "organisms" that represent specific app functionality.
 
-- **Layered Separation:** \* **UI Layer:** Purely declarative JSX.
+- **Layered Separation:** \* **UI Layer:** Purely declarative TSX.
 - **Logic Layer:** Extract all `useState`, `useEffect`, and data-handling into custom `hooks/`.
-- **Data Layer:** Extract all `fetch` or `Server Actions` into `services/` or `lib/`.
+- **Data Layer:** Extract all `fetch` or `Server Actions` into `services/` or `lib/
 
 ### 2. Code Quality & Formatting
 

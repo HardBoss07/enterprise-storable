@@ -6,6 +6,7 @@ export interface FileNode {
   storageKey: string | null;
   createdAt: string;
   modifiedAt: string;
+  isDeleted: boolean;
   deletedAt: string | null;
   ownerId: string;
   parentId: number | null;

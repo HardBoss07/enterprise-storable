@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from 'react';
 interface FileListProps {
   files: FileNode[];
   onFolderClick: (folderId: number) => void;
+  onDelete: (nodeId: number) => void;
   isCreatingFolder?: boolean;
   onCreateFolder?: (name: string) => void;
   onCancelCreateFolder?: () => void;
@@ -20,10 +21,12 @@ interface FileListProps {
  * Renders a list of files and folders with sorting.
  * @param files The list of file nodes to display.
  * @param onFolderClick Callback when a folder is clicked.
+ * @param onDelete Callback when a node is deleted.
  */
 export default function FileList({ 
   files, 
   onFolderClick, 
+  onDelete,
   isCreatingFolder, 
   onCreateFolder, 
   onCancelCreateFolder 
@@ -101,7 +104,7 @@ export default function FileList({
         </div>
       ) : (
         sortedFiles.map((file) => (
-          <FileListItem key={file.id} node={file} onFolderClick={onFolderClick} />
+          <FileListItem key={file.id} node={file} onFolderClick={onFolderClick} onDelete={onDelete} />
         ))
       )}
     </div>

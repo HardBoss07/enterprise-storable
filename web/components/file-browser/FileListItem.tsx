@@ -3,7 +3,7 @@
 import { FileNode } from '@/types/FileNode';
 import { FileIcon } from '@/components/icons/FileIcon';
 import { format } from 'date-fns';
-import { Download } from 'lucide-react';
+import { Download, Trash2 } from 'lucide-react';
 import { downloadFileBlob } from '@/lib/api';
 import { formatBytes, cn } from '@/lib/utils';
 import { IconButton } from '@/components/ui/IconButton';
@@ -11,17 +11,19 @@ import { IconButton } from '@/components/ui/IconButton';
 interface FileListItemProps {
   node: FileNode;
   onFolderClick: (folderId: number) => void;
+  onDelete: (nodeId: number) => void;
 }
 
 /**
  * Renders a single row in the file list.
  * @param node The file or folder data.
  * @param onFolderClick Callback when a folder is clicked.
+ * @param onDelete Callback when the delete button is clicked.
  */
-export default function FileListItem({ node, onFolderClick }: FileListItemProps) {
+export default function FileListItem({ node, onFolderClick, onDelete }: FileListItemProps) {
   const handleClick = (e: React.MouseEvent) => {
-    // Prevent click if we're clicking the download button
-    if ((e.target as HTMLElement).closest('.download-btn')) {
+    // Prevent click if we're clicking the download button or delete button
+    if ((e.target as HTMLElement).closest('.download-btn') || (e.target as HTMLElement).closest('.delete-btn')) {
         return;
     }
 
@@ -48,6 +50,13 @@ export default function FileListItem({ node, onFolderClick }: FileListItemProps)
       }
   };
 
+  const handleDelete = (e: React.MouseEvent) => {
+      e.stopPropagation();
+      if (confirm(`Are you sure you want to delete ${node.name}?`)) {
+          onDelete(node.id);
+      }
+  };
+
   return (
       <div
           className={cn("flex items-center space-x-4 p-2 interactive-surface group")}
@@ -61,7 +70,7 @@ export default function FileListItem({ node, onFolderClick }: FileListItemProps)
           </div>
           
           <div className="flex items-center space-x-2">
-              <div className="hidden group-hover:flex px-2">
+              <div className="hidden group-hover:flex px-2 space-x-2">
                   {!node.folder && (
                       <IconButton 
                           icon={Download}
@@ -73,6 +82,15 @@ export default function FileListItem({ node, onFolderClick }: FileListItemProps)
                           title="Download"
                       />
                   )}
+                  <IconButton 
+                      icon={Trash2}
+                      onClick={handleDelete}
+                      className="delete-btn text-red-500 hover:text-red-400"
+                      variant="ghost"
+                      size="sm"
+                      iconSize={16}
+                      title="Delete"
+                  />
               </div>
 
               <div className="w-40 text-text-muted text-sm hidden sm:block">

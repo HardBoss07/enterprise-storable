@@ -149,3 +149,117 @@ export async function downloadFileBlob(nodeId: number): Promise<Blob> {
     if (!response.ok) throw new Error('Download failed');
     return response.blob();
 }
+
+/**
+ * Soft deletes a file node (moves to trash).
+ * @param nodeId The ID of the node to delete.
+ */
+export async function softDelete(nodeId: number): Promise<void> {
+  const url = `${API_BASE_URL}/api/files/${nodeId}`;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!response.ok) throw new Error('Delete failed');
+}
+
+/**
+ * Restores a file node from trash.
+ * @param nodeId The ID of the node to restore.
+ */
+export async function restore(nodeId: number): Promise<void> {
+  const url = `${API_BASE_URL}/api/files/${nodeId}/restore`;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const response = await fetch(url, {
+    method: 'POST',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!response.ok) throw new Error('Restore failed');
+}
+
+export interface TrashItem {
+    metadata: FileNode;
+    daysRemaining: number;
+}
+
+/**
+ * Fetches all items in the trash for the current user.
+ * @returns A list of trash items.
+ */
+export async function getTrash(): Promise<TrashItem[]> {
+  return apiRequest<TrashItem[]>('/api/files/trash');
+}
+
+/**
+ * Permanently deletes a file node.
+ * @param nodeId The ID of the node to delete permanently.
+ */
+export async function permanentlyDelete(nodeId: number): Promise<void> {
+  const url = `${API_BASE_URL}/api/files/${nodeId}/permanent`;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const response = await fetch(url, {
+    method: 'DELETE',
+    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+  });
+  if (!response.ok) throw new Error('Permanent delete failed');
+}
+
+/**
+ * Permanently empties the trash for the current user.
+ */
+export async function emptyTrash(): Promise<void> {
+    const url = `${API_BASE_URL}/api/files/trash/empty`;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const response = await fetch(url, {
+      method: 'DELETE',
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    if (!response.ok) throw new Error('Empty trash failed');
+}
+
+/**
+ * Retrieves the current global trash retention days (Public endpoint).
+ */
+export async function getPublicTrashRetention(): Promise<number> {
+    const url = `${API_BASE_URL}/api/files/trash/retention`;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const response = await fetch(url, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    if (!response.ok) throw new Error('Failed to fetch public retention config');
+    const data = await response.json();
+    return data.days;
+}
+
+/**
+ * Retrieves the current global trash retention days (ADMIN only).
+ */
+export async function getTrashRetention(): Promise<number> {
+    const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const response = await fetch(url, {
+      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    });
+    if (!response.ok) throw new Error('Failed to fetch retention config');
+    const data = await response.json();
+    return data.days;
+}
+
+/**
+ * Updates the global trash retention days (ADMIN only).
+ * @param days The number of days for retention.
+ */
+export async function updateTrashRetention(days: number): Promise<void> {
+    const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
+      },
+      body: JSON.stringify({ days })
+    });
+    if (!response.ok) throw new Error('Failed to update retention config');
+}

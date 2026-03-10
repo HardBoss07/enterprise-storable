@@ -78,7 +78,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 4: Authentication & Security (In Progress) | **Last Updated:** 2026-03-09
+> **Status:** Phase 5: Access Control & Permissions (In Progress) | **Last Updated:** 2026-03-10
 
 ### [ ] Phase 1: Infrastructure & Skeleton
 
@@ -110,6 +110,9 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ### [ ] Phase 5: Access Control & Permissions
 
+- [x] **Logic:** Implement Soft Delete (Trash) system with recursive deletion and restoration.
+- [x] **Logic:** Background task for trash cleanup.
+- [x] **UI:** Delete action in File Explorer.
 - [ ] **Data:** Add `AccessPrivilege` table (VIEW, EDIT, OWNER).
 - [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
 - [ ] **UI:** "Share" modal mock-up.
