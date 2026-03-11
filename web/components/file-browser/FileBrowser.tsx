@@ -8,6 +8,7 @@ import { useFileBrowser } from "@/hooks/useFileBrowser";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Spinner } from "@/components/ui/Spinner";
+import { useToast } from "@/context/ToastContext";
 
 interface FileBrowserProps {
   initialFolderId?: number | null;
@@ -20,6 +21,7 @@ interface FileBrowserProps {
 export default function FileBrowser({
   initialFolderId = null,
 }: FileBrowserProps) {
+  const { showToast } = useToast();
   const {
     files,
     path,
@@ -50,8 +52,9 @@ export default function FileBrowser({
     if (file) {
       try {
         await uploadFile(file);
+        showToast(`Successfully uploaded ${file.name}`, "success");
       } catch (err) {
-        alert("Failed to upload file");
+        showToast("Failed to upload file", "error");
       }
     }
   };

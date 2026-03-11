@@ -7,6 +7,8 @@ import { Download, Trash2 } from "lucide-react";
 import { downloadFileBlob } from "@/lib/api";
 import { formatBytes, cn } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 interface FileListItemProps {
   node: FileNode;
@@ -25,6 +27,9 @@ export default function FileListItem({
   onFolderClick,
   onDelete,
 }: FileListItemProps) {
+  const { showToast } = useToast();
+  const { confirm } = useConfirm();
+
   const handleClick = (e: React.MouseEvent) => {
     // Prevent click if we're clicking the download button or delete button
     if (
@@ -51,15 +56,23 @@ export default function FileListItem({
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
+      showToast(`Started downloading ${node.name}`, "success");
     } catch (error) {
       console.error("Download failed:", error);
-      alert("Failed to download file. Please try again.");
+      showToast("Failed to download file. Please try again.", "error");
     }
   };
 
-  const handleDelete = (e: React.MouseEvent) => {
+  const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (confirm(`Are you sure you want to delete ${node.name}?`)) {
+    const confirmed = await confirm({
+      title: "Delete Item",
+      message: `Are you sure you want to delete ${node.name}? It will be moved to the trash.`,
+      confirmLabel: "Delete",
+      variant: "danger",
+    });
+
+    if (confirmed) {
       onDelete(node.id);
     }
   };
