@@ -18,7 +18,7 @@ public class JwtService {
     @Value("${storable.security.jwt.secret-key:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
     private String secretKey;
 
-    @Value("${storable.security.jwt.expiration:86400000}") // 1 day
+    @Value("${storable.security.jwt.expiration:604800000}") // 1 week
     private long jwtExpiration;
 
     public String extractUsername(String token) {
