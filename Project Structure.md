@@ -137,7 +137,9 @@ enterprise-storable/
 │   │       ├── IconButton.tsx
 │   │       └── Spinner.tsx
 │   ├── context/
-│   │   └── AuthContext.tsx
+│   │   ├── AuthContext.tsx
+│   │   ├── ConfirmContext.tsx
+│   │   └── ToastContext.tsx
 │   ├── hooks/
 │   │   ├── useFileBrowser.ts
 │   │   └── useTrash.ts
