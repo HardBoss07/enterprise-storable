@@ -8,34 +8,27 @@ enterprise-storable/
 │   └── test-data.sql
 ├── storable-api/
 │   ├── src/
-│   │   ├── main/
-│   │   │   ├── java/
-│   │   │   │   └── dev/
-│   │   │   │       └── m4tt3o/
-│   │   │   │           └── storable/
-│   │   │   │               └── api/
-│   │   │   │                   ├── controller/
-│   │   │   │                   │   ├── AdminController.java
-│   │   │   │                   │   ├── AuthController.java
-│   │   │   │                   │   └── FileController.java
-│   │   │   │                   ├── exception/
-│   │   │   │                   │   └── GlobalExceptionHandler.java
-│   │   │   │                   ├── request/
-│   │   │   │                   │   ├── CreateFolderRequest.java
-│   │   │   │                   │   └── RecursiveFolderRequest.java
-│   │   │   │                   ├── security/
-│   │   │   │                   │   ├── JwtAuthenticationFilter.java
-│   │   │   │                   │   └── SecurityConfig.java
-│   │   │   │                   └── StorableApiApplication.java
-│   │   │   └── resources/
-│   │   │       └── application.yml
-│   │   └── test/
-│   │       └── java/
-│   │           └── dev/
-│   │               └── m4tt3o/
-│   │                   └── storable/
-│   │                       └── api/
-│   ├── target/
+│   │   └── main/
+│   │       ├── java/
+│   │       │   └── dev/
+│   │       │       └── m4tt3o/
+│   │       │           └── storable/
+│   │       │               └── api/
+│   │       │                   ├── controller/
+│   │       │                   │   ├── AdminController.java
+│   │       │                   │   ├── AuthController.java
+│   │       │                   │   └── FileController.java
+│   │       │                   ├── exception/
+│   │       │                   │   └── GlobalExceptionHandler.java
+│   │       │                   ├── request/
+│   │       │                   │   ├── CreateFolderRequest.java
+│   │       │                   │   └── RecursiveFolderRequest.java
+│   │       │                   ├── security/
+│   │       │                   │   ├── JwtAuthenticationFilter.java
+│   │       │                   │   └── SecurityConfig.java
+│   │       │                   └── StorableApiApplication.java
+│   │       └── resources/
+│   │           └── application.yml
 │   └── pom.xml
 ├── storable-common/
 │   ├── src/
@@ -73,7 +66,6 @@ enterprise-storable/
 │   │                           │   ├── AuthRequest.java
 │   │                           │   ├── AuthResponse.java
 │   │                           │   └── RegisterRequest.java
-│   │                           ├── repository/
 │   │                           ├── security/
 │   │                           │   ├── CustomUserDetails.java
 │   │                           │   └── JwtService.java
@@ -86,7 +78,6 @@ enterprise-storable/
 │   │                               ├── LocalStorageService.java
 │   │                               ├── StorageService.java
 │   │                               └── TrashCleanupService.java
-│   ├── target/
 │   └── pom.xml
 ├── storable-data/
 │   ├── src/
@@ -96,11 +87,8 @@ enterprise-storable/
 │   │               └── m4tt3o/
 │   │                   └── storable/
 │   │                       └── data/
-│   │                           ├── entity/
-│   │                           ├── repository/
 │   │                           └── service/
 │   │                               └── FileNodePersistenceImpl.java
-│   ├── target/
 │   └── pom.xml
 ├── storage/
 │   ├── 0c739db5-8341-4e5f-b639-01af13e12dc8
