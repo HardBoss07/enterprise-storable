@@ -11,6 +11,8 @@ import {
   getPublicTrashRetention,
 } from "@/lib/api";
 import { useAuth } from "@/context/AuthContext";
+import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 
 /**
  * Custom hook for managing Trash page logic and state.
@@ -18,6 +20,8 @@ import { useAuth } from "@/context/AuthContext";
  */
 export function useTrash() {
   const { user } = useAuth();
+  const { showToast } = useToast();
+  const { confirm } = useConfirm();
   const [trashItems, setTrashItems] = useState<TrashItem[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
@@ -61,9 +65,10 @@ export function useTrash() {
   const handleRestore = async (id: number) => {
     try {
       await restore(id);
+      showToast("Item restored successfully.", "success");
       await fetchTrashData();
     } catch (err) {
-      alert("Failed to restore item.");
+      showToast("Failed to restore item.", "error");
     }
   };
 
@@ -73,16 +78,20 @@ export function useTrash() {
    * @param name - The name of the node for confirmation.
    */
   const handlePermanentDelete = async (id: number, name: string) => {
-    if (
-      confirm(
-        `Are you sure you want to permanently delete ${name}? This action cannot be undone.`,
-      )
-    ) {
+    const confirmed = await confirm({
+      title: "Delete Permanently",
+      message: `Are you sure you want to permanently delete ${name}? This action cannot be undone.`,
+      confirmLabel: "Delete Permanently",
+      variant: "danger",
+    });
+
+    if (confirmed) {
       try {
         await permanentlyDelete(id);
+        showToast(`Permanently deleted ${name}.`, "success");
         await fetchTrashData();
       } catch (err) {
-        alert("Failed to delete item.");
+        showToast("Failed to delete item.", "error");
       }
     }
   };
@@ -91,16 +100,20 @@ export function useTrash() {
    * Permanently deletes all items in the user's trash.
    */
   const handleEmptyTrash = async () => {
-    if (
-      confirm(
-        "Are you sure you want to permanently delete ALL items in the trash? This action cannot be undone.",
-      )
-    ) {
+    const confirmed = await confirm({
+      title: "Empty Trash",
+      message: "Are you sure you want to permanently delete ALL items in the trash? This action cannot be undone.",
+      confirmLabel: "Empty Trash",
+      variant: "danger",
+    });
+
+    if (confirmed) {
       try {
         await emptyTrash();
+        showToast("Trash emptied successfully.", "success");
         await fetchTrashData();
       } catch (err) {
-        alert("Failed to empty trash.");
+        showToast("Failed to empty trash.", "error");
       }
     }
   };
@@ -113,9 +126,10 @@ export function useTrash() {
     try {
       await updateTrashRetention(retentionDays);
       setIsEditingRetention(false);
+      showToast("Retention period updated successfully.", "success");
       await fetchTrashData();
     } catch (err) {
-      alert("Failed to update retention period.");
+      showToast("Failed to update retention period.", "error");
     } finally {
       setIsSavingRetention(false);
     }
