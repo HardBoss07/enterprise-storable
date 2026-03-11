@@ -3,6 +3,7 @@
 ```
 enterprise-storable/
 ├── db/
+│   ├── base-data.sql
 │   ├── schema.sql
 │   └── test-data.sql
 ├── storable-api/
