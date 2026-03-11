@@ -2,7 +2,6 @@ package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.entity.FileNode;
 import dev.m4tt3o.storable.common.repository.FileNodeRepository;
-import dev.m4tt3o.storable.core.config.StorageProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

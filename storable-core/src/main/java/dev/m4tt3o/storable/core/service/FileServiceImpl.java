@@ -3,7 +3,6 @@ package dev.m4tt3o.storable.core.service;
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
 import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
 import dev.m4tt3o.storable.common.repository.FileNodePersistence;
-import dev.m4tt3o.storable.core.config.StorageProperties;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Implementation of the FileService business logic.
