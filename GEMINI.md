@@ -122,10 +122,12 @@ This file is the **Source of Truth** for the project. Every session should begin
 ## Technical Decisions & Architecture (Updated)
 
 ### Circular Dependency Resolution
+
 - **Shared Module:** Created `storable-common` to hold DTOs, Entities, and shared Interfaces.
 - **Dependency Flow:** `storable-api` -> `storable-core` -> `storable-common` and `storable-api` -> `storable-data` -> `storable-common`. This breaks the cycle between `core` and `data`.
 
 ### Database Schema Alignment
+
 - **Table Names:** Unified all SQL and Java Entities to use `users` and `nodes` table names.
 - **Column Mapping:** Ensured `User` entity matches `users` table (`id`, `username`, `email`, `password`, `role`).
 - **Initialization:** Fixed `test-data.sql` to use correct column names (`password`, `role`) instead of deprecated/incorrect ones.
@@ -147,5 +149,6 @@ Whenever you ask me to "Implement X," my first task (if successful) is to run a 
 ---
 
 ## Current Issues:
+
 - [x] Guest User still gets created but no file entires for guest user are created
-- [x] Downloading doesn't work, gives me a 403 Error 
+- [x] Downloading doesn't work, gives me a 403 Error

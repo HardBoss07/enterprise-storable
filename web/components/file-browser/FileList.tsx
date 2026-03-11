@@ -1,12 +1,12 @@
-'use client';
+"use client";
 
-import { FileNode } from '@/types/FileNode';
-import FileListItem from './FileListItem';
-import { useMemo } from 'react';
-import { cn } from '@/lib/utils';
+import { FileNode } from "@/types/FileNode";
+import FileListItem from "./FileListItem";
+import { useMemo } from "react";
+import { cn } from "@/lib/utils";
 
-import { FileIcon } from '@/components/icons/FileIcon';
-import { useState, useEffect, useRef } from 'react';
+import { FileIcon } from "@/components/icons/FileIcon";
+import { useState, useEffect, useRef } from "react";
 
 interface FileListProps {
   files: FileNode[];
@@ -23,28 +23,28 @@ interface FileListProps {
  * @param onFolderClick Callback when a folder is clicked.
  * @param onDelete Callback when a node is deleted.
  */
-export default function FileList({ 
-  files, 
-  onFolderClick, 
+export default function FileList({
+  files,
+  onFolderClick,
   onDelete,
-  isCreatingFolder, 
-  onCreateFolder, 
-  onCancelCreateFolder 
+  isCreatingFolder,
+  onCreateFolder,
+  onCancelCreateFolder,
 }: FileListProps) {
-  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderName, setNewFolderName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isCreatingFolder) {
-      setNewFolderName('');
+      setNewFolderName("");
       inputRef.current?.focus();
     }
   }, [isCreatingFolder]);
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && newFolderName.trim()) {
+    if (e.key === "Enter" && newFolderName.trim()) {
       onCreateFolder?.(newFolderName.trim());
-    } else if (e.key === 'Escape') {
+    } else if (e.key === "Escape") {
       onCancelCreateFolder?.();
     }
   };
@@ -57,25 +57,27 @@ export default function FileList({
       // 1. Folders before files
       if (a.folder && !b.folder) return -1;
       if (!a.folder && b.folder) return 1;
-      
+
       // 2. Alphabetical order (case-insensitive)
-      return a.name.localeCompare(b.name, undefined, { 
-        numeric: true, 
-        sensitivity: 'base' 
+      return a.name.localeCompare(b.name, undefined, {
+        numeric: true,
+        sensitivity: "base",
       });
     });
   }, [files]);
 
   return (
     <div className="space-y-1">
-      <div className={cn(
-        "flex items-center p-2 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2"
-      )}>
+      <div
+        className={cn(
+          "flex items-center p-2 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2",
+        )}
+      >
         <div className="flex-1 min-w-0 ml-10">Name</div>
         <div className="w-40 hidden sm:block">Last Modified</div>
         <div className="w-24 text-right">File Size</div>
       </div>
-      
+
       {isCreatingFolder && (
         <div className="flex items-center space-x-4 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
           <div className="flex items-center justify-center w-10 h-10">
@@ -100,11 +102,16 @@ export default function FileList({
 
       {sortedFiles.length === 0 && !isCreatingFolder ? (
         <div className="flex flex-col items-center justify-center h-48 text-neutral-500">
-           <p>This folder is empty</p>
+          <p>This folder is empty</p>
         </div>
       ) : (
         sortedFiles.map((file) => (
-          <FileListItem key={file.id} node={file} onFolderClick={onFolderClick} onDelete={onDelete} />
+          <FileListItem
+            key={file.id}
+            node={file}
+            onFolderClick={onFolderClick}
+            onDelete={onDelete}
+          />
         ))
       )}
     </div>

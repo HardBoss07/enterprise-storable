@@ -1,6 +1,6 @@
-import { FileNode } from '@/types/FileNode';
+import { FileNode } from "@/types/FileNode";
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
 /**
  * A simple wrapper around fetch to handle common API logic.
@@ -8,50 +8,65 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080';
  * @param options Fetch options.
  * @returns The parsed JSON response.
  */
-async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
+async function apiRequest<T>(
+  endpoint: string,
+  options?: RequestInit,
+): Promise<T> {
   const url = `${API_BASE_URL}${endpoint}`;
-  
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-  
+
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
   const headers = {
     ...options?.headers,
-    ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+    ...(token ? { Authorization: `Bearer ${token}` } : {}),
   } as HeadersInit;
 
   const response = await fetch(url, { ...options, headers });
 
   if (!response.ok) {
-    if (response.status === 401 && typeof window !== 'undefined') {
-        // Redirect to login if unauthorized and client-side
-        window.location.href = '/login';
+    if (response.status === 401 && typeof window !== "undefined") {
+      // Redirect to login if unauthorized and client-side
+      window.location.href = "/login";
     }
     const errorData = await response.json().catch(() => ({}));
-    throw new Error(errorData.error || errorData.message || `API request failed with status ${response.status}`);
+    throw new Error(
+      errorData.error ||
+        errorData.message ||
+        `API request failed with status ${response.status}`,
+    );
   }
 
   return response.json();
 }
 
 export interface AuthResponse {
-    token: string;
-    username: string;
-    role: string;
+  token: string;
+  username: string;
+  role: string;
 }
 
-export async function login(username: string, password: string): Promise<AuthResponse> {
-    return apiRequest<AuthResponse>('/api/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
-    });
+export async function login(
+  username: string,
+  password: string,
+): Promise<AuthResponse> {
+  return apiRequest<AuthResponse>("/api/auth/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, password }),
+  });
 }
 
-export async function register(username: string, email: string, password: string): Promise<AuthResponse> {
-    return apiRequest<AuthResponse>('/api/auth/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
-    });
+export async function register(
+  username: string,
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
+  return apiRequest<AuthResponse>("/api/auth/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, email, password }),
+  });
 }
 
 /**
@@ -77,7 +92,7 @@ export async function getFileMetadata(nodeId: number): Promise<FileNode> {
  * @returns The home folder node.
  */
 export async function getHomeFolder(): Promise<FileNode> {
-  return apiRequest<FileNode>('/api/files/home');
+  return apiRequest<FileNode>("/api/files/home");
 }
 
 /**
@@ -95,11 +110,14 @@ export async function getPath(nodeId: number): Promise<FileNode[]> {
  * @param parentId The ID of the parent folder, or null for root.
  * @returns The newly created folder node.
  */
-export async function createFolder(name: string, parentId: number | null): Promise<FileNode> {
-  return apiRequest<FileNode>('/api/files/folders', {
-    method: 'POST',
+export async function createFolder(
+  name: string,
+  parentId: number | null,
+): Promise<FileNode> {
+  return apiRequest<FileNode>("/api/files/folders", {
+    method: "POST",
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
     },
     body: JSON.stringify({ name, parentId: parentId || 0 }),
   });
@@ -111,15 +129,18 @@ export async function createFolder(name: string, parentId: number | null): Promi
  * @param parentId The ID of the destination folder, or null for root.
  * @returns The newly created file node.
  */
-export async function uploadFile(file: File, parentId: number | null): Promise<FileNode> {
+export async function uploadFile(
+  file: File,
+  parentId: number | null,
+): Promise<FileNode> {
   const formData = new FormData();
-  formData.append('file', file);
+  formData.append("file", file);
   if (parentId !== null) {
-    formData.append('parentId', parentId.toString());
+    formData.append("parentId", parentId.toString());
   }
 
-  return apiRequest<FileNode>('/api/files/upload', {
-    method: 'POST',
+  return apiRequest<FileNode>("/api/files/upload", {
+    method: "POST",
     body: formData,
   });
 }
@@ -130,24 +151,26 @@ export async function uploadFile(file: File, parentId: number | null): Promise<F
  * @returns The full download URL.
  */
 export function downloadFileUrl(nodeId: number): string {
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   // If token required for download, passing via query param or using fetch+blob is needed.
   // Standard href download with Bearer token is tricky.
   // For now, let's assume query param or cookie? But API expects Header.
   // Option: Use a short-lived token in query param, or fetch blob in client and create object URL.
   // Let's implement fetch blob in component if needed, or update API to accept token in query param.
   // Updating API to accept token in query param is easiest for "direct download link".
-  return `${API_BASE_URL}/api/files/${nodeId}/download`; 
+  return `${API_BASE_URL}/api/files/${nodeId}/download`;
 }
 
 // Helper to fetch blob with auth
 export async function downloadFileBlob(nodeId: number): Promise<Blob> {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const response = await fetch(`${API_BASE_URL}/api/files/${nodeId}/download`, {
-        headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
-    if (!response.ok) throw new Error('Download failed');
-    return response.blob();
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const response = await fetch(`${API_BASE_URL}/api/files/${nodeId}/download`, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error("Download failed");
+  return response.blob();
 }
 
 /**
@@ -156,12 +179,13 @@ export async function downloadFileBlob(nodeId: number): Promise<Blob> {
  */
 export async function softDelete(nodeId: number): Promise<void> {
   const url = `${API_BASE_URL}/api/files/${nodeId}`;
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const response = await fetch(url, {
-    method: 'DELETE',
-    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error('Delete failed');
+  if (!response.ok) throw new Error("Delete failed");
 }
 
 /**
@@ -170,17 +194,18 @@ export async function softDelete(nodeId: number): Promise<void> {
  */
 export async function restore(nodeId: number): Promise<void> {
   const url = `${API_BASE_URL}/api/files/${nodeId}/restore`;
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const response = await fetch(url, {
-    method: 'POST',
-    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error('Restore failed');
+  if (!response.ok) throw new Error("Restore failed");
 }
 
 export interface TrashItem {
-    metadata: FileNode;
-    daysRemaining: number;
+  metadata: FileNode;
+  daysRemaining: number;
 }
 
 /**
@@ -188,7 +213,7 @@ export interface TrashItem {
  * @returns A list of trash items.
  */
 export async function getTrash(): Promise<TrashItem[]> {
-  return apiRequest<TrashItem[]>('/api/files/trash');
+  return apiRequest<TrashItem[]>("/api/files/trash");
 }
 
 /**
@@ -197,53 +222,57 @@ export async function getTrash(): Promise<TrashItem[]> {
  */
 export async function permanentlyDelete(nodeId: number): Promise<void> {
   const url = `${API_BASE_URL}/api/files/${nodeId}/permanent`;
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const response = await fetch(url, {
-    method: 'DELETE',
-    headers: token ? { 'Authorization': `Bearer ${token}` } : {}
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error('Permanent delete failed');
+  if (!response.ok) throw new Error("Permanent delete failed");
 }
 
 /**
  * Permanently empties the trash for the current user.
  */
 export async function emptyTrash(): Promise<void> {
-    const url = `${API_BASE_URL}/api/files/trash/empty`;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const response = await fetch(url, {
-      method: 'DELETE',
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
-    if (!response.ok) throw new Error('Empty trash failed');
+  const url = `${API_BASE_URL}/api/files/trash/empty`;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const response = await fetch(url, {
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error("Empty trash failed");
 }
 
 /**
  * Retrieves the current global trash retention days (Public endpoint).
  */
 export async function getPublicTrashRetention(): Promise<number> {
-    const url = `${API_BASE_URL}/api/files/trash/retention`;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const response = await fetch(url, {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
-    if (!response.ok) throw new Error('Failed to fetch public retention config');
-    const data = await response.json();
-    return data.days;
+  const url = `${API_BASE_URL}/api/files/trash/retention`;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const response = await fetch(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error("Failed to fetch public retention config");
+  const data = await response.json();
+  return data.days;
 }
 
 /**
  * Retrieves the current global trash retention days (ADMIN only).
  */
 export async function getTrashRetention(): Promise<number> {
-    const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const response = await fetch(url, {
-      headers: token ? { 'Authorization': `Bearer ${token}` } : {}
-    });
-    if (!response.ok) throw new Error('Failed to fetch retention config');
-    const data = await response.json();
-    return data.days;
+  const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const response = await fetch(url, {
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error("Failed to fetch retention config");
+  const data = await response.json();
+  return data.days;
 }
 
 /**
@@ -251,15 +280,16 @@ export async function getTrashRetention(): Promise<number> {
  * @param days The number of days for retention.
  */
 export async function updateTrashRetention(days: number): Promise<void> {
-    const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        ...(token ? { 'Authorization': `Bearer ${token}` } : {})
-      },
-      body: JSON.stringify({ days })
-    });
-    if (!response.ok) throw new Error('Failed to update retention config');
+  const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
+  const token =
+    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      ...(token ? { Authorization: `Bearer ${token}` } : {}),
+    },
+    body: JSON.stringify({ days }),
+  });
+  if (!response.ok) throw new Error("Failed to update retention config");
 }

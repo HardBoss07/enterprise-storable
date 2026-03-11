@@ -3,7 +3,7 @@ export default function Footer() {
     <footer className="bg-neutral-900 text-white">
       <div className="container mx-auto py-4 px-4 text-center">
         <p>
-          Storable - All rights reserved. Created by{' '}
+          Storable - All rights reserved. Created by{" "}
           <a
             href="https://m4tt3o.dev"
             target="_blank"

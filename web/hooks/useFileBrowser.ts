@@ -1,8 +1,16 @@
-'use client';
+"use client";
 
-import { useState, useEffect, useCallback } from 'react';
-import { FileNode } from '@/types/FileNode';
-import { getFiles, getFileMetadata, createFolder, uploadFile, getPath, getHomeFolder, softDelete } from '@/lib/api';
+import { useState, useEffect, useCallback } from "react";
+import { FileNode } from "@/types/FileNode";
+import {
+  getFiles,
+  getFileMetadata,
+  createFolder,
+  uploadFile,
+  getPath,
+  getHomeFolder,
+  softDelete,
+} from "@/lib/api";
 
 /**
  * Hook for managing the file browser state and operations.
@@ -14,7 +22,9 @@ export function useFileBrowser(initialFolderId: number | null = null) {
   const [path, setPath] = useState<FileNode[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentFolderId, setCurrentFolderId] = useState<number | null>(initialFolderId);
+  const [currentFolderId, setCurrentFolderId] = useState<number | null>(
+    initialFolderId,
+  );
   const [homeFolderId, setHomeFolderId] = useState<number | null>(null);
   const [isCreatingFolder, setIsCreatingFolder] = useState<boolean>(false);
 
@@ -30,7 +40,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
           setCurrentFolderId(home.id);
         }
       } catch (err) {
-        console.error('Failed to fetch home folder:', err);
+        console.error("Failed to fetch home folder:", err);
       }
     };
     fetchHome();
@@ -50,8 +60,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       const pathArr = await getPath(currentFolderId);
       setPath(pathArr);
     } catch (err) {
-      console.error('Error fetching file data:', err);
-      setError('Failed to fetch file data.');
+      console.error("Error fetching file data:", err);
+      setError("Failed to fetch file data.");
     } finally {
       setLoading(false);
       setIsCreatingFolder(false); // Reset when navigating/refreshing
@@ -94,8 +104,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       setIsCreatingFolder(false);
       await fetchData();
     } catch (err) {
-      console.error('Failed to create folder:', err);
-      throw new Error('Failed to create folder');
+      console.error("Failed to create folder:", err);
+      throw new Error("Failed to create folder");
     }
   };
 
@@ -109,9 +119,9 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       await uploadFile(file, currentFolderId);
       await fetchData();
     } catch (err) {
-      console.error('Failed to upload file:', err);
+      console.error("Failed to upload file:", err);
       setLoading(false);
-      throw new Error('Failed to upload file');
+      throw new Error("Failed to upload file");
     }
   };
 
@@ -124,8 +134,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       await softDelete(nodeId);
       await fetchData();
     } catch (err) {
-      console.error('Failed to delete file:', err);
-      throw new Error('Failed to delete file');
+      console.error("Failed to delete file:", err);
+      throw new Error("Failed to delete file");
     }
   };
 

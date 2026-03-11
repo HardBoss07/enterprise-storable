@@ -25,9 +25,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={cn(robotoSans.variable, "antialiased")}>
         <Providers>
-          <AppLayout>
-            {children}
-          </AppLayout>
+          <AppLayout>{children}</AppLayout>
         </Providers>
       </body>
     </html>
