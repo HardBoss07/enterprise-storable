@@ -2,16 +2,23 @@
 
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context/AuthContext";
 
 /**
  * Renders the sidebar with navigation links.
  */
 export default function Sidebar() {
+  const { user } = useAuth();
+
   const navLinks = [
     { href: "/", label: "My Files" },
     { href: "/recent", label: "Recent" },
     { href: "/trash", label: "Trash" },
   ];
+
+  if (user?.role === "ADMIN") {
+    navLinks.push({ href: "/admin", label: "Admin" });
+  }
 
   return (
     <aside className={cn("w-64 bg-neutral-800 text-white p-4")}>
