@@ -113,15 +113,15 @@ enterprise-storable/
 │   │   └── page.tsx
 │   ├── components/
 │   │   ├── features/
+│   │   │   ├── file-browser/
+│   │   │   │   ├── Breadcrumbs.tsx
+│   │   │   │   ├── FileBrowser.tsx
+│   │   │   │   ├── FileList.tsx
+│   │   │   │   └── FileListItem.tsx
 │   │   │   └── trash/
 │   │   │       ├── RetentionSettings.tsx
 │   │   │       ├── TrashTable.tsx
 │   │   │       └── TrashTableRow.tsx
-│   │   ├── file-browser/
-│   │   │   ├── Breadcrumbs.tsx
-│   │   │   ├── FileBrowser.tsx
-│   │   │   ├── FileList.tsx
-│   │   │   └── FileListItem.tsx
 │   │   ├── icons/
 │   │   │   └── FileIcon.tsx
 │   │   ├── layout/

@@ -80,26 +80,26 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 > **Status:** Phase 5: Access Control & Permissions (In Progress) | **Last Updated:** 2026-03-10
 
-### [ ] Phase 1: Infrastructure & Skeleton
+### [x] Phase 1: Infrastructure & Skeleton
 
 - [x] Define multi-module Maven structure.
 - [x] Configure Docker Compose (App + DB).
 - [x] Implement `schema.sql` for `FileNode` (File/Folder metadata).
 - [x] Frontend: Basic layout with Sidebar and Header.
 
-### [ ] Phase 2: Core File Management (No-Auth)
+### [x] Phase 2: Core File Management (No-Auth)
 
 - [x] **Service:** Local storage provider (Write/Read from disk).
 - [x] **API:** Recursive folder creation.
 - [x] **API:** File upload (Multipart) and Download.
 - [x] **UI:** File Explorer grid/list view with navigation (breadcrumbs).
 
-### [ ] Phase 3: Base File Structure (Virtual Pathing) - DEFERRED
+### [x] Phase 3: Base File Structure (Virtual Pathing) - DEFERRED
 
-- [ ] **Logic:** Implement `UserHome` resolution logic (Maps `UUID` to `/home/{username}`).
-- [ ] **Security:** Implement "Jailbreak" prevention (Ensure users cannot navigate `..` or traverse above their assigned home directory).
-- [ ] **Admin Privileges:** Define `IsAdmin` flag for the Guest UUID to allow global directory traversal.
-- [ ] **API:** Update File Discovery endpoints to default to the User's home directory instead of the system root.
+- [x] **Logic:** Implement `UserHome` resolution logic (Maps `UUID` to `/{username}`).
+- [x] **Security:** Implement "Jailbreak" prevention (Ensure users cannot navigate `..` or traverse above their assigned home directory).
+- [x] **Admin Privileges:** Define `IsAdmin` flag for the Guest UUID to allow global directory traversal.
+- [x] **API:** Update File Discovery endpoints to default to the User's home directory instead of the system root.
 
 ### [x] Phase 4: Authentication & Security
 
