@@ -1,6 +1,7 @@
 package dev.m4tt3o.storable.core.security;
 
 import dev.m4tt3o.storable.common.entity.User;
+import dev.m4tt3o.storable.common.entity.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -12,7 +13,7 @@ public record CustomUserDetails(
     String id,
     String username,
     String password,
-    String role
+    UserRole role
 ) implements UserDetails {
 
     public static CustomUserDetails fromEntity(User user) {

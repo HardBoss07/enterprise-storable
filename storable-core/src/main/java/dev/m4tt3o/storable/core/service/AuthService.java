@@ -5,6 +5,7 @@ import dev.m4tt3o.storable.core.dto.AuthResponse;
 import dev.m4tt3o.storable.core.dto.RegisterRequest;
 import dev.m4tt3o.storable.core.security.JwtService;
 import dev.m4tt3o.storable.common.entity.User;
+import dev.m4tt3o.storable.common.entity.UserRole;
 import dev.m4tt3o.storable.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,13 +39,13 @@ public class AuthService {
         user.setUsername(request.username());
         user.setEmail(request.email());
         user.setPassword(passwordEncoder.encode(request.password()));
-        user.setRole("USER"); // Default role
+        user.setRole(UserRole.USER); // Default role
 
         User savedUser = userRepository.save(user);
         
-        String token = jwtService.generateToken(savedUser.getUsername(), Map.of("role", savedUser.getRole(), "id", savedUser.getId()));
+        String token = jwtService.generateToken(savedUser.getUsername(), Map.of("role", savedUser.getRole().name(), "id", savedUser.getId()));
         
-        return new AuthResponse(token, savedUser.getUsername(), savedUser.getRole());
+        return new AuthResponse(token, savedUser.getUsername(), savedUser.getRole().name());
     }
 
     public AuthResponse login(AuthRequest request) {
@@ -57,8 +58,8 @@ public class AuthService {
             throw new RuntimeException("Invalid username or password");
         }
 
-        String token = jwtService.generateToken(user.getUsername(), Map.of("role", user.getRole(), "id", user.getId()));
+        String token = jwtService.generateToken(user.getUsername(), Map.of("role", user.getRole().name(), "id", user.getId()));
         
-        return new AuthResponse(token, user.getUsername(), user.getRole());
+        return new AuthResponse(token, user.getUsername(), user.getRole().name());
     }
 }

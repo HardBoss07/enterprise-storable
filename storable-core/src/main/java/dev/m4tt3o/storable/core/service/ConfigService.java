@@ -20,6 +20,7 @@ public class ConfigService {
     private final StorageProperties storageProperties;
 
     private static final String TRASH_RETENTION_KEY = "trash_retention_days";
+    private static final String SYSTEM_TIMEZONE_KEY = "system_timezone";
 
     /** Retrieves the trash retention days from DB or default. */
     @Transactional(readOnly = true)
@@ -52,6 +53,24 @@ public class ConfigService {
         SystemSetting setting = repository.findById(TRASH_RETENTION_KEY)
                 .orElse(new SystemSetting(TRASH_RETENTION_KEY, String.valueOf(days)));
         setting.setSettingValue(String.valueOf(days));
+        repository.save(setting);
+    }
+
+    /** Retrieves the system timezone from DB or default. */
+    @Transactional(readOnly = true)
+    public String getSystemTimezone() {
+        return repository.findById(SYSTEM_TIMEZONE_KEY)
+                .map(SystemSetting::getSettingValue)
+                .orElse("UTC");
+    }
+
+    /** Updates the system timezone. */
+    @Transactional
+    public void setSystemTimezone(String timezone) {
+        log.info("Updating global system timezone to: {}", timezone);
+        SystemSetting setting = repository.findById(SYSTEM_TIMEZONE_KEY)
+                .orElse(new SystemSetting(SYSTEM_TIMEZONE_KEY, timezone));
+        setting.setSettingValue(timezone);
         repository.save(setting);
     }
 }
