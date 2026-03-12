@@ -2,16 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { UserDto } from "@/types/Admin";
-import { getAllUsers, deleteUser } from "@/lib/api";
+import { getAllUsers, deleteUser, updateUserRole } from "@/lib/api";
 import { Button } from "@/components/ui/Button";
-import { Trash2, User as UserIcon, Shield } from "lucide-react";
+import { Trash2, User as UserIcon, Shield, ChevronDown } from "lucide-react";
 import { useConfirm } from "@/context/ConfirmContext";
 import { useToast } from "@/context/ToastContext";
 import { Spinner } from "@/components/ui/Spinner";
+import { cn } from "@/lib/utils";
 
 export default function UserManagementPage() {
   const [users, setUsers] = useState<UserDto[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [updatingUserId, setUpdatingUserId] = useState<string | null>(null);
   const { confirm } = useConfirm();
   const { showToast } = useToast();
 
@@ -30,6 +32,21 @@ export default function UserManagementPage() {
   useEffect(() => {
     fetchUsers();
   }, []);
+
+  const handleRoleChange = async (userId: string, newRole: string) => {
+    try {
+      setUpdatingUserId(userId);
+      await updateUserRole(userId, newRole);
+      showToast("User role updated successfully", "success");
+      
+      // Update local state instead of full refresh
+      setUsers(users.map(u => u.id === userId ? { ...u, role: newRole as any } : u));
+    } catch (error) {
+      showToast("Failed to update user role", "error");
+    } finally {
+      setUpdatingUserId(null);
+    }
+  };
 
   const handleDeleteUser = async (userToDelete: UserDto) => {
     const isConfirmed = await confirm({
@@ -84,14 +101,48 @@ export default function UserManagementPage() {
                 </td>
                 <td className="px-6 py-4 text-neutral-400">{user.email}</td>
                 <td className="px-6 py-4">
-                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
-                    user.role === 'ADMIN' 
-                      ? 'bg-purple-500/10 text-purple-400 border border-purple-500/20' 
-                      : 'bg-blue-500/10 text-blue-400 border border-blue-500/20'
-                  }`}>
-                    {user.role === 'ADMIN' && <Shield size={12} />}
-                    {user.role}
-                  </span>
+                  {user.id === 'f43c0bcf-11e4-4629-b072-321ccd04e72a' ? (
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                      <Shield size={12} />
+                      ADMIN
+                    </span>
+                  ) : (
+                    <div className="relative inline-flex items-center group/select">
+                      <div className={cn(
+                        "absolute left-2.5 z-10 pointer-events-none transition-colors",
+                        user.role === 'ADMIN' ? 'text-purple-400' : 'text-blue-400'
+                      )}>
+                        {user.role === 'ADMIN' ? <Shield size={12} /> : <UserIcon size={12} />}
+                      </div>
+                      <select
+                        value={user.role}
+                        onChange={(e) => handleRoleChange(user.id, e.target.value)}
+                        disabled={updatingUserId === user.id}
+                        className={cn(
+                          "appearance-none text-xs font-medium rounded-full pl-7 pr-8 py-1 border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-accent",
+                          user.role === 'ADMIN' 
+                            ? 'bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20' 
+                            : 'bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20',
+                          updatingUserId === user.id && "opacity-50 cursor-not-allowed"
+                        )}
+                      >
+                        <option value="USER" className="bg-neutral-800 text-neutral-100">USER</option>
+                        <option value="ADMIN" className="bg-neutral-800 text-neutral-100">ADMIN</option>
+                      </select>
+                      <ChevronDown 
+                        size={12} 
+                        className={cn(
+                          "absolute right-2.5 pointer-events-none transition-colors",
+                          user.role === 'ADMIN' ? 'text-purple-400/50' : 'text-blue-400/50'
+                        )} 
+                      />
+                      {updatingUserId === user.id && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-black/10 rounded-full">
+                          <Spinner size="sm" className="scale-50" />
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </td>
                 <td className="px-6 py-4 text-xs font-mono text-neutral-500">{user.id}</td>
                 <td className="px-6 py-4 text-right">

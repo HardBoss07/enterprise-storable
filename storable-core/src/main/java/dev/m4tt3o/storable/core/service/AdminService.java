@@ -2,6 +2,8 @@ package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.dto.UserDto;
 import dev.m4tt3o.storable.common.entity.FileNode;
+import dev.m4tt3o.storable.common.entity.User;
+import dev.m4tt3o.storable.common.entity.UserRole;
 import dev.m4tt3o.storable.common.repository.FileNodeRepository;
 import dev.m4tt3o.storable.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +33,27 @@ public class AdminService {
         return userRepository.findAll().stream()
                 .map(u -> new UserDto(u.getId(), u.getUsername(), u.getEmail(), u.getRole()))
                 .collect(Collectors.toList());
+    }
+
+    /**
+     * Updates the role of a user.
+     * @param userId The UUID of the user.
+     * @param newRole The new role to assign.
+     */
+    @Transactional
+    public void updateUserRole(String userId, UserRole newRole) {
+        log.info("Updating role for user {} to {}", userId, newRole);
+
+        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) {
+            log.warn("Attempted to change the role of the root admin user!");
+            throw new RuntimeException("The root admin user's role cannot be changed.");
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found: " + userId));
+
+        user.setRole(newRole);
+        userRepository.save(user);
     }
 
     /**

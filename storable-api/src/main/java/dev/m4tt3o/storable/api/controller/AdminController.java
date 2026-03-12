@@ -2,6 +2,7 @@ package dev.m4tt3o.storable.api.controller;
 
 import dev.m4tt3o.storable.common.dto.GlobalSettingsDto;
 import dev.m4tt3o.storable.common.dto.UserDto;
+import dev.m4tt3o.storable.common.entity.UserRole;
 import dev.m4tt3o.storable.core.service.AdminService;
 import dev.m4tt3o.storable.core.service.ConfigService;
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,16 @@ public class AdminController {
     public ResponseEntity<Void> deleteUser(@PathVariable String id) {
         log.info("Admin request: Delete user {}", id);
         adminService.deleteUser(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    @PatchMapping("/users/{id}/role")
+    /** Updates a user's role. */
+    public ResponseEntity<Void> updateUserRole(@PathVariable String id, @RequestBody String role) {
+        log.info("Admin request: Update user {} role to {}", id, role);
+        // Remove extra quotes if role is passed as a raw string in JSON
+        String cleanedRole = role.replace("\"", "");
+        adminService.updateUserRole(id, UserRole.valueOf(cleanedRole));
         return ResponseEntity.noContent().build();
     }
 

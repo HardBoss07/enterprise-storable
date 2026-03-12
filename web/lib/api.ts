@@ -285,6 +285,20 @@ export async function deleteUser(userId: string): Promise<void> {
 }
 
 /**
+ * Updates a user's role (ADMIN only).
+ */
+export async function updateUserRole(
+  userId: string,
+  role: string,
+): Promise<void> {
+  await apiRequest<void>(`/api/admin/users/${userId}/role`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(role),
+  });
+}
+
+/**
  * Retrieves global system settings (ADMIN only).
  */
 export async function getGlobalSettings(): Promise<GlobalSettingsDto> {
