@@ -4,11 +4,13 @@ import { useAuth } from "@/context/AuthContext";
 import { register as registerApi } from "@/lib/api";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const { login } = useAuth();
   const router = useRouter();
@@ -16,6 +18,12 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match");
+      return;
+    }
+
     try {
       const res = await registerApi(username, email, password);
       login(res.token, res.username, res.role);
@@ -69,6 +77,23 @@ export default function RegisterPage() {
               className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1 text-neutral-300">
+              Repeat Password
+            </label>
+            <input
+              type="password"
+              className={cn(
+                "w-full bg-neutral-900 border rounded p-2 text-white outline-none transition-all focus:ring-2",
+                confirmPassword && password !== confirmPassword
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-neutral-700 focus:ring-blue-500"
+              )}
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
               required
             />
           </div>
