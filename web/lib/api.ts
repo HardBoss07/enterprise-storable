@@ -1,4 +1,5 @@
 import { FileNode } from "@/types/FileNode";
+import { UserDto, GlobalSettingsDto } from "@/types/Admin";
 
 const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
 
@@ -37,7 +38,9 @@ async function apiRequest<T>(
     );
   }
 
-  return response.json();
+  // Handle empty bodies for 204 No Content or similar
+  const text = await response.text();
+  return text ? JSON.parse(text) : ({} as T);
 }
 
 export interface AuthResponse {
@@ -261,35 +264,50 @@ export async function getPublicTrashRetention(): Promise<number> {
 }
 
 /**
- * Retrieves the current global trash retention days (ADMIN only).
+ * Retrieves all users (ADMIN only).
  */
-export async function getTrashRetention(): Promise<number> {
-  const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
-  const response = await fetch(url, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (!response.ok) throw new Error("Failed to fetch retention config");
-  const data = await response.json();
-  return data.days;
+export async function getAllUsers(): Promise<UserDto[]> {
+  return apiRequest<UserDto[]>("/api/admin/users");
 }
 
 /**
- * Updates the global trash retention days (ADMIN only).
- * @param days The number of days for retention.
+ * Deletes a user and their data (ADMIN only).
  */
-export async function updateTrashRetention(days: number): Promise<void> {
-  const url = `${API_BASE_URL}/api/admin/config/trash-retention`;
+export async function deleteUser(userId: string): Promise<void> {
+  const url = `${API_BASE_URL}/api/admin/users/${userId}`;
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;
   const response = await fetch(url, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    },
-    body: JSON.stringify({ days }),
+    method: "DELETE",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error("Failed to update retention config");
+  if (!response.ok) throw new Error("User deletion failed");
+}
+
+/**
+ * Retrieves global system settings (ADMIN only).
+ */
+export async function getGlobalSettings(): Promise<GlobalSettingsDto> {
+  return apiRequest<GlobalSettingsDto>("/api/admin/settings");
+}
+
+/**
+ * Updates global system settings (ADMIN only).
+ */
+export async function updateGlobalSettings(
+  settings: GlobalSettingsDto,
+): Promise<void> {
+  await apiRequest<void>("/api/admin/settings", {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(settings),
+  });
+}
+
+/**
+ * Convenience function to update only trash retention (ADMIN only).
+ */
+export async function updateTrashRetention(days: number): Promise<void> {
+  const current = await getGlobalSettings();
+  await updateGlobalSettings({ ...current, trashRetentionDays: days });
 }
