@@ -7,6 +7,7 @@ FLUSH PRIVILEGES;
 
 -- Basic system settings
 INSERT INTO system_settings (setting_key, setting_value) VALUES ('trash_retention_days', '30');
+INSERT INTO system_settings (setting_key, setting_value) VALUES ('system_timezone', 'UTC');
 
 -- Create root user and root directory
 INSERT INTO users (id, username, email, password, role)

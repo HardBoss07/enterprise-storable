@@ -108,11 +108,12 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **UI:** Login/Register pages and Route Guards.
 - [x] **Password:** BCrypt for hashing
 
-### [ ] Phase 5: Access Control & Permissions
+### [x] Phase 5: Access Control & Permissions
 
 - [x] **Logic:** Implement Soft Delete (Trash) system with recursive deletion and restoration.
 - [x] **Logic:** Background task for trash cleanup.
 - [x] **UI:** Delete action in File Explorer.
+- [x] **Admin:** Comprehensive Admin Panel for User Management and Global Settings.
 - [ ] **Data:** Add `AccessPrivilege` table (VIEW, EDIT, OWNER).
 - [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
 - [ ] **UI:** "Share" modal mock-up.
