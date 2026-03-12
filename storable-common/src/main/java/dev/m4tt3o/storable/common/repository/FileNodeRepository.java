@@ -34,4 +34,6 @@ public interface FileNodeRepository extends JpaRepository<FileNode, Long> {
     List<FileNode> findAllDeleted();
 
     List<FileNode> findByParentId(Long parentId);
+
+    List<FileNode> findByOwnerId(String ownerId);
 }
