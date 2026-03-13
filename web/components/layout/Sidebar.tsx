@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
+import { usePathname } from "next/navigation";
 
 /**
  * Renders the sidebar with navigation links.
  */
 export default function Sidebar() {
   const { user } = useAuth();
+  const pathname = usePathname();
 
   const navLinks = [
     { href: "/", label: "My Files" },
@@ -21,14 +23,15 @@ export default function Sidebar() {
   }
 
   return (
-    <aside className={cn("w-64 bg-neutral-800 text-white p-4")}>
+    <aside className="app-sidebar">
       <nav className="flex flex-col space-y-2">
         {navLinks.map((link) => (
           <Link
             key={link.href}
             href={link.href}
             className={cn(
-              "py-2 px-4 rounded-md hover:bg-neutral-700 transition-colors text-sm font-medium",
+              "nav-link",
+              pathname === link.href && "sidebar-link-active",
             )}
           >
             {link.label}

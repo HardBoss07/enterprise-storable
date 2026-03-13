@@ -8,11 +8,7 @@ export default function Header() {
   const { user, logout } = useAuth();
 
   return (
-    <header
-      className={cn(
-        "bg-neutral-900 text-white shadow-md border-b border-neutral-800",
-      )}
-    >
+    <header className="app-header">
       <div className="container mx-auto flex h-16 items-center justify-between px-6">
         <Link
           href="/"
