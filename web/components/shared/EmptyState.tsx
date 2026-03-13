@@ -23,19 +23,11 @@ export function EmptyState({
   description,
   className,
 }: EmptyStateProps) {
-  const CLASSES = {
-    container:
-      "card-surface py-20 flex flex-col items-center justify-center text-neutral-500 italic",
-    icon: "mb-4 text-neutral-600",
-    title: "text-neutral-400",
-    description: "text-neutral-500 text-sm mt-1",
-  };
-
   return (
-    <div className={cn(CLASSES.container, className)}>
-      <Icon className={CLASSES.icon} size={48} />
-      <p className={CLASSES.title}>{title}</p>
-      {description && <p className={CLASSES.description}>{description}</p>}
+    <div className={cn("empty-state-container", className)}>
+      <Icon className="mb-4 text-neutral-600" size={48} />
+      <p className="text-neutral-400">{title}</p>
+      {description && <p className="text-neutral-500 text-sm mt-1">{description}</p>}
     </div>
   );
 }
