@@ -18,10 +18,10 @@
   }
 
   .table-header-grid {
-    @apply grid grid-cols-12 gap-4 p-4 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2;
+    @apply grid grid-cols-12 gap-4 p-2 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2;
   }
 
   .table-row-grid {
-    @apply grid grid-cols-12 gap-4 p-3 items-center rounded-lg hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-neutral-700/50;
+    @apply grid grid-cols-12 gap-4 p-2 items-center rounded-lg hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-neutral-700/50;
   }
 }

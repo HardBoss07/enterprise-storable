@@ -29,7 +29,7 @@ export function TrashTable({
         <div className="col-span-2 text-right">Days Left</div>
       </div>
 
-      <div className="divide-y divide-neutral-700/30">
+      <div className="space-y-1">
         {items.map((item) => (
           <TrashTableRow
             key={item.metadata.id}
