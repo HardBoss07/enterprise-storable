@@ -29,7 +29,6 @@ enterprise-storable/
 │   │       │                   └── StorableApiApplication.java
 │   │       └── resources/
 │   │           └── application.yml
-│   ├── target/
 │   └── pom.xml
 ├── storable-common/
 │   ├── src/
@@ -54,7 +53,6 @@ enterprise-storable/
 │   │                               ├── FileNodeRepository.java
 │   │                               ├── SystemSettingRepository.java
 │   │                               └── UserRepository.java
-│   ├── target/
 │   └── pom.xml
 ├── storable-core/
 │   ├── src/
@@ -84,7 +82,6 @@ enterprise-storable/
 │   │                               ├── LocalStorageService.java
 │   │                               ├── StorageService.java
 │   │                               └── TrashCleanupService.java
-│   ├── target/
 │   └── pom.xml
 ├── storable-data/
 │   ├── src/
@@ -96,10 +93,10 @@ enterprise-storable/
 │   │                       └── data/
 │   │                           └── service/
 │   │                               └── FileNodePersistenceImpl.java
-│   ├── target/
 │   └── pom.xml
 ├── storage/
 │   ├── 0c739db5-8341-4e5f-b639-01af13e12dc8
+│   ├── 6c5106ff-54e6-4f8f-a159-85195763fc10
 │   ├── 8ae365c8-b2dc-44d8-968f-05f3fc1fe097
 │   ├── a92fffd8-8286-4ac3-8c90-5488b105587f
 │   └── dffd5f1b-9b77-409a-a126-3be1e8e41351
@@ -162,6 +159,21 @@ enterprise-storable/
 │   │   ├── mock-data.ts
 │   │   └── utils.ts
 │   ├── public/
+│   ├── styles/
+│   │   ├── base/
+│   │   │   ├── reset.css
+│   │   │   └── variables.css
+│   │   ├── components/
+│   │   │   ├── badges.css
+│   │   │   ├── buttons.css
+│   │   │   ├── inputs.css
+│   │   │   ├── spinner.css
+│   │   │   └── surfaces.css
+│   │   ├── features/
+│   │   │   ├── file-browser.css
+│   │   │   └── trash.css
+│   │   └── layouts/
+│   │       └── main-layout.css
 │   ├── types/
 │   │   ├── Admin.ts
 │   │   └── FileNode.ts

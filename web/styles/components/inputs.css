@@ -1,0 +1,11 @@
+@layer components {
+  /* --- Forms & Inputs --- */
+  .input-field {
+    @apply bg-neutral-800 text-neutral-100 px-2 py-1 rounded border border-neutral-700 focus:outline-none focus:border-blue-500;
+  }
+
+  /* --- Retention Settings --- */
+  .retention-input {
+    @apply w-16 bg-neutral-900 text-neutral-100 text-xs px-2 py-1 rounded border border-neutral-700 focus:outline-none focus:border-blue-500;
+  }
+}

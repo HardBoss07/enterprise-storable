@@ -1,0 +1,14 @@
+@layer components {
+  /* --- Spinner Components --- */
+  .spinner-container {
+    @apply flex justify-center items-center;
+  }
+
+  .spinner-element {
+    @apply animate-spin rounded-full border-b-primary-accent border-neutral-700;
+  }
+
+  .spinner-sm { @apply h-6 w-6 border-2; }
+  .spinner-md { @apply h-12 w-12 border-2; }
+  .spinner-lg { @apply h-16 w-16 border-4; }
+}

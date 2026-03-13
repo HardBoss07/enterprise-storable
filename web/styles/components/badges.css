@@ -1,0 +1,14 @@
+@layer components {
+  /* --- Badges --- */
+  .badge {
+    @apply text-xs font-medium px-2 py-1 rounded-full;
+  }
+
+  .badge-warning {
+    @apply bg-red-500/10 text-red-500;
+  }
+
+  .badge-neutral {
+    @apply bg-neutral-800 text-neutral-400;
+  }
+}

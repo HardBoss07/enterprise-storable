@@ -1,0 +1,6 @@
+@layer components {
+  /* --- Retention Settings --- */
+  .retention-container {
+    @apply flex items-center bg-neutral-800/50 rounded-lg p-1 border border-neutral-700;
+  }
+}
