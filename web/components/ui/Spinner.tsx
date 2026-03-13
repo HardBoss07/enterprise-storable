@@ -13,19 +13,14 @@ interface SpinnerProps {
  */
 export function Spinner({ size = "md", className }: SpinnerProps) {
   const sizes = {
-    sm: "h-6 w-6 border-2",
-    md: "h-12 w-12 border-2",
-    lg: "h-16 w-16 border-4",
+    sm: "spinner-sm",
+    md: "spinner-md",
+    lg: "spinner-lg",
   };
 
   return (
-    <div className={cn("flex justify-center items-center", className)}>
-      <div
-        className={cn(
-          "animate-spin rounded-full border-b-primary-accent border-neutral-700",
-          sizes[size],
-        )}
-      />
+    <div className={cn("spinner-container", className)}>
+      <div className={cn("spinner-element", sizes[size])} />
     </div>
   );
 }
