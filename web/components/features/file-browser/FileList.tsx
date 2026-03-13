@@ -68,11 +68,7 @@ export default function FileList({
 
   return (
     <div className="space-y-1">
-      <div
-        className={cn(
-          "flex items-center p-2 text-neutral-400 text-sm font-bold border-b border-neutral-700/50 mb-2",
-        )}
-      >
+      <div className="list-header">
         <div className="flex-1 min-w-0 ml-10">Name</div>
         <div className="w-40 hidden sm:block">Last Modified</div>
         <div className="w-24 text-right">File Size</div>
@@ -92,7 +88,7 @@ export default function FileList({
               onKeyDown={handleKeyDown}
               onBlur={() => !newFolderName.trim() && onCancelCreateFolder?.()}
               placeholder="Folder name..."
-              className="bg-neutral-800 text-neutral-100 px-2 py-1 rounded border border-neutral-700 focus:outline-none focus:border-blue-500 w-full max-w-sm"
+              className="input-field w-full max-w-sm"
             />
           </div>
           <div className="hidden sm:block w-40" />

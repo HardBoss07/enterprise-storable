@@ -79,9 +79,7 @@ export default function FileListItem({
 
   return (
     <div
-      className={cn(
-        "flex items-center space-x-4 p-2 interactive-surface group",
-      )}
+      className="flex items-center space-x-4 p-2 interactive-surface group"
       onClick={handleClick}
     >
       <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">

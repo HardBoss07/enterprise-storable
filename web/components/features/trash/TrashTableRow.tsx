@@ -27,38 +27,30 @@ export function TrashTableRow({
 }: TrashTableRowProps) {
   const { metadata, daysRemaining } = item;
 
-  const CLASSES = {
-    row: "grid grid-cols-12 gap-4 p-3 items-center group interactive-surface no-hover",
-    cellName: "col-span-5 flex items-center min-w-0",
-    cellIcon: "flex items-center justify-center w-10 h-10 mr-2 flex-shrink-0",
-    cellText: "text-neutral-100 font-medium truncate",
-    cellDate: "col-span-3 text-text-muted text-sm",
-    cellSize: "col-span-2 text-text-muted text-sm text-right",
-    cellActions: "col-span-2 flex items-center justify-end space-x-2",
-  };
-
   return (
-    <div className={CLASSES.row}>
-      <div className={CLASSES.cellName}>
-        <div className={CLASSES.cellIcon}>
+    <div className="table-row-grid no-hover group">
+      <div className="col-span-5 flex items-center min-w-0">
+        <div className="flex items-center justify-center w-10 h-10 mr-2 flex-shrink-0">
           <FileIcon mime={metadata.mime} isFolder={metadata.folder} size={22} />
         </div>
-        <span className={CLASSES.cellText}>{metadata.name}</span>
+        <span className="text-neutral-100 font-medium truncate">
+          {metadata.name}
+        </span>
       </div>
 
-      <div className={CLASSES.cellDate}>
+      <div className="col-span-3 text-text-muted text-sm">
         {metadata.deletedAt
           ? format(new Date(metadata.deletedAt), "MMM d, yyyy HH:mm")
           : "--"}
       </div>
 
-      <div className={CLASSES.cellSize}>
+      <div className="col-span-2 text-text-muted text-sm text-right">
         {!metadata.folder && metadata.size !== null
           ? formatBytes(metadata.size)
           : "--"}
       </div>
 
-      <div className={CLASSES.cellActions}>
+      <div className="col-span-2 flex items-center justify-end space-x-2">
         <StatusBadge
           label={`${daysRemaining} days left`}
           isWarning={daysRemaining <= 5}

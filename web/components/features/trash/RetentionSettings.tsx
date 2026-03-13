@@ -30,23 +30,14 @@ export function RetentionSettings({
   onEditToggle,
   onSave,
 }: RetentionSettingsProps) {
-  const CLASSES = {
-    container:
-      "flex items-center bg-neutral-800/50 rounded-lg p-1 border border-neutral-700",
-    input:
-      "w-16 bg-neutral-900 text-neutral-100 text-xs px-2 py-1 rounded border border-neutral-700 focus:outline-none focus:border-blue-500",
-    label: "text-xs text-neutral-400",
-    editButton: "text-xs text-neutral-400 hover:text-neutral-100",
-  };
-
   if (!isEditing) {
     return (
-      <div className={CLASSES.container}>
+      <div className="retention-container">
         <Button
           onClick={() => onEditToggle(true)}
           variant="ghost"
           size="sm"
-          className={CLASSES.editButton}
+          className="text-xs text-neutral-400 hover:text-neutral-100"
         >
           <Settings size={14} className="mr-2" />
           Retention: {days}d
@@ -56,17 +47,17 @@ export function RetentionSettings({
   }
 
   return (
-    <div className={CLASSES.container}>
+    <div className="retention-container">
       <div className="flex items-center space-x-2 px-2">
         <Settings size={14} className="text-neutral-500" />
         <input
           type="number"
           value={days}
           onChange={(e) => onDaysChange(parseInt(e.target.value) || 0)}
-          className={CLASSES.input}
+          className="retention-input"
           min="0"
         />
-        <span className={CLASSES.label}>days</span>
+        <span className="text-xs text-neutral-400">days</span>
         <IconButton
           icon={Save}
           onClick={onSave}
