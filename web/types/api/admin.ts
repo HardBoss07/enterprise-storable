@@ -11,3 +11,8 @@ export interface GlobalSettingsDto {
   trashRetentionDays: number;
   systemTimezone: string;
 }
+
+export interface UpdateUserRolePayload {
+  userId: string;
+  role: UserRole;
+}

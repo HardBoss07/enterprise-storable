@@ -12,3 +12,13 @@ export interface FileNode {
   parentId: number | null;
   folder: boolean;
 }
+
+export interface CreateFolderPayload {
+  name: string;
+  parentId: number | null;
+}
+
+export interface UploadFilePayload {
+  file: File;
+  parentId: number | null;
+}
