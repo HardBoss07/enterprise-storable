@@ -1,16 +1,15 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { FileNode } from "@/types/FileNode";
+import { FileNode } from "@/types/api";
 import {
-  getFiles,
-  getFileMetadata,
+  getFileList,
   createFolder,
   uploadFile,
-  getPath,
+  getFilePath,
   getHomeFolder,
-  softDelete,
-} from "@/lib/api";
+  softDeleteNode,
+} from "@/lib/api/file";
 
 /**
  * Hook for managing the file browser state and operations.
@@ -54,10 +53,10 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     setLoading(true);
     setError(null);
     try {
-      const children = await getFiles(currentFolderId);
+      const children = await getFileList(currentFolderId);
       setFiles(children);
 
-      const pathArr = await getPath(currentFolderId);
+      const pathArr = await getFilePath(currentFolderId);
       setPath(pathArr);
     } catch (err) {
       console.error("Error fetching file data:", err);
@@ -100,7 +99,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
    */
   const handleCreateFolder = async (name: string) => {
     try {
-      await createFolder(name, currentFolderId);
+      await createFolder({ name, parentId: currentFolderId });
       setIsCreatingFolder(false);
       await fetchData();
     } catch (err) {
@@ -131,7 +130,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
    */
   const handleDelete = async (nodeId: number) => {
     try {
-      await softDelete(nodeId);
+      await softDeleteNode(nodeId);
       await fetchData();
     } catch (err) {
       console.error("Failed to delete file:", err);

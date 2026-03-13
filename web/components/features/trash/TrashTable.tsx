@@ -1,6 +1,6 @@
 "use client";
 
-import { TrashItem } from "@/lib/api";
+import { TrashItem } from "@/types/api";
 import { TrashTableRow } from "./TrashTableRow";
 
 interface TrashTableProps {

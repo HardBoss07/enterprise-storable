@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { GlobalSettingsDto } from "@/types/Admin";
-import { getGlobalSettings, updateGlobalSettings } from "@/lib/api";
+import { GlobalSettingsDto } from "@/types/api";
+import { getSettings, updateSettings } from "@/lib/api/admin";
 import { Button } from "@/components/ui/Button";
 import { Save, Clock, Trash2, Search, Check } from "lucide-react";
 import { useToast } from "@/context/ToastContext";
@@ -31,7 +31,7 @@ export default function GlobalSettingsPage() {
   useEffect(() => {
     const fetchSettings = async () => {
       try {
-        const data = await getGlobalSettings();
+        const data = await getSettings();
         setSettings(data);
       } catch (error) {
         showToast("Failed to fetch settings", "error");
@@ -46,7 +46,7 @@ export default function GlobalSettingsPage() {
     if (!settings) return;
     try {
       setIsSaving(true);
-      await updateGlobalSettings(settings);
+      await updateSettings(settings);
       showToast("Settings updated successfully", "success");
     } catch (error) {
       showToast("Failed to update settings", "error");

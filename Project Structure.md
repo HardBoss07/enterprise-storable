@@ -155,7 +155,12 @@ enterprise-storable/
 │   │   ├── useFileBrowser.ts
 │   │   └── useTrash.ts
 │   ├── lib/
-│   │   ├── api.ts
+│   │   ├── api/
+│   │   │   ├── admin.ts
+│   │   │   ├── auth.ts
+│   │   │   ├── client.ts
+│   │   │   ├── file.ts
+│   │   │   └── trash.ts
 │   │   ├── mock-data.ts
 │   │   └── utils.ts
 │   ├── public/
@@ -175,8 +180,12 @@ enterprise-storable/
 │   │   └── layouts/
 │   │       └── main-layout.css
 │   ├── types/
-│   │   ├── Admin.ts
-│   │   └── FileNode.ts
+│   │   └── api/
+│   │       ├── admin.ts
+│   │       ├── auth.ts
+│   │       ├── files.ts
+│   │       ├── index.ts
+│   │       └── trash.ts
 │   ├── Dockerfile
 │   ├── README.md
 │   ├── eslint.config.mjs

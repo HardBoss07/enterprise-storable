@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { login as loginApi } from "@/lib/api";
+import { loginUser as loginApi } from "@/lib/api/auth";
+import { useRouter } from 'next/navigation';
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const [username, setUsername] = useState("");
@@ -16,7 +16,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError("");
     try {
-      const res = await loginApi(username, password);
+      const res = await loginApi({ username, password });
       login(res.token, res.username, res.role);
       // login function handles redirect usually, but duplicate just in case
     } catch (err: any) {

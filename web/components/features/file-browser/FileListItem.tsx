@@ -1,11 +1,11 @@
 "use client";
 
-import { FileNode } from "@/types/FileNode";
+import { FileNode } from "@/types/api";
 import { FileIcon } from "@/components/icons/FileIcon";
 import { format } from "date-fns";
 import { Download, Trash2 } from "lucide-react";
-import { downloadFileBlob } from "@/lib/api";
-import { formatBytes, cn } from "@/lib/utils";
+import { downloadFileAsBlob } from "@/lib/api/file";
+import { formatBytes } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
@@ -47,7 +47,7 @@ export default function FileListItem({
   const handleDownload = async (e: React.MouseEvent) => {
     e.stopPropagation();
     try {
-      const blob = await downloadFileBlob(node.id);
+      const blob = await downloadFileAsBlob(node.id);
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

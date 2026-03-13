@@ -3,13 +3,15 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import {
   TrashItem,
-  getTrash,
-  restore,
-  emptyTrash,
-  permanentlyDelete,
-  updateTrashRetention,
-  getPublicTrashRetention,
-} from "@/lib/api";
+} from "@/types/api";
+import {
+  getTrashList,
+  deleteNodePermanently,
+  emptyTrashBin,
+  getTrashRetentionConfig,
+} from "@/lib/api/trash";
+import { restoreNode } from "@/lib/api/file";
+import { updateRetentionDays } from "@/lib/api/admin";
 import { useAuth } from "@/context/AuthContext";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
@@ -41,8 +43,8 @@ export function useTrash() {
     setError(null);
     try {
       const [items, days] = await Promise.all([
-        getTrash(),
-        getPublicTrashRetention(),
+        getTrashList(),
+        getTrashRetentionConfig(),
       ]);
       setTrashItems(items);
       setRetentionDays(days);
@@ -64,7 +66,7 @@ export function useTrash() {
    */
   const handleRestore = async (id: number) => {
     try {
-      await restore(id);
+      await restoreNode(id);
       showToast("Item restored successfully.", "success");
       await fetchTrashData();
     } catch (err) {
@@ -87,7 +89,7 @@ export function useTrash() {
 
     if (confirmed) {
       try {
-        await permanentlyDelete(id);
+        await deleteNodePermanently(id);
         showToast(`Permanently deleted ${name}.`, "success");
         await fetchTrashData();
       } catch (err) {
@@ -109,7 +111,7 @@ export function useTrash() {
 
     if (confirmed) {
       try {
-        await emptyTrash();
+        await emptyTrashBin();
         showToast("Trash emptied successfully.", "success");
         await fetchTrashData();
       } catch (err) {
@@ -124,7 +126,7 @@ export function useTrash() {
   const handleSaveRetention = async () => {
     setIsSavingRetention(true);
     try {
-      await updateTrashRetention(retentionDays);
+      await updateRetentionDays(retentionDays);
       setIsEditingRetention(false);
       showToast("Retention period updated successfully.", "success");
       await fetchTrashData();

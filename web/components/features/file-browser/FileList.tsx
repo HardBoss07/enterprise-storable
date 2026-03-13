@@ -1,6 +1,6 @@
 "use client";
 
-import { FileNode } from "@/types/FileNode";
+import { FileNode } from "@/types/api";
 import FileListItem from "./FileListItem";
 import { useMemo } from "react";
 import { cn } from "@/lib/utils";

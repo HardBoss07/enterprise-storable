@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { UserDto } from "@/types/Admin";
-import { getAllUsers, deleteUser, updateUserRole } from "@/lib/api";
+import { UserDto } from "@/types/api";
+import { getUsers, removeUser, changeUserRole } from "@/lib/api/admin";
 import { Button } from "@/components/ui/Button";
 import { Trash2, User as UserIcon, Shield, ChevronDown } from "lucide-react";
 import { useConfirm } from "@/context/ConfirmContext";
@@ -20,7 +20,7 @@ export default function UserManagementPage() {
   const fetchUsers = async () => {
     try {
       setIsLoading(true);
-      const data = await getAllUsers();
+      const data = await getUsers();
       setUsers(data);
     } catch (error) {
       showToast("Failed to fetch users", "error");
@@ -36,7 +36,7 @@ export default function UserManagementPage() {
   const handleRoleChange = async (userId: string, newRole: string) => {
     try {
       setUpdatingUserId(userId);
-      await updateUserRole(userId, newRole);
+      await changeUserRole({ userId, role: newRole as any });
       showToast("User role updated successfully", "success");
       
       // Update local state instead of full refresh
@@ -58,7 +58,7 @@ export default function UserManagementPage() {
 
     if (isConfirmed) {
       try {
-        await deleteUser(userToDelete.id);
+        await removeUser(userToDelete.id);
         showToast(`User ${userToDelete.username} deleted successfully`, "success");
         fetchUsers();
       } catch (error) {

@@ -1,4 +1,4 @@
-import { FileNode } from "@/types/FileNode";
+import { FileNode } from "@/types/api";
 
 const GUEST_ID = "00000000-0000-0000-0000-000000000000";
 

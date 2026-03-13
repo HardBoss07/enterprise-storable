@@ -2,7 +2,7 @@
 
 import { format } from "date-fns";
 import { RotateCcw, Trash2 } from "lucide-react";
-import { TrashItem } from "@/lib/api";
+import { TrashItem } from "@/types/api";
 import { FileIcon } from "@/components/icons/FileIcon";
 import { IconButton } from "@/components/ui/IconButton";
 import { StatusBadge } from "@/components/shared/StatusBadge";

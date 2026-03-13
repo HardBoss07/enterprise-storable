@@ -1,9 +1,9 @@
 "use client";
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { register as registerApi } from "@/lib/api";
+import { registerUser as registerApi } from "@/lib/api/auth";
+import { useRouter } from 'next/navigation';
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
@@ -25,7 +25,7 @@ export default function RegisterPage() {
     }
 
     try {
-      const res = await registerApi(username, email, password);
+      const res = await registerApi({ username, email, password });
       login(res.token, res.username, res.role);
     } catch (err: any) {
       setError(err.message || "Registration failed");
