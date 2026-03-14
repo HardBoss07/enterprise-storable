@@ -12,9 +12,14 @@ interface FileListProps {
   files: FileNode[];
   onFolderClick: (folderId: number) => void;
   onDelete: (nodeId: number) => void;
+  onRename: (nodeId: number, newName: string) => void;
+  onDuplicate: (nodeId: number) => void;
+  onMove: (nodeId: number) => void;
   isCreatingFolder?: boolean;
   onCreateFolder?: (name: string) => void;
   onCancelCreateFolder?: () => void;
+  renamingNodeId?: number | null;
+  onCancelRename?: () => void;
 }
 
 /**
@@ -27,9 +32,14 @@ export default function FileList({
   files,
   onFolderClick,
   onDelete,
+  onRename,
+  onDuplicate,
+  onMove,
   isCreatingFolder,
   onCreateFolder,
   onCancelCreateFolder,
+  renamingNodeId,
+  onCancelRename,
 }: FileListProps) {
   const [newFolderName, setNewFolderName] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -107,6 +117,11 @@ export default function FileList({
             node={file}
             onFolderClick={onFolderClick}
             onDelete={onDelete}
+            onRename={onRename}
+            onDuplicate={onDuplicate}
+            onMove={onMove}
+            isInitialRenaming={renamingNodeId === file.id}
+            onCancelRename={onCancelRename}
           />
         ))
       )}

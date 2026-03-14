@@ -3,17 +3,23 @@
 import { FileNode } from "@/types/api";
 import { FileIcon } from "@/components/icons/FileIcon";
 import { format } from "date-fns";
-import { Download, Trash2 } from "lucide-react";
+import { Download, Trash2, Edit2, Copy, ArrowRightLeft } from "lucide-react";
 import { downloadFileAsBlob } from "@/lib/api/file";
 import { formatBytes } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
+import { useState, useRef, useEffect } from "react";
 
 interface FileListItemProps {
   node: FileNode;
   onFolderClick: (folderId: number) => void;
   onDelete: (nodeId: number) => void;
+  onRename: (nodeId: number, newName: string) => void;
+  onDuplicate: (nodeId: number) => void;
+  onMove: (nodeId: number) => void;
+  isInitialRenaming?: boolean;
+  onCancelRename?: () => void;
 }
 
 /**
@@ -26,15 +32,43 @@ export default function FileListItem({
   node,
   onFolderClick,
   onDelete,
+  onRename,
+  onDuplicate,
+  onMove,
+  isInitialRenaming,
+  onCancelRename,
 }: FileListItemProps) {
   const { showToast } = useToast();
   const { confirm } = useConfirm();
+  const [isRenaming, setIsRenaming] = useState(isInitialRenaming || false);
+  const [newName, setNewName] = useState(node.name);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (isInitialRenaming) {
+      setIsRenaming(true);
+    }
+  }, [isInitialRenaming]);
+
+  useEffect(() => {
+    if (isRenaming) {
+      // Strip extension for base name editing if it's a file
+      if (!node.folder) {
+        const lastDotIndex = node.name.lastIndexOf(".");
+        setNewName(lastDotIndex !== -1 ? node.name.substring(0, lastDotIndex) : node.name);
+      } else {
+        setNewName(node.name);
+      }
+      inputRef.current?.focus();
+      inputRef.current?.select();
+    }
+  }, [isRenaming, node.name, node.folder]);
 
   const handleClick = (e: React.MouseEvent) => {
-    // Prevent click if we're clicking the download button or delete button
+    // Prevent click if we're clicking any action button or renaming
     if (
-      (e.target as HTMLElement).closest(".download-btn") ||
-      (e.target as HTMLElement).closest(".delete-btn")
+      (e.target as HTMLElement).closest(".action-btn") ||
+      isRenaming
     ) {
       return;
     }
@@ -77,6 +111,39 @@ export default function FileListItem({
     }
   };
 
+  const handleRenameClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    setIsRenaming(true);
+  };
+
+  const handleDuplicateClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onDuplicate(node.id);
+  };
+
+  const handleMoveClick = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    onMove(node.id);
+  };
+
+  const submitRename = () => {
+    if (newName.trim() && newName.trim() !== node.name) {
+      onRename(node.id, newName.trim());
+    }
+    setIsRenaming(false);
+    onCancelRename?.();
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      submitRename();
+    } else if (e.key === "Escape") {
+      setIsRenaming(false);
+      setNewName(node.name);
+      onCancelRename?.();
+    }
+  };
+
   return (
     <div
       className="flex items-center space-x-4 p-2 interactive-surface group"
@@ -86,31 +153,72 @@ export default function FileListItem({
         <FileIcon mime={node.mime} isFolder={node.folder} size={22} />
       </div>
       <div className="flex-1 min-w-0 flex items-center h-10">
-        <p className="text-neutral-100 font-medium m-0 truncate leading-none">
-          {node.name}
-        </p>
+        {isRenaming ? (
+          <input
+            ref={inputRef}
+            type="text"
+            value={newName}
+            onChange={(e) => setNewName(e.target.value)}
+            onKeyDown={handleKeyDown}
+            onBlur={submitRename}
+            className="input-field w-full max-w-sm h-8 py-0 px-2 text-sm"
+          />
+        ) : (
+          <p className="text-neutral-100 font-medium m-0 truncate leading-none">
+            {node.name}
+          </p>
+        )}
       </div>
 
       <div className="flex items-center space-x-2">
-        <div className="hidden group-hover:flex px-2 space-x-2">
+        <div className="hidden group-hover:flex px-2 space-x-1">
           {!node.folder && (
             <IconButton
               icon={Download}
               onClick={handleDownload}
-              className="download-btn"
+              className="action-btn"
               variant="secondary"
               size="sm"
-              iconSize={16}
+              iconSize={14}
               title="Download"
             />
           )}
           <IconButton
-            icon={Trash2}
-            onClick={handleDelete}
-            className="delete-btn text-red-500 hover:text-red-400"
+            icon={Edit2}
+            onClick={handleRenameClick}
+            className="action-btn"
             variant="ghost"
             size="sm"
-            iconSize={16}
+            iconSize={14}
+            title="Rename"
+          />
+          {!node.folder && (
+            <IconButton
+              icon={Copy}
+              onClick={handleDuplicateClick}
+              className="action-btn"
+              variant="ghost"
+              size="sm"
+              iconSize={14}
+              title="Create Copy"
+            />
+          )}
+          <IconButton
+            icon={ArrowRightLeft}
+            onClick={handleMoveClick}
+            className="action-btn"
+            variant="ghost"
+            size="sm"
+            iconSize={14}
+            title="Move"
+          />
+          <IconButton
+            icon={Trash2}
+            onClick={handleDelete}
+            className="action-btn text-red-500 hover:text-red-400"
+            variant="ghost"
+            size="sm"
+            iconSize={14}
             title="Delete"
           />
         </div>

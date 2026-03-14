@@ -9,6 +9,9 @@ import {
   getFilePath,
   getHomeFolder,
   softDeleteNode,
+  renameNode,
+  duplicateFile,
+  moveNode,
 } from "@/lib/api/file";
 
 /**
@@ -138,6 +141,51 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     }
   };
 
+  /**
+   * Renames a file node.
+   * @param nodeId The ID of the node to rename.
+   * @param newName The new name.
+   */
+  const handleRename = async (nodeId: number, newName: string) => {
+    try {
+      await renameNode(nodeId, newName);
+      await fetchData();
+    } catch (err) {
+      console.error("Failed to rename file:", err);
+      throw new Error("Failed to rename file");
+    }
+  };
+
+  /**
+   * Duplicates a file.
+   * @param nodeId The ID of the file to duplicate.
+   */
+  const handleDuplicate = async (nodeId: number) => {
+    try {
+      const newNode = await duplicateFile(nodeId);
+      await fetchData();
+      return newNode;
+    } catch (err) {
+      console.error("Failed to duplicate file:", err);
+      throw new Error("Failed to duplicate file");
+    }
+  };
+
+  /**
+   * Moves a node to a new destination.
+   * @param nodeId The ID of the node to move.
+   * @param targetParentId The ID of the destination folder.
+   */
+  const handleMove = async (nodeId: number, targetParentId: number | null) => {
+    try {
+      await moveNode(nodeId, targetParentId);
+      await fetchData();
+    } catch (err) {
+      console.error("Failed to move file:", err);
+      throw new Error("Failed to move file");
+    }
+  };
+
   return {
     files,
     path,
@@ -152,5 +200,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     createFolder: handleCreateFolder,
     uploadFile: handleUploadFile,
     deleteFile: handleDelete,
+    renameFile: handleRename,
+    duplicateFile: handleDuplicate,
+    moveFile: handleMove,
   };
 }

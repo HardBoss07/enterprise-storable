@@ -93,6 +93,9 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **API:** Recursive folder creation.
 - [x] **API:** File upload (Multipart) and Download.
 - [x] **UI:** File Explorer grid/list view with navigation (breadcrumbs).
+- [x] **Feature:** Rename files/folders with extension preservation.
+- [x] **Feature:** Smart Duplicate with collision avoidance.
+- [x] **Feature:** Move files/folders with circular reference protection and search-to-move UI.
 
 ### [x] Phase 3: Base File Structure (Virtual Pathing) - DEFERRED
 

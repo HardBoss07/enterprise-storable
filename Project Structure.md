@@ -128,7 +128,8 @@ enterprise-storable/
 │   │   │   │   ├── Breadcrumbs.tsx
 │   │   │   │   ├── FileBrowser.tsx
 │   │   │   │   ├── FileList.tsx
-│   │   │   │   └── FileListItem.tsx
+│   │   │   │   ├── FileListItem.tsx
+│   │   │   │   └── MoveModal.tsx
 │   │   │   └── trash/
 │   │   │       ├── RetentionSettings.tsx
 │   │   │       ├── TrashTable.tsx

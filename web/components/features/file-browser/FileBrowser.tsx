@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import Breadcrumbs from "./Breadcrumbs";
 import FileList from "./FileList";
 import { Upload, FolderPlus, RefreshCw } from "lucide-react";
@@ -9,6 +9,8 @@ import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/context/ToastContext";
+import MoveModal from "./MoveModal";
+import { FileNode } from "@/types/api";
 
 interface FileBrowserProps {
   initialFolderId?: number | null;
@@ -32,12 +34,17 @@ export default function FileBrowser({
     createFolder,
     uploadFile,
     deleteFile,
+    renameFile,
+    duplicateFile,
+    moveFile,
     isCreatingFolder,
     triggerCreateFolder,
     cancelCreateFolder,
   } = useFileBrowser(initialFolderId);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [movingNode, setMovingNode] = useState<FileNode | null>(null);
+  const [renamingNodeId, setRenamingNodeId] = useState<number | null>(null);
 
   const handleCreateFolder = () => {
     triggerCreateFolder();
@@ -59,8 +66,49 @@ export default function FileBrowser({
     }
   };
 
+  const handleRename = async (nodeId: number, newName: string) => {
+    try {
+      await renameFile(nodeId, newName);
+      showToast("Successfully renamed", "success");
+    } catch (err) {
+      showToast("Failed to rename", "error");
+    } finally {
+      setRenamingNodeId(null);
+    }
+  };
+
+  const handleDuplicate = async (nodeId: number) => {
+    try {
+      const newNode = await duplicateFile(nodeId);
+      showToast("Successfully duplicated", "success");
+      // Trigger rename for the new node
+      setRenamingNodeId(newNode.id);
+    } catch (err) {
+      showToast("Failed to duplicate", "error");
+    }
+  };
+
+  const handleMoveClick = (nodeId: number) => {
+    const node = files.find(f => f.id === nodeId);
+    if (node) {
+      setMovingNode(node);
+    }
+  };
+
+  const handleMoveConfirm = async (targetParentId: number | null) => {
+    if (!movingNode) return;
+    try {
+      await moveFile(movingNode.id, targetParentId);
+      showToast(`Moved ${movingNode.name} successfully`, "success");
+    } catch (err) {
+      showToast("Failed to move item", "error");
+    } finally {
+      setMovingNode(null);
+    }
+  };
+
   return (
-    <div className="card-surface">
+    <div className="card-surface relative">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
         <Breadcrumbs path={path} onBreadcrumbClick={navigateToFolder} />
 
@@ -111,9 +159,23 @@ export default function FileBrowser({
           files={files}
           onFolderClick={navigateToFolder}
           onDelete={deleteFile}
+          onRename={handleRename}
+          onDuplicate={handleDuplicate}
+          onMove={handleMoveClick}
           isCreatingFolder={isCreatingFolder}
           onCreateFolder={createFolder}
           onCancelCreateFolder={cancelCreateFolder}
+          renamingNodeId={renamingNodeId}
+          onCancelRename={() => setRenamingNodeId(null)}
+        />
+      )}
+
+      {movingNode && (
+        <MoveModal
+          isOpen={!!movingNode}
+          nodeToMove={movingNode}
+          onClose={() => setMovingNode(null)}
+          onMove={handleMoveConfirm}
         />
       )}
     </div>

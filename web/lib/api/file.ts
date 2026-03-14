@@ -102,3 +102,34 @@ export async function restoreNode(nodeId: number): Promise<void> {
   });
   if (!response.ok) throw new Error("Restore failed");
 }
+
+/**
+ * Renames a file or folder.
+ */
+export async function renameNode(nodeId: number, newName: string): Promise<FileNode> {
+  return apiRequest<FileNode>(`/api/files/${nodeId}/rename`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ name: newName }),
+  });
+}
+
+/**
+ * Creates a duplicate of a file.
+ */
+export async function duplicateFile(nodeId: number): Promise<FileNode> {
+  return apiRequest<FileNode>(`/api/files/${nodeId}/duplicate`, {
+    method: "POST",
+  });
+}
+
+/**
+ * Moves a file or folder to a new destination.
+ */
+export async function moveNode(nodeId: number, targetParentId: number | null): Promise<FileNode> {
+  return apiRequest<FileNode>(`/api/files/${nodeId}/move`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ targetParentId: targetParentId || 0 }),
+  });
+}
