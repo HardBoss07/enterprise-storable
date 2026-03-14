@@ -5,12 +5,16 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
+import org.springframework.data.domain.Pageable;
+
 import java.util.List;
 import java.util.Optional;
 
 @Repository
 public interface FileNodeRepository extends JpaRepository<FileNode, Long> {
     
+    List<FileNode> findTop5ByOwnerIdAndKindAndIsDeletedFalseOrderByModifiedAtDesc(String ownerId, FileNode.NodeKind kind);
+
     @Query("SELECT f FROM FileNode f WHERE f.parentId = :parentId AND f.isDeleted = false AND (f.ownerId = :ownerId OR :ownerId = 'f43c0bcf-11e4-4629-b072-321ccd04e72a')")
     List<FileNode> findByParentIdAndAuthorizedOwner(Long parentId, String ownerId);
 

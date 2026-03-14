@@ -6,6 +6,7 @@ import dev.m4tt3o.storable.common.entity.FileNode;
 import dev.m4tt3o.storable.common.repository.FileNodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -40,6 +41,15 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     public Optional<FileMetadataDto> findByIdAndOwner(Long id, String ownerId) {
         log.debug("Finding node by ID: {} and owner: {}", id, ownerId);
         return repository.findByIdAndAuthorizedOwner(id, ownerId).map(this::toDto);
+    }
+    
+    @Override
+    /** Retrieves the 5 most recently modified files for a specific owner. */
+    public List<FileMetadataDto> findRecentFiles(String ownerId) {
+        log.debug("Finding 5 recent files for owner: {}", ownerId);
+        return repository.findTop5ByOwnerIdAndKindAndIsDeletedFalseOrderByModifiedAtDesc(ownerId, FileNode.NodeKind.file).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
     }
     
     // Note: Older methods kept for compatibility if needed, but updated interface requires implementation.

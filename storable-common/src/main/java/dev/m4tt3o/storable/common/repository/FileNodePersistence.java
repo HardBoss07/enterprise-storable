@@ -56,6 +56,9 @@ public interface FileNodePersistence {
     /** Searches for nodes by name and kind for a specific owner. */
     List<FileMetadataDto> search(String query, String kind, String ownerId);
 
+    /** Retrieves the 5 most recently modified files for a specific owner. */
+    List<FileMetadataDto> findRecentFiles(String ownerId);
+
     /** Checks if a node with the given name exists in the parent globally (any owner, any state). */
     boolean existsByNameAndParentGlobal(String name, Long parentId);
 }
