@@ -176,4 +176,38 @@ public class FileController {
         // I will need to inject ConfigService into FileController as well.
         return ResponseEntity.ok(Map.of("days", fileService.getTrashRetentionDays()));
     }
+
+    @PatchMapping("/{nodeId}/rename")
+    /** Renames a node. */
+    public FileMetadataDto rename(@PathVariable Long nodeId, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomUserDetails user) {
+        String newName = body.get("name");
+        log.info("Request to rename node: {} to: {} by user: {}", nodeId, newName, user.getUsername());
+        return fileService.rename(nodeId, newName, user.id());
+    }
+
+    @PostMapping("/{nodeId}/duplicate")
+    /** Duplicates a file with an optional new name. */
+    public FileMetadataDto duplicate(@PathVariable Long nodeId, @RequestBody(required = false) Map<String, String> body, @AuthenticationPrincipal CustomUserDetails user) {
+        String newName = body != null ? body.get("name") : null;
+        log.info("Request to duplicate node: {} with name: {} by user: {}", nodeId, newName, user.getUsername());
+        return fileService.duplicate(nodeId, newName, user.id());
+    }
+
+    @PatchMapping("/{nodeId}/move")
+    /** Moves a node. */
+    public FileMetadataDto move(@PathVariable Long nodeId, @RequestBody Map<String, Long> body, @AuthenticationPrincipal CustomUserDetails user) {
+        Long targetParentId = body.get("targetParentId");
+        log.info("Request to move node: {} to: {} by user: {}", nodeId, targetParentId, user.getUsername());
+        return fileService.move(nodeId, targetParentId, user.id());
+    }
+
+    @GetMapping("/search")
+    /** Searches for nodes. */
+    public List<FileMetadataDto> search(
+            @RequestParam("query") String query,
+            @RequestParam(value = "kind", required = false) String kind,
+            @AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to search nodes with query: {} and kind: {} by user: {}", query, kind, user.getUsername());
+        return fileService.search(query, kind, user.id());
+    }
 }
