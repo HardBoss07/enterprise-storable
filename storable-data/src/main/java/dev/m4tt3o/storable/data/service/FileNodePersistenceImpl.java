@@ -209,6 +209,58 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
         }
     }
 
+    @Override
+    /** Renames a node. */
+    public FileMetadataDto rename(Long id, String newName, String ownerId) {
+        log.info("Renaming node ID: {} to {} for owner: {}", id, newName, ownerId);
+        FileNode node = repository.findByIdAndAuthorizedOwner(id, ownerId)
+                .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + id));
+        node.setName(newName);
+        return toDto(repository.save(node));
+    }
+
+    @Override
+    /** Moves a node to a new parent folder. */
+    public FileMetadataDto move(Long id, Long targetParentId, String ownerId) {
+        log.info("Moving node ID: {} to parent ID: {} for owner: {}", id, targetParentId, ownerId);
+        FileNode node = repository.findByIdAndAuthorizedOwner(id, ownerId)
+                .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + id));
+        
+        // Ensure target parent is null (root) or belongs to owner
+        if (targetParentId != null && targetParentId != 0 && targetParentId != 1L) {
+            repository.findByIdAndAuthorizedOwner(targetParentId, ownerId)
+                .orElseThrow(() -> new RuntimeException("Target parent not found or access denied: " + targetParentId));
+        }
+
+        node.setParentId((targetParentId == null || targetParentId == 0) ? null : targetParentId);
+        return toDto(repository.save(node));
+    }
+
+    @Override
+    /** Searches for nodes by name and kind for a specific owner. */
+    public List<FileMetadataDto> search(String query, String kind, String ownerId) {
+        log.debug("Searching for nodes with query: {} and kind: {} for owner: {}", query, kind, ownerId);
+        FileNode.NodeKind nodeKind = null;
+        if (kind != null) {
+            try {
+                nodeKind = FileNode.NodeKind.valueOf(kind.toLowerCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid kind
+            }
+        }
+
+        return repository.search(query, nodeKind, ownerId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    /** Checks if a node with the given name exists in the parent globally (any owner, any state). */
+    public boolean existsByNameAndParentGlobal(String name, Long parentId) {
+        log.debug("Checking global existence for name: {} and parent: {}", name, parentId);
+        return repository.findByNameAndParentIdGlobal(name, parentId).isPresent();
+    }
+
     /**
      * Maps a FileNode entity to a FileMetadataDto record.
      */
