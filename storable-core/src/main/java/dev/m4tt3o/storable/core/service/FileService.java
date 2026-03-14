@@ -56,4 +56,16 @@ public interface FileService {
 
     /** Retrieves the global trash retention days. */
     int getTrashRetentionDays();
+
+    /** Renames a file or folder. */
+    FileMetadataDto rename(Long nodeId, String newName, String ownerId);
+
+    /** Creates a duplicate of a file with an optional new name. */
+    FileMetadataDto duplicate(Long nodeId, String newName, String ownerId);
+
+    /** Moves a file or folder to a new destination. */
+    FileMetadataDto move(Long nodeId, Long targetParentId, String ownerId);
+
+    /** Searches for nodes by name and kind for a specific owner. */
+    List<FileMetadataDto> search(String query, String kind, String ownerId);
 }

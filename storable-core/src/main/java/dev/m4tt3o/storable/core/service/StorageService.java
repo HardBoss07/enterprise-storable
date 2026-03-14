@@ -7,5 +7,7 @@ public interface StorageService {
     void store(InputStream inputStream, String storageKey);
     InputStream load(String storageKey);
     void delete(String storageKey);
+    /** Copies a file from sourceKey to destinationKey. */
+    void copy(String sourceKey, String destinationKey);
     Path getPath(String storageKey);
 }

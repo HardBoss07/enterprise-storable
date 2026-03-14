@@ -71,6 +71,12 @@ public class FileServiceImpl implements FileService {
                  throw new RuntimeException("Parent folder not found or access denied.");
              }
         }
+
+        // Collision Check
+        if (persistence.existsByNameAndParentGlobal(name, targetParentId)) {
+             throw new RuntimeException("A file or folder with this name already exists.");
+        }
+
         return persistence.saveFolder(name, targetParentId, ownerId, storageKey);
     }
 
@@ -90,12 +96,15 @@ public class FileServiceImpl implements FileService {
         for (String part : parts) {
             if (part.isBlank()) continue;
 
+            // Here we only check for existing folders the user owns or can see
             Optional<FileMetadataDto> existing = persistence.findFolder(ownerId, currentParentId, part);
 
             if (existing.isPresent()) {
                 lastFolder = existing.get();
                 currentParentId = lastFolder.id();
             } else {
+                // This might still fail if a folder with same name exists but owned by someone else
+                // in a global shared space, but createFolder will catch it.
                 lastFolder = createFolder(part, currentParentId, ownerId);
                 currentParentId = lastFolder.id();
             }
@@ -119,6 +128,11 @@ public class FileServiceImpl implements FileService {
              if (parent.isEmpty()) {
                  throw new RuntimeException("Parent folder not found or access denied.");
              }
+        }
+
+        // Collision Check
+        if (persistence.existsByNameAndParentGlobal(name, targetParentId)) {
+             throw new RuntimeException("A file or folder with this name already exists.");
         }
 
         String storageKey = UUID.randomUUID().toString();
@@ -245,6 +259,141 @@ public class FileServiceImpl implements FileService {
     @Override
     public int getTrashRetentionDays() {
         return configService.getTrashRetentionDays();
+    }
+
+    @Override
+    @Transactional
+    public FileMetadataDto rename(Long nodeId, String newName, String ownerId) {
+        log.info("Renaming node: {} to: {} for owner: {}", nodeId, newName, ownerId);
+        FileMetadataDto node = persistence.findByIdAndOwner(nodeId, ownerId)
+                .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + nodeId));
+
+        String finalName = newName;
+        if (!node.folder()) {
+            // Validate: No invalid characters
+            if (newName.matches(".*[\\\\/:*?\"<>|].*")) {
+                throw new RuntimeException("Filename contains invalid characters.");
+            }
+
+            // Preservation of extension
+            String originalName = node.name();
+            int lastDotIndex = originalName.lastIndexOf('.');
+            if (lastDotIndex != -1) {
+                String extension = originalName.substring(lastDotIndex); // e.g., ".pdf"
+                
+                int newLastDotIndex = newName.lastIndexOf('.');
+                String baseName = (newLastDotIndex != -1) ? newName.substring(0, newLastDotIndex) : newName;
+                finalName = baseName + extension;
+            }
+        } else {
+             if (newName.matches(".*[\\\\/:*?\"<>|].*")) {
+                throw new RuntimeException("Folder name contains invalid characters.");
+            }
+        }
+
+        // Collision Check: Ensure no other node has this name in the same parent
+        if (persistence.existsByNameAndParentGlobal(finalName, node.parentId())) {
+             throw new RuntimeException("A file or folder with this name already exists in the destination.");
+        }
+
+        return persistence.rename(nodeId, finalName, ownerId);
+    }
+
+    @Override
+    @Transactional
+    public FileMetadataDto duplicate(Long nodeId, String newName, String ownerId) {
+        log.info("Duplicating node: {} with new name: {} for owner: {}", nodeId, newName, ownerId);
+        FileMetadataDto original = persistence.findByIdAndOwner(nodeId, ownerId)
+                .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + nodeId));
+
+        if (original.folder()) {
+            throw new RuntimeException("Duplicating folders is not supported yet.");
+        }
+
+        String finalName;
+        String originalName = original.name();
+        int lastDotIndex = originalName.lastIndexOf('.');
+        String extension = (lastDotIndex != -1) ? originalName.substring(lastDotIndex) : "";
+        String baseName = (lastDotIndex != -1) ? originalName.substring(0, lastDotIndex) : originalName;
+
+        if (newName != null && !newName.isBlank()) {
+            // Apply rename logic for consistency
+            if (newName.matches(".*[\\\\/:*?\"<>|].*")) {
+                throw new RuntimeException("Filename contains invalid characters.");
+            }
+            
+            // Preservation of extension (if source had one)
+            if (!extension.isEmpty()) {
+                int newLastDotIndex = newName.lastIndexOf('.');
+                String newBaseName = (newLastDotIndex != -1) ? newName.substring(0, newLastDotIndex) : newName;
+                finalName = newBaseName + extension;
+            } else {
+                finalName = newName;
+            }
+
+            // Collision Check
+            if (persistence.existsByNameAndParentGlobal(finalName, original.parentId())) {
+                throw new RuntimeException("A file or folder with this name already exists.");
+            }
+        } else {
+            // Auto-generation logic (original behavior)
+            finalName = originalName;
+            int counter = 1;
+            while (persistence.existsByNameAndParentGlobal(finalName, original.parentId())) {
+                finalName = baseName + " " + counter + extension;
+                counter++;
+            }
+        }
+
+        // Deep Copy physical file
+        String newStorageKey = UUID.randomUUID().toString();
+        storageService.copy(original.storageKey(), newStorageKey);
+
+        // Save Metadata
+        return persistence.saveFile(finalName, original.parentId(), ownerId, newStorageKey, original.mime(), original.size());
+    }
+
+    @Override
+    @Transactional
+    public FileMetadataDto move(Long nodeId, Long targetParentId, String ownerId) {
+        log.info("Moving node: {} to: {} for owner: {}", nodeId, targetParentId, ownerId);
+        
+        FileMetadataDto node = persistence.findByIdAndOwner(nodeId, ownerId)
+                .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + nodeId));
+
+        // Circular Reference Protection
+        if (node.folder()) {
+            if (isSubfolder(nodeId, targetParentId, ownerId)) {
+                throw new RuntimeException("Cannot move a folder into its own subfolder.");
+            }
+        }
+        
+        // Prevent moving to itself
+        if (nodeId.equals(targetParentId)) {
+             throw new RuntimeException("Cannot move a node to itself.");
+        }
+
+        return persistence.move(nodeId, targetParentId, ownerId);
+    }
+
+    @Override
+    public List<FileMetadataDto> search(String query, String kind, String ownerId) {
+        log.info("Searching for nodes with query: {} and kind: {} for owner: {}", query, kind, ownerId);
+        return persistence.search(query, kind, ownerId);
+    }
+
+    private boolean isSubfolder(Long folderId, Long targetParentId, String ownerId) {
+        if (targetParentId == null || targetParentId == 0 || targetParentId == 1L) return false;
+        if (folderId.equals(targetParentId)) return true;
+        
+        Long currentId = targetParentId;
+        while (currentId != null && currentId != 1L) {
+            Optional<FileMetadataDto> parent = persistence.findByIdAndOwner(currentId, ownerId);
+            if (parent.isEmpty()) break;
+            currentId = parent.get().parentId();
+            if (folderId.equals(currentId)) return true;
+        }
+        return false;
     }
 
     private TrashMetadataDto toTrashDto(FileMetadataDto metadata) {

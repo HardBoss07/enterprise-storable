@@ -64,6 +64,23 @@ public class LocalStorageService implements StorageService {
     }
 
     @Override
+    public void copy(String sourceKey, String destinationKey) {
+        try {
+            Path sourceFile = this.rootLocation.resolve(Paths.get(sourceKey)).normalize().toAbsolutePath();
+            Path destinationFile = this.rootLocation.resolve(Paths.get(destinationKey)).normalize().toAbsolutePath();
+            
+            if (!destinationFile.getParent().startsWith(this.rootLocation.toAbsolutePath())) {
+                throw new RuntimeException("Cannot copy file outside current directory.");
+            }
+            
+            Files.createDirectories(destinationFile.getParent());
+            Files.copy(sourceFile, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+        } catch (IOException e) {
+            throw new RuntimeException("Failed to copy file.", e);
+        }
+    }
+
+    @Override
     public Path getPath(String storageKey) {
         return rootLocation.resolve(storageKey);
     }
