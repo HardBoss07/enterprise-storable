@@ -119,6 +119,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **Logic:** Background task for trash cleanup.
 - [x] **UI:** Delete action in File Explorer.
 - [x] **Admin:** Comprehensive Admin Panel for User Management and Global Settings.
+- [x] **Logic:** Implement Global Time Offset solution (UTC to Local Time display).
 - [ ] **Data:** Add `AccessPrivilege` table (VIEW, EDIT, OWNER).
 - [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
 - [ ] **UI:** "Share" modal mock-up.
