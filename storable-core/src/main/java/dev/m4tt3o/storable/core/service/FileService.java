@@ -68,4 +68,7 @@ public interface FileService {
 
     /** Searches for nodes by name and kind for a specific owner. */
     List<FileMetadataDto> search(String query, String kind, String ownerId);
+
+    /** Retrieves the 5 most recently modified files for a specific owner. */
+    List<FileMetadataDto> getRecentFiles(String ownerId);
 }

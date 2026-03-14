@@ -382,6 +382,12 @@ public class FileServiceImpl implements FileService {
         return persistence.search(query, kind, ownerId);
     }
 
+    @Override
+    public List<FileMetadataDto> getRecentFiles(String ownerId) {
+        log.info("Retrieving recent files for owner: {}", ownerId);
+        return persistence.findRecentFiles(ownerId);
+    }
+
     private boolean isSubfolder(Long folderId, Long targetParentId, String ownerId) {
         if (targetParentId == null || targetParentId == 0 || targetParentId == 1L) return false;
         if (folderId.equals(targetParentId)) return true;
