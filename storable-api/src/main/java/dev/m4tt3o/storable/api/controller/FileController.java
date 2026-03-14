@@ -210,4 +210,11 @@ public class FileController {
         log.info("Request to search nodes with query: {} and kind: {} by user: {}", query, kind, user.getUsername());
         return fileService.search(query, kind, user.id());
     }
+
+    @GetMapping("/recent")
+    /** Retrieves the 5 most recently modified files for the current user. */
+    public List<FileMetadataDto> getRecent(@AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to get recent files for user: {}", user.getUsername());
+        return fileService.getRecentFiles(user.id());
+    }
 }
