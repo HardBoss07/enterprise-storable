@@ -4,8 +4,10 @@ import dev.m4tt3o.storable.core.dto.AuthRequest;
 import dev.m4tt3o.storable.core.dto.AuthResponse;
 import dev.m4tt3o.storable.core.dto.RegisterRequest;
 import dev.m4tt3o.storable.core.security.JwtService;
+import dev.m4tt3o.storable.common.entity.FileNode;
 import dev.m4tt3o.storable.common.entity.User;
 import dev.m4tt3o.storable.common.entity.UserRole;
+import dev.m4tt3o.storable.common.repository.FileNodeRepository;
 import dev.m4tt3o.storable.common.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -21,6 +24,7 @@ import java.util.Map;
 public class AuthService {
 
     private final UserRepository userRepository;
+    private final FileNodeRepository fileNodeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -42,6 +46,17 @@ public class AuthService {
         user.setRole(UserRole.USER); // Default role
 
         User savedUser = userRepository.save(user);
+
+        // Create Home Directory
+        FileNode homeDir = new FileNode();
+        homeDir.setName(savedUser.getUsername());
+        homeDir.setOwnerId(savedUser.getId());
+        homeDir.setParentId(1L); // The Root folder
+        homeDir.setKind(FileNode.NodeKind.folder);
+        homeDir.setMime("directory");
+        homeDir.setStorageKey(UUID.randomUUID().toString());
+        
+        fileNodeRepository.save(homeDir);
         
         String token = jwtService.generateToken(savedUser.getUsername(), Map.of("role", savedUser.getRole().name(), "id", savedUser.getId()));
         
