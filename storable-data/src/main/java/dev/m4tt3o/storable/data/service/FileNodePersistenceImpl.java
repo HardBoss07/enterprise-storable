@@ -117,7 +117,7 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
         log.info("Soft deleting node ID: {} and its children for owner: {}", id, ownerId);
         repository.findByIdAndAuthorizedOwner(id, ownerId).ifPresent(node -> {
             node.setDeleted(true);
-            node.setDeletedAt(java.time.LocalDateTime.now());
+            node.setDeletedAt(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC));
             // Store original path context if needed, for now we just keep parentId
             // but the requirement says original_path. 
             // In a real VFS we might calculate the full path here.
@@ -131,7 +131,7 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
         for (FileNode child : children) {
             if (!child.isDeleted()) {
                 child.setDeleted(true);
-                child.setDeletedAt(java.time.LocalDateTime.now());
+                child.setDeletedAt(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC));
                 repository.save(child);
                 if (child.getKind() == FileNode.NodeKind.folder) {
                     softDeleteChildren(child.getId());

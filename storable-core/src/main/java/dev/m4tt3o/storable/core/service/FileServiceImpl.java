@@ -406,7 +406,7 @@ public class FileServiceImpl implements FileService {
         long daysRemaining = 0;
         if (metadata.deletedAt() != null) {
             LocalDateTime expiryDate = metadata.deletedAt().plusDays(configService.getTrashRetentionDays());
-            daysRemaining = ChronoUnit.DAYS.between(LocalDateTime.now(), expiryDate);
+            daysRemaining = java.time.temporal.ChronoUnit.DAYS.between(java.time.LocalDateTime.now(java.time.ZoneOffset.UTC), expiryDate);
             if (daysRemaining < 0) daysRemaining = 0;
         }
         return new TrashMetadataDto(metadata, daysRemaining);

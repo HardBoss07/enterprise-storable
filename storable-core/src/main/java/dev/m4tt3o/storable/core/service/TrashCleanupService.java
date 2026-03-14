@@ -30,7 +30,7 @@ public class TrashCleanupService {
     @Transactional
     public void cleanupExpiredTrash() {
         log.info("Starting scheduled trash cleanup...");
-        LocalDateTime cutoff = LocalDateTime.now().minusDays(configService.getTrashRetentionDays());
+        LocalDateTime cutoff = LocalDateTime.now(java.time.ZoneOffset.UTC).minusDays(configService.getTrashRetentionDays());
         
         // This is a simplified version. In a real system, you'd want to handle 
         // physical file deletion too via StorageService.
