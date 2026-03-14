@@ -46,4 +46,16 @@ public interface FileNodePersistence {
 
     /** Permanently deletes all nodes in trash for an owner. */
     void emptyTrash(String ownerId);
+
+    /** Renames a node. */
+    FileMetadataDto rename(Long id, String newName, String ownerId);
+
+    /** Moves a node to a new parent folder. */
+    FileMetadataDto move(Long id, Long targetParentId, String ownerId);
+
+    /** Searches for nodes by name and kind for a specific owner. */
+    List<FileMetadataDto> search(String query, String kind, String ownerId);
+
+    /** Checks if a node with the given name exists in the parent globally (any owner, any state). */
+    boolean existsByNameAndParentGlobal(String name, Long parentId);
 }
