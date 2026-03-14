@@ -78,7 +78,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 5: Access Control & Permissions (In Progress) | **Last Updated:** 2026-03-10
+> **Status:** Phase 5: Access Control & Permissions (In Progress) | **Last Updated:** 2026-03-14
 
 ### [x] Phase 1: Infrastructure & Skeleton
 
@@ -96,6 +96,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **Feature:** Rename files/folders with extension preservation.
 - [x] **Feature:** Smart Duplicate with collision avoidance.
 - [x] **Feature:** Move files/folders with circular reference protection and search-to-move UI.
+- [x] **Feature:** Recent Files (5 most recently modified files) - UI Synced with Trash.
 
 ### [x] Phase 3: Base File Structure (Virtual Pathing) - DEFERRED
 
@@ -109,7 +110,8 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **Logic:** Implement JWT and User Session management.
 - [x] **Logic:** Secure all endpoints behind Spring Security.
 - [x] **UI:** Login/Register pages and Route Guards.
-- [x] **Password:** BCrypt for hashing
+- [x] **Password:** BCrypt for hashing.
+- [x] **Registration:** Automated 'Home Directory' creation for new users.
 
 ### [x] Phase 5: Access Control & Permissions
 
@@ -135,6 +137,11 @@ This file is the **Source of Truth** for the project. Every session should begin
 - **Table Names:** Unified all SQL and Java Entities to use `users` and `nodes` table names.
 - **Column Mapping:** Ensured `User` entity matches `users` table (`id`, `username`, `email`, `password`, `role`).
 - **Initialization:** Fixed `test-data.sql` to use correct column names (`password`, `role`) instead of deprecated/incorrect ones.
+
+### User Registration & Home Directory
+
+- **Automation:** Implemented a transactional registration flow that creates a user in `users` and their corresponding home folder in `nodes` (named after the username, parented to Root ID 1).
+- **Recent Files:** Added `GET /api/files/recent` to fetch the 5 most recently modified files for the current user. UI synced with Trash page design.
 
 ---
 

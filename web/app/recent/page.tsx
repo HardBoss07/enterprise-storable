@@ -1,7 +1,109 @@
+"use client";
+
+import React, { useEffect, useState } from "react";
+import { Clock, Upload, AlertCircle } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { FileNode } from "@/types/api";
+import { getRecentFiles } from "@/lib/api/file";
+import { Spinner } from "@/components/ui/Spinner";
+import { EmptyState } from "@/components/shared/EmptyState";
+import { Button } from "@/components/ui/Button";
+import { RecentTable } from "@/components/features/recent/RecentTable";
+
+/**
+ * Recent Page: Displays the 5 most recently modified files for the logged-in user.
+ * Design Sync: Matches the 'Trash' page layout, container padding, and typography.
+ */
 export default function RecentPage() {
+  const router = useRouter();
+  const [files, setFiles] = useState<FileNode[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function fetchRecent() {
+      try {
+        setLoading(true);
+        const data = await getRecentFiles();
+        setFiles(data);
+        setError(null);
+      } catch (err: any) {
+        console.error("Failed to fetch recent files:", err);
+        setError(err.message || "Failed to load recent files");
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchRecent();
+  }, []);
+
+  const handleNavigate = (folderId: number | null) => {
+    if (folderId) {
+      router.push(`/?folderId=${folderId}`);
+    } else {
+      router.push("/");
+    }
+  };
+
+  const CLASSES = {
+    container: "space-y-6",
+    header: "flex items-center justify-between mb-8",
+    titleSection: "flex flex-col",
+    title: "text-2xl font-bold text-neutral-100 flex items-center",
+    subtitle: "text-text-muted text-sm mt-1",
+    errorBox:
+      "bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-md flex items-center",
+    footer: "mt-4 text-xs text-neutral-500 text-center italic",
+  };
+
+  if (loading) return <Spinner size="lg" className="h-64" />;
+
+  if (error) {
+    return (
+      <div className={CLASSES.errorBox}>
+        <AlertCircle className="mr-2" />
+        {error}
+      </div>
+    );
+  }
+
   return (
-    <div className="flex items-center justify-center h-full text-neutral-400 italic">
-      Recent files will appear here (Coming soon in Phase 2)
+    <div className={CLASSES.container}>
+      <div className={CLASSES.header}>
+        <div className={CLASSES.titleSection}>
+          <h1 className={CLASSES.title}>
+            <Clock className="mr-2 text-blue-500" />
+            Recent Files
+          </h1>
+          <p className={CLASSES.subtitle}>
+            Showing your 5 most recently modified files.
+          </p>
+        </div>
+      </div>
+
+      {files.length === 0 ? (
+        <EmptyState
+          icon={Clock}
+          title="No recent files yet."
+          description="Files you've recently uploaded or modified will appear here."
+        >
+          <Link href="/">
+            <Button className="flex items-center gap-2">
+              <Upload size={18} />
+              Upload your first file
+            </Button>
+          </Link>
+        </EmptyState>
+      ) : (
+        <>
+          <RecentTable files={files} onNavigate={handleNavigate} />
+          <p className={CLASSES.footer}>
+            Showing the 5 most recently modified files
+          </p>
+        </>
+      )}
     </div>
   );
 }

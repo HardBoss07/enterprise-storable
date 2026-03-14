@@ -130,6 +130,9 @@ enterprise-storable/
 │   │   │   │   ├── FileList.tsx
 │   │   │   │   ├── FileListItem.tsx
 │   │   │   │   └── MoveModal.tsx
+│   │   │   ├── recent/
+│   │   │   │   ├── RecentTable.tsx
+│   │   │   │   └── RecentTableRow.tsx
 │   │   │   └── trash/
 │   │   │       ├── RetentionSettings.tsx
 │   │   │       ├── TrashTable.tsx

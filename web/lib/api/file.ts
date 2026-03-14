@@ -133,3 +133,10 @@ export async function moveNode(nodeId: number, targetParentId: number | null): P
     body: JSON.stringify({ targetParentId: targetParentId || 0 }),
   });
 }
+
+/**
+ * Fetches the 5 most recently modified files for the current user.
+ */
+export async function getRecentFiles(): Promise<FileNode[]> {
+  return apiRequest<FileNode[]>("/api/files/recent");
+}
