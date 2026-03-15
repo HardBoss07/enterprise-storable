@@ -1,9 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useMemo } from "react";
-import {
-  TrashItem,
-} from "@/types/api";
+import { TrashItem } from "@/types/api";
 import {
   getTrashList,
   deleteNodePermanently,
@@ -104,7 +102,8 @@ export function useTrash() {
   const handleEmptyTrash = async () => {
     const confirmed = await confirm({
       title: "Empty Trash",
-      message: "Are you sure you want to permanently delete ALL items in the trash? This action cannot be undone.",
+      message:
+        "Are you sure you want to permanently delete ALL items in the trash? This action cannot be undone.",
       confirmLabel: "Empty Trash",
       variant: "danger",
     });

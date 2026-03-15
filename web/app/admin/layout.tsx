@@ -45,7 +45,7 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
               "px-4 py-3 text-sm font-medium transition-colors border-b-2",
               pathname === tab.href
                 ? "border-primary-accent text-primary-accent"
-                : "border-transparent text-neutral-400 hover:text-neutral-200"
+                : "border-transparent text-neutral-400 hover:text-neutral-200",
             )}
           >
             {tab.name}

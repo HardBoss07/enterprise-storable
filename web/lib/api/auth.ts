@@ -15,7 +15,9 @@ export async function loginUser(payload: LoginPayload): Promise<AuthResponse> {
 /**
  * Registers a new user account.
  */
-export async function registerUser(payload: RegisterPayload): Promise<AuthResponse> {
+export async function registerUser(
+  payload: RegisterPayload,
+): Promise<AuthResponse> {
   return apiRequest<AuthResponse>("/api/auth/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },

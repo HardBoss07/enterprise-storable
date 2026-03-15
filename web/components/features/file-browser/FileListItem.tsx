@@ -3,7 +3,13 @@
 import { FileNode } from "@/types/api";
 import { FileIcon } from "@/components/icons/FileIcon";
 import { format } from "date-fns";
-import { Download, Trash2, SquarePen, Copy, ArrowRightLeft } from "lucide-react";
+import {
+  Download,
+  Trash2,
+  SquarePen,
+  Copy,
+  ArrowRightLeft,
+} from "lucide-react";
 import { downloadFileAsBlob } from "@/lib/api/file";
 import { formatBytes } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
@@ -55,7 +61,11 @@ export default function FileListItem({
       // Strip extension for base name editing if it's a file
       if (!node.folder) {
         const lastDotIndex = node.name.lastIndexOf(".");
-        setNewName(lastDotIndex !== -1 ? node.name.substring(0, lastDotIndex) : node.name);
+        setNewName(
+          lastDotIndex !== -1
+            ? node.name.substring(0, lastDotIndex)
+            : node.name,
+        );
       } else {
         setNewName(node.name);
       }
@@ -66,10 +76,7 @@ export default function FileListItem({
 
   const handleClick = (e: React.MouseEvent) => {
     // Prevent click if we're clicking any action button or renaming
-    if (
-      (e.target as HTMLElement).closest(".action-btn") ||
-      isRenaming
-    ) {
+    if ((e.target as HTMLElement).closest(".action-btn") || isRenaming) {
       return;
     }
 

@@ -43,15 +43,29 @@
   }
 
   /* Button Sizes */
-  .btn-sm { @apply px-3 py-1.5 text-xs; }
-  .btn-md { @apply px-5 py-2.5 text-sm; }
-  .btn-lg { @apply px-8 py-3.5 text-base; }
-  .btn-icon-pad { @apply p-2.5; }
+  .btn-sm {
+    @apply px-3 py-1.5 text-xs;
+  }
+  .btn-md {
+    @apply px-5 py-2.5 text-sm;
+  }
+  .btn-lg {
+    @apply px-8 py-3.5 text-base;
+  }
+  .btn-icon-pad {
+    @apply p-2.5;
+  }
 
   /* IconButton Sizes */
-  .btn-icon-sm { @apply p-1.5; }
-  .btn-icon-md { @apply p-2.5; }
-  .btn-icon-lg { @apply p-4; }
+  .btn-icon-sm {
+    @apply p-1.5;
+  }
+  .btn-icon-md {
+    @apply p-2.5;
+  }
+  .btn-icon-lg {
+    @apply p-4;
+  }
 
   /* Spinner inside Button */
   .btn-spinner {

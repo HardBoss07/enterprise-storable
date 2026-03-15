@@ -23,7 +23,9 @@ export async function removeUser(userId: string): Promise<void> {
 /**
  * Updates a user's role (ADMIN only).
  */
-export async function changeUserRole(payload: UpdateUserRolePayload): Promise<void> {
+export async function changeUserRole(
+  payload: UpdateUserRolePayload,
+): Promise<void> {
   await apiRequest<void>(`/api/admin/users/${payload.userId}/role`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -41,7 +43,9 @@ export async function getSettings(): Promise<GlobalSettingsDto> {
 /**
  * Updates global system settings (ADMIN only).
  */
-export async function updateSettings(settings: GlobalSettingsDto): Promise<void> {
+export async function updateSettings(
+  settings: GlobalSettingsDto,
+): Promise<void> {
   await apiRequest<void>("/api/admin/settings", {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },

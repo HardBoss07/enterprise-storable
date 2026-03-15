@@ -89,7 +89,7 @@ export default function FileBrowser({
   };
 
   const handleMoveClick = (nodeId: number) => {
-    const node = files.find(f => f.id === nodeId);
+    const node = files.find((f) => f.id === nodeId);
     if (node) {
       setMovingNode(node);
     }

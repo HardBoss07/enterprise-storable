@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { registerUser as registerApi } from "@/lib/api/auth";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -90,7 +90,7 @@ export default function RegisterPage() {
                 "w-full bg-neutral-900 border rounded p-2 text-white outline-none transition-all focus:ring-2",
                 confirmPassword && password !== confirmPassword
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-neutral-700 focus:ring-blue-500"
+                  : "border-neutral-700 focus:ring-blue-500",
               )}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}

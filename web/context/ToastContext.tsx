@@ -1,6 +1,12 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, ReactNode } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  ReactNode,
+} from "react";
 import { X, CheckCircle, AlertCircle, Info, AlertTriangle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -34,15 +40,18 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
     setToasts((prev) => prev.filter((toast) => toast.id !== id));
   }, []);
 
-  const showToast = useCallback((message: string, type: ToastType = "info") => {
-    const id = Math.random().toString(36).substring(2, 9);
-    setToasts((prev) => [...prev, { id, message, type }]);
+  const showToast = useCallback(
+    (message: string, type: ToastType = "info") => {
+      const id = Math.random().toString(36).substring(2, 9);
+      setToasts((prev) => [...prev, { id, message, type }]);
 
-    // Auto-remove after 5 seconds
-    setTimeout(() => {
-      removeToast(id);
-    }, 5000);
-  }, [removeToast]);
+      // Auto-remove after 5 seconds
+      setTimeout(() => {
+        removeToast(id);
+      }, 5000);
+    },
+    [removeToast],
+  );
 
   return (
     <ToastContext.Provider value={{ showToast, removeToast }}>
@@ -56,7 +65,13 @@ export const ToastProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-const ToastItem = ({ toast, onRemove }: { toast: Toast; onRemove: (id: string) => void }) => {
+const ToastItem = ({
+  toast,
+  onRemove,
+}: {
+  toast: Toast;
+  onRemove: (id: string) => void;
+}) => {
   const icons = {
     success: <CheckCircle className="text-green-500" size={18} />,
     error: <AlertCircle className="text-red-500" size={18} />,
@@ -75,7 +90,7 @@ const ToastItem = ({ toast, onRemove }: { toast: Toast; onRemove: (id: string) =
     <div
       className={cn(
         "pointer-events-auto flex items-center justify-between min-w-[300px] max-w-md p-4 rounded-lg border shadow-lg backdrop-blur-md animate-in slide-in-from-right-full duration-300",
-        bgColors[toast.type]
+        bgColors[toast.type],
       )}
     >
       <div className="flex items-center gap-3">

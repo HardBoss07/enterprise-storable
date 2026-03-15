@@ -47,7 +47,12 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
     return (
       <button
         ref={ref}
-        className={cn("btn-base", variants[variant], sizes[size], cleanedClassName)}
+        className={cn(
+          "btn-base",
+          variants[variant],
+          sizes[size],
+          cleanedClassName,
+        )}
         disabled={isLoading || props.disabled}
         {...props}
       >

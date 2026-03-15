@@ -58,8 +58,8 @@ export default function MoveModal({
     try {
       const children = await getFileList(folderId);
       // Only keep folders, and exclude the node itself (if it's a folder)
-      setFolders(children.filter(f => f.folder && f.id !== nodeToMove.id));
-      
+      setFolders(children.filter((f) => f.folder && f.id !== nodeToMove.id));
+
       const pathArr = await getFilePath(folderId || 0);
       setPath(pathArr);
     } catch (err) {
@@ -84,16 +84,18 @@ export default function MoveModal({
 
     setSearching(true);
     try {
-      // We don't have a dedicated search endpoint for folders yet, 
+      // We don't have a dedicated search endpoint for folders yet,
       // but let's assume we can use a generic search or implement one.
       // For now, let's mock it or if we have time, implement a search endpoint.
-      // Actually, let's just search within the current list or 
+      // Actually, let's just search within the current list or
       // implement a simple search in FileController.
-      
+
       // I'll add a search endpoint to the backend later if needed.
       // For now, let's just use what we have or mock.
-      const response = await apiRequest<FileNode[]>(`/api/files/search?query=${query}&kind=folder`);
-      setSearchResults(response.filter(f => f.id !== nodeToMove.id));
+      const response = await apiRequest<FileNode[]>(
+        `/api/files/search?query=${query}&kind=folder`,
+      );
+      setSearchResults(response.filter((f) => f.id !== nodeToMove.id));
     } catch (err) {
       console.error("Search failed:", err);
     } finally {
@@ -117,7 +119,10 @@ export default function MoveModal({
         {/* Search */}
         <div className="p-4 bg-neutral-950/50">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={18} />
+            <Search
+              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+              size={18}
+            />
             <input
               type="text"
               placeholder="Search folders..."
@@ -131,14 +136,17 @@ export default function MoveModal({
         {/* Breadcrumbs */}
         {!searchQuery && (
           <div className="px-4 py-2 bg-neutral-800/30 flex items-center space-x-1 overflow-x-auto text-sm no-scrollbar">
-            <button 
+            <button
               onClick={fetchHome}
               className="p-1 hover:text-blue-400 text-neutral-400 transition-colors"
             >
               <Home size={14} />
             </button>
             {path.map((folder) => (
-              <div key={folder.id} className="flex items-center space-x-1 shrink-0">
+              <div
+                key={folder.id}
+                className="flex items-center space-x-1 shrink-0"
+              >
                 <ChevronRight size={14} className="text-neutral-600" />
                 <button
                   onClick={() => handleFolderClick(folder.id)}
@@ -160,7 +168,7 @@ export default function MoveModal({
           ) : searchQuery ? (
             <div className="space-y-1">
               {searchResults.length > 0 ? (
-                searchResults.map(folder => (
+                searchResults.map((folder) => (
                   <button
                     key={folder.id}
                     onClick={() => handleFolderClick(folder.id)}
@@ -178,7 +186,7 @@ export default function MoveModal({
             </div>
           ) : (
             <div className="space-y-1">
-              {folders.map(folder => (
+              {folders.map((folder) => (
                 <button
                   key={folder.id}
                   onClick={() => handleFolderClick(folder.id)}
@@ -188,7 +196,10 @@ export default function MoveModal({
                     <Folder size={20} className="text-blue-500" />
                     <span className="text-neutral-200">{folder.name}</span>
                   </div>
-                  <ChevronRight size={16} className="text-neutral-600 group-hover:text-neutral-400" />
+                  <ChevronRight
+                    size={16}
+                    className="text-neutral-600 group-hover:text-neutral-400"
+                  />
                 </button>
               ))}
               {folders.length === 0 && (
@@ -203,14 +214,17 @@ export default function MoveModal({
         {/* Footer */}
         <div className="p-4 border-t border-neutral-800 flex items-center justify-between bg-neutral-950/50">
           <div className="text-sm text-neutral-400 truncate max-w-[200px]">
-            Target: <span className="text-neutral-200">{path[path.length - 1]?.name || "Home"}</span>
+            Target:{" "}
+            <span className="text-neutral-200">
+              {path[path.length - 1]?.name || "Home"}
+            </span>
           </div>
           <div className="flex space-x-3">
             <Button variant="ghost" onClick={onClose}>
               Cancel
             </Button>
-            <Button 
-              variant="primary" 
+            <Button
+              variant="primary"
               onClick={() => onMove(currentFolderId)}
               disabled={loading || currentFolderId === nodeToMove.parentId}
             >

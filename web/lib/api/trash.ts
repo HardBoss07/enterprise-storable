@@ -13,10 +13,13 @@ export async function getTrashList(): Promise<TrashItem[]> {
  */
 export async function deleteNodePermanently(nodeId: number): Promise<void> {
   const token = getToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/files/${nodeId}/permanent`, {
-    method: "DELETE",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+  const response = await fetch(
+    `${getApiBaseUrl()}/api/files/${nodeId}/permanent`,
+    {
+      method: "DELETE",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  );
   if (!response.ok) throw new Error("Permanent delete failed");
 }
 

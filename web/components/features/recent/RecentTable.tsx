@@ -25,11 +25,7 @@ export function RecentTable({ files, onNavigate }: RecentTableProps) {
 
       <div className="space-y-1">
         {files.map((file) => (
-          <RecentTableRow
-            key={file.id}
-            file={file}
-            onNavigate={onNavigate}
-          />
+          <RecentTableRow key={file.id} file={file} onNavigate={onNavigate} />
         ))}
       </div>
     </div>

@@ -58,4 +58,3 @@
 
 **API Integrity:** Do not change existing REST endpoint paths, methods, or JSON payload structures.
 **Persistence Parity:** Do not alter the MySQL schema or `@Table` mappings unless strictly necessary to correct an explicit bug.
-

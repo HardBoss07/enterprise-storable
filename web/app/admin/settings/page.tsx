@@ -18,14 +18,14 @@ export default function GlobalSettingsPage() {
   const { showToast } = useToast();
 
   const allTimezones = useMemo(() => {
-    return (Intl as any).supportedValuesOf('timeZone') as string[];
+    return (Intl as any).supportedValuesOf("timeZone") as string[];
   }, []);
 
   const filteredTimezones = useMemo(() => {
     if (!tzSearch) return allTimezones.slice(0, 100);
-    return allTimezones.filter(tz => 
-      tz.toLowerCase().includes(tzSearch.toLowerCase())
-    ).slice(0, 100);
+    return allTimezones
+      .filter((tz) => tz.toLowerCase().includes(tzSearch.toLowerCase()))
+      .slice(0, 100);
   }, [tzSearch, allTimezones]);
 
   useEffect(() => {
@@ -73,7 +73,7 @@ export default function GlobalSettingsPage() {
           </div>
           <h2 className="text-lg font-semibold">Trash Management</h2>
         </div>
-        
+
         <div className="space-y-2">
           <label className="block text-sm font-medium text-neutral-400">
             Trash Retention Days
@@ -83,7 +83,12 @@ export default function GlobalSettingsPage() {
               type="number"
               min="0"
               value={settings.trashRetentionDays}
-              onChange={(e) => setSettings({ ...settings, trashRetentionDays: parseInt(e.target.value) || 0 })}
+              onChange={(e) =>
+                setSettings({
+                  ...settings,
+                  trashRetentionDays: parseInt(e.target.value) || 0,
+                })
+              }
               className="w-32 bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-accent transition-all text-neutral-100"
             />
             <span className="text-sm text-neutral-500 italic">
@@ -106,7 +111,7 @@ export default function GlobalSettingsPage() {
           <label className="block text-sm font-medium text-neutral-400">
             Default Server Timezone
           </label>
-          
+
           <div className="relative">
             <button
               onClick={() => setIsTzOpen(!isTzOpen)}
@@ -120,7 +125,10 @@ export default function GlobalSettingsPage() {
               <div className="absolute z-50 w-full mt-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
                 <div className="p-2 border-b border-neutral-700">
                   <div className="relative">
-                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500" size={14} />
+                    <Search
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                      size={14}
+                    />
                     <input
                       autoFocus
                       placeholder="Search timezones..."
@@ -140,7 +148,9 @@ export default function GlobalSettingsPage() {
                       }}
                       className={cn(
                         "w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors hover:bg-neutral-700/50",
-                        settings.systemTimezone === tz ? "text-primary-accent bg-primary-accent/5" : "text-neutral-300"
+                        settings.systemTimezone === tz
+                          ? "text-primary-accent bg-primary-accent/5"
+                          : "text-neutral-300",
                       )}
                     >
                       {tz}
@@ -152,7 +162,8 @@ export default function GlobalSettingsPage() {
             )}
           </div>
           <p className="text-xs text-neutral-500">
-            This affects display dates and background tasks like trash cleanup schedules.
+            This affects display dates and background tasks like trash cleanup
+            schedules.
           </p>
         </div>
       </section>

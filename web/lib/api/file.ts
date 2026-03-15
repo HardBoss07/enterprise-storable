@@ -33,7 +33,9 @@ export async function getFilePath(nodeId: number): Promise<FileNode[]> {
 /**
  * Creates a new folder.
  */
-export async function createFolder(payload: CreateFolderPayload): Promise<FileNode> {
+export async function createFolder(
+  payload: CreateFolderPayload,
+): Promise<FileNode> {
   return apiRequest<FileNode>("/api/files/folders", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -47,7 +49,10 @@ export async function createFolder(payload: CreateFolderPayload): Promise<FileNo
 /**
  * Uploads a file to a specific folder.
  */
-export async function uploadFile(file: File, parentId: number | null): Promise<FileNode> {
+export async function uploadFile(
+  file: File,
+  parentId: number | null,
+): Promise<FileNode> {
   const formData = new FormData();
   formData.append("file", file);
   if (parentId !== null) {
@@ -96,17 +101,23 @@ export async function softDeleteNode(nodeId: number): Promise<void> {
  */
 export async function restoreNode(nodeId: number): Promise<void> {
   const token = getToken();
-  const response = await fetch(`${getApiBaseUrl()}/api/files/${nodeId}/restore`, {
-    method: "POST",
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
+  const response = await fetch(
+    `${getApiBaseUrl()}/api/files/${nodeId}/restore`,
+    {
+      method: "POST",
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    },
+  );
   if (!response.ok) throw new Error("Restore failed");
 }
 
 /**
  * Renames a file or folder.
  */
-export async function renameNode(nodeId: number, newName: string): Promise<FileNode> {
+export async function renameNode(
+  nodeId: number,
+  newName: string,
+): Promise<FileNode> {
   return apiRequest<FileNode>(`/api/files/${nodeId}/rename`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
@@ -126,7 +137,10 @@ export async function duplicateFile(nodeId: number): Promise<FileNode> {
 /**
  * Moves a file or folder to a new destination.
  */
-export async function moveNode(nodeId: number, targetParentId: number | null): Promise<FileNode> {
+export async function moveNode(
+  nodeId: number,
+  targetParentId: number | null,
+): Promise<FileNode> {
   return apiRequest<FileNode>(`/api/files/${nodeId}/move`, {
     method: "PATCH",
     headers: { "Content-Type": "application/json" },
