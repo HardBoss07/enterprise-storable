@@ -170,6 +170,7 @@ enterprise-storable/
 │   │   │   ├── client.ts
 │   │   │   ├── file.ts
 │   │   │   └── trash.ts
+│   │   ├── file-constants.ts
 │   │   ├── mock-data.ts
 │   │   └── utils.ts
 │   ├── public/

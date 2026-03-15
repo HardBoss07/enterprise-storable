@@ -192,3 +192,4 @@ Whenever you ask me to "Implement X," my first task (if successful) is to run a 
 
 - [x] Guest User still gets created but no file entires for guest user are created
 - [x] Downloading doesn't work, gives me a 403 Error
+- [ ] Upload of larger files gets a NET::CONNECTION_ABORTED error with "Maximum upload size exceeded" (about limit of 1K)
