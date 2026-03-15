@@ -154,6 +154,7 @@ enterprise-storable/
 │   │   └── ui/
 │   │       ├── Button.tsx
 │   │       ├── IconButton.tsx
+│   │       ├── PageContainer.tsx
 │   │       └── Spinner.tsx
 │   ├── context/
 │   │   ├── AuthContext.tsx
@@ -203,6 +204,7 @@ enterprise-storable/
 │   ├── postcss.config.mjs
 │   └── tsconfig.json
 ├── Dockerfile.backend
+├── File Colors.md
 ├── GEMINI.md
 ├── LICENSE
 ├── Project Structure.md
