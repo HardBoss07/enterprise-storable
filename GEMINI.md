@@ -124,6 +124,34 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
 - [ ] **UI:** "Share" modal mock-up.
 
+### [ ] Phase 6: Design System & Global UI Refinement
+
+- **Styling:** Define CSS variables for `primary` (Neon Pink), `accent` (Yellow), and `neutral-surface` weights in `globals.css`.
+- **Components:** Create a `PageContainer` atomic component to standardize margins, paddings, and responsive behavior.
+- **Refactor:** Audit existing components to remove inline styles and implement the new color palette and Lucide icon set globally.
+- **Feedback:** Implement standardized Toast notifications for success/error states using the primary/accent theme.
+
+### [ ] Phase 7: Advanced Discovery & Organization
+
+- **Logic:** Add `is_favorite` (boolean) to the `nodes` table in `storable-data`.
+- **API:** Create `PATCH /api/files/{id}/favorite` and `GET /api/files/favorites` endpoints.
+- **UI:** Add "Favorites" tab to Sidebar; implement "Jump to Location" logic when clicking a file in Recent/Favorites.
+- **Search:** Implement a global search bar in the Header with debounced API calls to filter the user's `FileNodes`.
+- **Public Space:** Initialize a "Public" root-level folder with universal `VIEW/EDIT` permissions for all authenticated users.
+
+### [ ] Phase 8: Social Sharing & Permissions
+
+- **Data:** Implement the `AccessPrivilege` schema to support granular sharing (VIEW, DOWNLOAD, RENAME, MOVE, DELETE). To handle the "Share" and "Public Space" requirements efficiently, consider using a **Bitmask** or a simple **Permission Level** integer if you want to keep the logic lean.
+- **Logic:** Develop the sharing engine—allowing users to lookup other users by email/username and assign specific rights to a `FileNode`.
+- **UI:** Build the "Share" modal with user search and a permission toggle list.
+- **Validation:** Ensure the backend enforces these permissions on every CRUD operation.
+
+### [ ] Phase 9: User Profile & Account Lifecycle
+
+- **UI:** Create a "Settings" page accessible from the Header/Sidebar.
+- **Feature:** Implementation of "Change Password" (with current password verification) and "Change Email" flows.
+- **Security:** Implement the "Nuclear Option" - a "Delete Account" flow that recursively wipes the user's database entries and physical `/storage` directory after a "Confirm Password" warning.
+
 ---
 
 ## Technical Decisions & Architecture (Updated)
