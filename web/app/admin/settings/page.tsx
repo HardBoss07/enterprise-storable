@@ -66,16 +66,16 @@ export default function GlobalSettingsPage() {
   return (
     <div className="max-w-2xl space-y-8">
       {/* Trash Retention Section */}
-      <section className="bg-neutral-800/50 rounded-xl border border-neutral-700 p-6 shadow-lg space-y-4">
-        <div className="flex items-center gap-3 text-neutral-100">
+      <section className="bg-bg-sidebar rounded-2xl border border-surface-300 p-6 shadow-2xl space-y-4">
+        <div className="flex items-center gap-3 text-text-primary">
           <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
             <Trash2 size={20} />
           </div>
-          <h2 className="text-lg font-semibold">Trash Management</h2>
+          <h2 className="text-lg font-bold tracking-tight">Trash Management</h2>
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-neutral-400">
+          <label className="block text-sm font-bold text-text-muted uppercase tracking-tighter">
             Trash Retention Days
           </label>
           <div className="flex items-center gap-4">
@@ -89,9 +89,9 @@ export default function GlobalSettingsPage() {
                   trashRetentionDays: parseInt(e.target.value) || 0,
                 })
               }
-              className="w-32 bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary-accent transition-all text-neutral-100"
+              className="w-32 bg-surface-100 border border-surface-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-text-primary"
             />
-            <span className="text-sm text-neutral-500 italic">
+            <span className="text-sm text-text-muted italic">
               Items older than this will be automatically purged from the trash.
             </span>
           </div>
@@ -99,34 +99,34 @@ export default function GlobalSettingsPage() {
       </section>
 
       {/* Timezone Section */}
-      <section className="bg-neutral-800/50 rounded-xl border border-neutral-700 p-6 shadow-lg space-y-4 relative">
-        <div className="flex items-center gap-3 text-neutral-100">
-          <div className="p-2 rounded-lg bg-blue-500/10 text-blue-400">
+      <section className="bg-bg-sidebar rounded-2xl border border-surface-300 p-6 shadow-2xl space-y-4 relative">
+        <div className="flex items-center gap-3 text-text-primary">
+          <div className="p-2 rounded-lg bg-primary/10 text-primary">
             <Clock size={20} />
           </div>
-          <h2 className="text-lg font-semibold">System Timezone</h2>
+          <h2 className="text-lg font-bold tracking-tight">System Timezone</h2>
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-medium text-neutral-400">
+          <label className="block text-sm font-bold text-text-muted uppercase tracking-tighter">
             Default Server Timezone
           </label>
 
           <div className="relative">
             <button
               onClick={() => setIsTzOpen(!isTzOpen)}
-              className="w-full text-left bg-neutral-900 border border-neutral-700 rounded-lg px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary-accent transition-all text-neutral-100 flex justify-between items-center"
+              className="w-full text-left bg-surface-100 border border-surface-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-text-primary flex justify-between items-center"
             >
-              <span>{settings.systemTimezone}</span>
-              <Search size={16} className="text-neutral-500" />
+              <span className="font-medium">{settings.systemTimezone}</span>
+              <Search size={16} className="text-text-muted" />
             </button>
 
             {isTzOpen && (
-              <div className="absolute z-50 w-full mt-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                <div className="p-2 border-b border-neutral-700">
+              <div className="absolute z-50 w-full mt-2 bg-bg-sidebar border border-surface-300 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+                <div className="p-2 border-b border-surface-300 bg-surface-100">
                   <div className="relative">
                     <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+                      className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
                       size={14}
                     />
                     <input
@@ -134,7 +134,7 @@ export default function GlobalSettingsPage() {
                       placeholder="Search timezones..."
                       value={tzSearch}
                       onChange={(e) => setTzSearch(e.target.value)}
-                      className="w-full bg-neutral-900 border-none rounded-md pl-9 pr-4 py-2 text-sm focus:ring-0 text-neutral-200"
+                      className="w-full bg-surface-200 border-none rounded-lg pl-9 pr-4 py-2 text-sm focus:ring-0 text-text-primary"
                     />
                   </div>
                 </div>
@@ -147,10 +147,10 @@ export default function GlobalSettingsPage() {
                         setIsTzOpen(false);
                       }}
                       className={cn(
-                        "w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors hover:bg-neutral-700/50",
+                        "w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors hover:bg-surface-200",
                         settings.systemTimezone === tz
-                          ? "text-primary-accent bg-primary-accent/5"
-                          : "text-neutral-300",
+                          ? "text-primary bg-primary/5 font-bold"
+                          : "text-text-secondary",
                       )}
                     >
                       {tz}
@@ -161,7 +161,7 @@ export default function GlobalSettingsPage() {
               </div>
             )}
           </div>
-          <p className="text-xs text-neutral-500">
+          <p className="text-xs text-text-muted italic">
             This affects display dates and background tasks like trash cleanup
             schedules.
           </p>

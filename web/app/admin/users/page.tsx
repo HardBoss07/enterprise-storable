@@ -84,47 +84,47 @@ export default function UserManagementPage() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-neutral-800/50 rounded-xl border border-neutral-700 overflow-hidden shadow-lg">
+      <div className="bg-bg-sidebar rounded-2xl border border-surface-300 overflow-hidden shadow-2xl">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-neutral-800 border-b border-neutral-700">
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+            <tr className="bg-surface-100 border-b border-surface-300">
+              <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">
                 User
               </th>
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+              <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">
                 Email
               </th>
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+              <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">
                 Role
               </th>
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider">
+              <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider">
                 ID
               </th>
-              <th className="px-6 py-4 text-xs font-semibold text-neutral-400 uppercase tracking-wider text-right">
+              <th className="px-6 py-4 text-xs font-bold text-text-muted uppercase tracking-wider text-right">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-neutral-700">
+          <tbody className="divide-y divide-surface-300">
             {users.map((user) => (
               <tr
                 key={user.id}
-                className="hover:bg-neutral-800/80 transition-colors group"
+                className="hover:bg-surface-200/50 transition-colors group"
               >
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-neutral-700 flex items-center justify-center text-neutral-300 group-hover:bg-primary-accent/10 group-hover:text-primary-accent transition-colors">
+                    <div className="w-10 h-10 rounded-full bg-surface-200 flex items-center justify-center text-text-secondary group-hover:bg-primary/10 group-hover:text-primary transition-colors">
                       <UserIcon size={20} />
                     </div>
-                    <span className="font-medium text-neutral-200">
+                    <span className="font-bold text-text-primary">
                       {user.username}
                     </span>
                   </div>
                 </td>
-                <td className="px-6 py-4 text-neutral-400">{user.email}</td>
+                <td className="px-6 py-4 text-text-secondary">{user.email}</td>
                 <td className="px-6 py-4">
                   {user.id === "f43c0bcf-11e4-4629-b072-321ccd04e72a" ? (
-                    <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-500/10 text-purple-400 border border-purple-500/20">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold bg-accent/10 text-accent border border-accent/20 uppercase tracking-tighter">
                       <Shield size={12} />
                       ADMIN
                     </span>
@@ -134,8 +134,8 @@ export default function UserManagementPage() {
                         className={cn(
                           "absolute left-2.5 z-10 pointer-events-none transition-colors",
                           user.role === "ADMIN"
-                            ? "text-purple-400"
-                            : "text-blue-400",
+                            ? "text-accent"
+                            : "text-primary",
                         )}
                       >
                         {user.role === "ADMIN" ? (
@@ -151,23 +151,23 @@ export default function UserManagementPage() {
                         }
                         disabled={updatingUserId === user.id}
                         className={cn(
-                          "appearance-none text-xs font-medium rounded-full pl-7 pr-8 py-1 border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary-accent",
+                          "appearance-none text-xs font-bold rounded-full pl-7 pr-8 py-1 border transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary uppercase tracking-tighter",
                           user.role === "ADMIN"
-                            ? "bg-purple-500/10 text-purple-400 border-purple-500/20 hover:bg-purple-500/20"
-                            : "bg-blue-500/10 text-blue-400 border-blue-500/20 hover:bg-blue-500/20",
+                            ? "bg-accent/10 text-accent border-accent/20 hover:bg-accent/20"
+                            : "bg-primary/10 text-primary border-primary/20 hover:bg-primary/20",
                           updatingUserId === user.id &&
                             "opacity-50 cursor-not-allowed",
                         )}
                       >
                         <option
                           value="USER"
-                          className="bg-neutral-800 text-neutral-100"
+                          className="bg-bg-sidebar text-text-primary"
                         >
                           USER
                         </option>
                         <option
                           value="ADMIN"
-                          className="bg-neutral-800 text-neutral-100"
+                          className="bg-bg-sidebar text-text-primary"
                         >
                           ADMIN
                         </option>
@@ -177,8 +177,8 @@ export default function UserManagementPage() {
                         className={cn(
                           "absolute right-2.5 pointer-events-none transition-colors",
                           user.role === "ADMIN"
-                            ? "text-purple-400/50"
-                            : "text-blue-400/50",
+                            ? "text-accent/50"
+                            : "text-primary/50",
                         )}
                       />
                       {updatingUserId === user.id && (
@@ -189,7 +189,7 @@ export default function UserManagementPage() {
                     </div>
                   )}
                 </td>
-                <td className="px-6 py-4 text-xs font-mono text-neutral-500">
+                <td className="px-6 py-4 text-xs font-mono text-text-muted">
                   {user.id}
                 </td>
                 <td className="px-6 py-4 text-right">
@@ -197,7 +197,7 @@ export default function UserManagementPage() {
                     onClick={() => handleDeleteUser(user)}
                     variant="ghost"
                     size="sm"
-                    className="text-neutral-500 hover:text-red-500 hover:bg-red-500/10"
+                    className="text-text-muted hover:text-red-500 hover:bg-red-500/10"
                     title="Delete User"
                   >
                     <Trash2 size={18} />
@@ -209,7 +209,7 @@ export default function UserManagementPage() {
         </table>
 
         {users.length === 0 && (
-          <div className="p-12 text-center text-neutral-500">
+          <div className="p-12 text-center text-text-muted italic">
             No users found in the system.
           </div>
         )}
