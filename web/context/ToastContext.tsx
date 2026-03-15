@@ -72,36 +72,49 @@ const ToastItem = ({
   toast: Toast;
   onRemove: (id: string) => void;
 }) => {
-  const icons = {
-    success: <CheckCircle className="text-green-500" size={18} />,
-    error: <AlertCircle className="text-red-500" size={18} />,
-    warning: <AlertTriangle className="text-yellow-500" size={18} />,
-    info: <Info className="text-blue-500" size={18} />,
+  const configs = {
+    success: {
+      icon: <CheckCircle className="text-primary" size={20} />,
+      bg: "bg-primary/10 border-primary/30 shadow-primary/10",
+      text: "text-primary",
+    },
+    error: {
+      icon: <AlertCircle className="text-red-500" size={20} />,
+      bg: "bg-red-500/10 border-red-500/30 shadow-red-500/10",
+      text: "text-red-400",
+    },
+    warning: {
+      icon: <AlertTriangle className="text-accent" size={20} />,
+      bg: "bg-accent/10 border-accent/30 shadow-accent/10",
+      text: "text-accent",
+    },
+    info: {
+      icon: <Info className="text-blue-400" size={20} />,
+      bg: "bg-blue-400/10 border-blue-400/30 shadow-blue-400/10",
+      text: "text-blue-300",
+    },
   };
 
-  const bgColors = {
-    success: "bg-green-500/10 border-green-500/20",
-    error: "bg-red-500/10 border-red-500/20",
-    warning: "bg-yellow-500/10 border-yellow-500/20",
-    info: "bg-blue-500/10 border-blue-500/20",
-  };
+  const config = configs[toast.type];
 
   return (
     <div
       className={cn(
-        "pointer-events-auto flex items-center justify-between min-w-[300px] max-w-md p-4 rounded-lg border shadow-lg backdrop-blur-md animate-in slide-in-from-right-full duration-300",
-        bgColors[toast.type],
+        "pointer-events-auto flex items-center justify-between min-w-[320px] max-w-md p-4 rounded-2xl border shadow-2xl backdrop-blur-xl animate-in slide-in-from-right-full duration-500",
+        config.bg,
       )}
     >
       <div className="flex items-center gap-3">
-        {icons[toast.type]}
-        <p className="text-sm font-medium text-neutral-100">{toast.message}</p>
+        <div className="flex-shrink-0">{config.icon}</div>
+        <p className={cn("text-sm font-bold tracking-tight", config.text)}>
+          {toast.message}
+        </p>
       </div>
       <button
         onClick={() => onRemove(toast.id)}
-        className="ml-4 text-neutral-400 hover:text-neutral-100 transition-colors"
+        className="ml-4 p-1 hover:bg-white/10 rounded-full transition-colors"
       >
-        <X size={16} />
+        <X size={16} className="text-text-muted hover:text-white" />
       </button>
     </div>
   );

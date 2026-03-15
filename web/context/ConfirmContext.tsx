@@ -61,25 +61,25 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
     <ConfirmContext.Provider value={{ confirm }}>
       {children}
       {isOpen && options && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
-          <div className="w-full max-w-md bg-bg-sidebar rounded-xl p-6 shadow-2xl border border-neutral-800 animate-in zoom-in-95 duration-200">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/60 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-bg-sidebar rounded-2xl p-6 shadow-2xl border border-surface-300 animate-in zoom-in-95 duration-200">
             <div className="flex items-center gap-3 mb-4">
               <div
                 className={cn(
                   "p-2 rounded-lg",
                   options.variant === "danger"
                     ? "bg-red-500/10 text-red-500"
-                    : "bg-primary-accent/10 text-primary-accent",
+                    : "bg-primary/10 text-primary",
                 )}
               >
                 <AlertTriangle size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-neutral-100 m-0">
+              <h3 className="text-xl font-bold text-text-primary m-0 tracking-tight">
                 {options.title || "Confirm Action"}
               </h3>
             </div>
 
-            <p className="text-neutral-300 mb-8 leading-relaxed">
+            <p className="text-text-secondary mb-8 leading-relaxed">
               {options.message}
             </p>
 
@@ -87,7 +87,7 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
               <Button
                 onClick={handleCancel}
                 variant="ghost"
-                className="text-neutral-400 hover:text-neutral-100"
+                className="text-text-muted hover:text-text-primary"
               >
                 {options.cancelLabel || "Cancel"}
               </Button>
