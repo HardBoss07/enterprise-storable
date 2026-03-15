@@ -157,7 +157,12 @@ export default function FileListItem({
       onClick={handleClick}
     >
       <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
-        <FileIcon mime={node.mime} isFolder={node.folder} size={22} />
+        <FileIcon 
+          extension={node.name.split(".").pop()} 
+          mime={node.mime} 
+          isFolder={node.folder} 
+          size={22} 
+        />
       </div>
       <div className="flex-1 min-w-0 flex items-center h-10">
         {isRenaming ? (

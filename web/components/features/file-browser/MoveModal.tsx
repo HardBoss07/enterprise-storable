@@ -4,7 +4,6 @@ import { useState, useEffect, useMemo } from "react";
 import { FileNode } from "@/types/api";
 import { getFileList, getFilePath, getHomeFolder } from "@/lib/api/file";
 import { apiRequest } from "@/lib/api/client";
-import { FileIcon } from "@/components/icons/FileIcon";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Search, ChevronRight, X, Folder, Home } from "lucide-react";

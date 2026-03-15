@@ -31,7 +31,12 @@ export function TrashTableRow({
     <div className="table-row-grid group">
       <div className="col-span-5 flex items-center space-x-4 min-w-0">
         <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
-          <FileIcon mime={metadata.mime} isFolder={metadata.folder} size={22} />
+          <FileIcon 
+            extension={metadata.name.split(".").pop()} 
+            mime={metadata.mime} 
+            isFolder={metadata.folder} 
+            size={22} 
+          />
         </div>
         <span className="text-neutral-100 font-medium truncate">
           {metadata.name}
