@@ -168,10 +168,10 @@ export default function FileListItem({
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={handleKeyDown}
             onBlur={submitRename}
-            className="input-field w-full max-w-sm h-8 py-0 px-2 text-sm"
+            className="input-field w-full max-w-sm h-8 py-0 px-2 text-sm border-primary focus:ring-primary/30"
           />
         ) : (
-          <p className="text-neutral-100 font-medium m-0 truncate leading-none">
+          <p className="text-text-primary font-bold m-0 truncate leading-none group-hover:text-primary transition-colors">
             {node.name}
           </p>
         )}

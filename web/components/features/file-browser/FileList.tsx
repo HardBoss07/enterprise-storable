@@ -85,7 +85,7 @@ export default function FileList({
       </div>
 
       {isCreatingFolder && (
-        <div className="flex items-center space-x-4 p-2 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+        <div className="flex items-center space-x-4 p-2 bg-primary/10 border border-primary/20 rounded-lg animate-pulse">
           <div className="flex items-center justify-center w-10 h-10">
             <FileIcon isFolder={true} size={22} />
           </div>
@@ -102,12 +102,12 @@ export default function FileList({
             />
           </div>
           <div className="hidden sm:block w-40" />
-          <div className="w-24 text-right text-neutral-500">--</div>
+          <div className="w-24 text-right text-text-muted">--</div>
         </div>
       )}
 
       {sortedFiles.length === 0 && !isCreatingFolder ? (
-        <div className="flex flex-col items-center justify-center h-48 text-neutral-500">
+        <div className="flex flex-col items-center justify-center h-48 text-text-muted italic">
           <p>This folder is empty</p>
         </div>
       ) : (

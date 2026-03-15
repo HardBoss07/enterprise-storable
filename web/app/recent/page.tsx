@@ -11,6 +11,8 @@ import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { RecentTable } from "@/components/features/recent/RecentTable";
 
+import { PageContainer } from "@/components/ui/PageContainer";
+
 /**
  * Recent Page: Displays the 5 most recently modified files for the logged-in user.
  * Design Sync: Matches the 'Trash' page layout, container padding, and typography.
@@ -48,10 +50,6 @@ export default function RecentPage() {
   };
 
   const CLASSES = {
-    container: "space-y-6",
-    header: "flex items-center justify-between mb-8",
-    titleSection: "flex flex-col",
-    title: "text-2xl font-bold text-neutral-100 flex items-center",
     subtitle: "text-text-muted text-sm mt-1",
     errorBox:
       "bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-md flex items-center",
@@ -70,40 +68,34 @@ export default function RecentPage() {
   }
 
   return (
-    <div className={CLASSES.container}>
-      <div className={CLASSES.header}>
-        <div className={CLASSES.titleSection}>
-          <h1 className={CLASSES.title}>
-            <Clock className="mr-2 text-blue-500" />
-            Recent Files
-          </h1>
-          <p className={CLASSES.subtitle}>
-            Showing your 5 most recently modified files.
-          </p>
-        </div>
-      </div>
+    <PageContainer title="Recent Files">
+      <p className={CLASSES.subtitle}>
+        Showing your 5 most recently modified files.
+      </p>
 
-      {files.length === 0 ? (
-        <EmptyState
-          icon={Clock}
-          title="No recent files yet."
-          description="Files you've recently uploaded or modified will appear here."
-        >
-          <Link href="/">
-            <Button className="flex items-center gap-2">
-              <Upload size={18} />
-              Upload your first file
-            </Button>
-          </Link>
-        </EmptyState>
-      ) : (
-        <>
-          <RecentTable files={files} onNavigate={handleNavigate} />
-          <p className={CLASSES.footer}>
-            Showing the 5 most recently modified files
-          </p>
-        </>
-      )}
-    </div>
+      <div className="mt-8">
+        {files.length === 0 ? (
+          <EmptyState
+            icon={Clock}
+            title="No recent files yet."
+            description="Files you've recently uploaded or modified will appear here."
+          >
+            <Link href="/">
+              <Button className="flex items-center gap-2">
+                <Upload size={18} />
+                Upload your first file
+              </Button>
+            </Link>
+          </EmptyState>
+        ) : (
+          <>
+            <RecentTable files={files} onNavigate={handleNavigate} />
+            <p className={CLASSES.footer}>
+              Showing the 5 most recently modified files
+            </p>
+          </>
+        )}
+      </div>
+    </PageContainer>
   );
 }
