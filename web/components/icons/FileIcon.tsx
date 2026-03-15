@@ -1,113 +1,70 @@
-import {
-  File,
-  FileText,
-  FileImage,
-  FileCode,
-  FileArchive,
-  FileAudio,
-  FileVideo,
-  FileJson,
-  Folder,
-} from "lucide-react";
+import { Folder, LucideIcon, File, FileText } from "lucide-react";
+import { getFileConfig } from "@/lib/file-constants";
+import { cn } from "@/lib/utils";
 
+/**
+ * Props for the FileIcon component.
+ */
 interface FileIconProps extends React.ComponentProps<"svg"> {
+  /** The file extension (e.g., "pdf", "docx") used to resolve the icon and color. */
+  extension?: string | null;
+  /** Fallback MIME type used if extension is not provided. */
   mime?: string | null;
+  /** Whether the node is a folder. */
   isFolder?: boolean;
+  /** Size of the icon in pixels or Tailwind units. */
   size?: number | string;
 }
 
+/**
+ * Standardized File Icon component that renders the correct Lucide icon
+ * and color based on file extension, using a centralized configuration.
+ * 
+ * @param props The icon properties including extension, mime, and folder status.
+ */
 export function FileIcon({
+  extension,
   mime,
   isFolder,
   className,
-  size,
+  size = 20,
+  style,
   ...props
 }: FileIconProps) {
+  // Folders use a standard folder icon with a fixed color
   if (isFolder) {
     return (
-      <Folder className={`text-blue-400 ${className}`} size={size} {...props} />
-    );
-  }
-
-  if (!mime) return <File className={className} size={size} {...props} />;
-
-  if (mime.startsWith("image/"))
-    return (
-      <FileImage
-        className={`text-purple-400 ${className}`}
-        size={size}
-        {...props}
-      />
-    );
-  if (mime.startsWith("video/"))
-    return (
-      <FileVideo
-        className={`text-pink-400 ${className}`}
-        size={size}
-        {...props}
-      />
-    );
-  if (mime.startsWith("audio/"))
-    return (
-      <FileAudio
-        className={`text-orange-400 ${className}`}
-        size={size}
-        {...props}
-      />
-    );
-
-  if (mime.includes("pdf"))
-    return (
-      <FileText
-        className={`text-red-400 ${className}`}
-        size={size}
-        {...props}
-      />
-    );
-  if (mime.includes("zip") || mime.includes("tar") || mime.includes("rar"))
-    return (
-      <FileArchive
-        className={`text-yellow-500 ${className}`}
-        size={size}
-        {...props}
-      />
-    );
-
-  if (
-    mime.includes("javascript") ||
-    mime.includes("typescript") ||
-    mime.includes("html") ||
-    mime.includes("css")
-  ) {
-    return (
-      <FileCode
-        className={`text-green-400 ${className}`}
-        size={size}
-        {...props}
+      <Folder 
+        className={cn("text-blue-400", className)} 
+        size={size} 
+        {...props} 
       />
     );
   }
 
-  if (mime.includes("json"))
-    return (
-      <FileJson
-        className={`text-yellow-400 ${className}`}
-        size={size}
-        {...props}
-      />
-    );
+  // Determine which extension string to use for lookups
+  // 1. Explicit extension prop
+  // 2. Extracted from MIME type (fallback)
+  // 3. Null (will use generic fallback)
+  const effectiveExtension = extension || (mime ? mime.split("/").pop() : null);
+  
+  // Resolve configuration from constants
+  const { icon: Icon, color } = getFileConfig(effectiveExtension);
 
-  if (mime.startsWith("text/"))
-    return (
-      <FileText
-        className={`text-neutral-300 ${className}`}
-        size={size}
-        {...props}
-      />
-    );
-
-  return <File className={className} size={size} {...props} />;
+  return (
+    <Icon 
+      size={size} 
+      className={className}
+      // Apply the hex color from the design system as an inline style
+      style={{ color, ...style }}
+      {...props} 
+    />
+  );
 }
+
+/**
+ * Simple folder icon component for standalone use.
+ */
 export function FolderIcon(props: React.ComponentProps<"svg">) {
   return <Folder className="text-blue-400" {...props} />;
 }
