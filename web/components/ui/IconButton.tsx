@@ -41,23 +41,21 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       lg: "btn-icon-lg",
     };
 
+    // Clean the button's className to ensure no spin classes leak to the wrapper
+    const cleanedClassName = className?.replace("animate-spin", "").trim();
+
     return (
       <button
         ref={ref}
-        className={cn("btn-base", variants[variant], sizes[size], className)}
-        disabled={isLoading}
+        className={cn("btn-base", variants[variant], sizes[size], cleanedClassName)}
+        disabled={isLoading || props.disabled}
         {...props}
       >
-        {isLoading ? (
-          <span className="btn-spinner mr-0" />
-        ) : (
-          <Icon
-            size={iconSize}
-            className={cn(
-              className?.includes("animate-spin") && "animate-spin",
-            )}
-          />
-        )}
+        <Icon
+          size={iconSize}
+          // Only the icon gets the spin
+          className={cn(isLoading && "animate-spin")}
+        />
       </button>
     );
   },

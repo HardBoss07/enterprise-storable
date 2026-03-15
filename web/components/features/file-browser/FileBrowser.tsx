@@ -137,6 +137,7 @@ export default function FileBrowser({
             variant="secondary"
             title="Refresh"
             className={loading ? "animate-spin" : ""}
+            isLoading={loading}
           />
 
           <input

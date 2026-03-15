@@ -3,7 +3,7 @@
 import { FileNode } from "@/types/api";
 import { FileIcon } from "@/components/icons/FileIcon";
 import { format } from "date-fns";
-import { Download, Trash2, Edit2, Copy, ArrowRightLeft } from "lucide-react";
+import { Download, Trash2, SquarePen, Copy, ArrowRightLeft } from "lucide-react";
 import { downloadFileAsBlob } from "@/lib/api/file";
 import { formatBytes } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
@@ -184,7 +184,7 @@ export default function FileListItem({
             />
           )}
           <IconButton
-            icon={Edit2}
+            icon={SquarePen}
             onClick={handleRenameClick}
             className="action-btn"
             variant="ghost"
