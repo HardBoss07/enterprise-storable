@@ -1,24 +1,24 @@
 @layer utilities {
   .card-surface {
-    @apply bg-bg-sidebar rounded-xl p-6 shadow-2xl border border-neutral-800;
+    @apply bg-bg-sidebar rounded-xl p-6 shadow-2xl border border-surface-300;
   }
 
   .interactive-surface {
-    @apply rounded-lg hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-neutral-700/50;
+    @apply rounded-lg hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-surface-300;
   }
 
   .text-muted {
-    @apply text-neutral-400;
+    @apply text-text-muted;
   }
 
   .glass-nav {
-    @apply bg-neutral-900/40 backdrop-blur-sm border border-neutral-800 rounded-lg;
+    @apply bg-bg-main/40 backdrop-blur-md border border-surface-300 rounded-lg;
   }
 }
 
 @layer components {
   /* --- Empty State --- */
   .empty-state-container {
-    @apply bg-bg-sidebar rounded-xl shadow-2xl border border-neutral-800 py-20 flex flex-col items-center justify-center text-neutral-500 italic;
+    @apply bg-bg-sidebar rounded-xl shadow-2xl border border-surface-300 py-20 flex flex-col items-center justify-center text-text-muted italic;
   }
 }

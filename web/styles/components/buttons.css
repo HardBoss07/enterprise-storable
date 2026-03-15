@@ -1,24 +1,28 @@
 @layer components {
   /* --- Button Components --- */
   .btn-base {
-    @apply inline-flex items-center justify-center rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary-accent disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
+    @apply inline-flex items-center justify-center rounded-lg transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary disabled:opacity-50 disabled:pointer-events-none cursor-pointer;
   }
 
   /* Button Variants */
   .btn-primary {
-    @apply bg-primary-accent text-white hover:brightness-110 shadow-lg shadow-blue-500/20 font-medium;
+    @apply bg-primary text-white hover:brightness-110 shadow-lg shadow-primary/20 font-bold;
+  }
+
+  .btn-accent {
+    @apply bg-accent text-black hover:brightness-110 shadow-lg shadow-accent/20 font-bold;
   }
 
   .btn-secondary {
-    @apply bg-neutral-800 text-neutral-100 hover:bg-neutral-700 font-medium;
+    @apply bg-surface-200 text-text-primary hover:bg-surface-300 font-medium border border-surface-300;
   }
 
   .btn-outline {
-    @apply bg-transparent border border-neutral-700 hover:border-neutral-500 hover:bg-white/5 text-neutral-200 font-medium;
+    @apply bg-transparent border border-primary text-primary hover:bg-primary/10 font-medium;
   }
 
   .btn-ghost {
-    @apply bg-transparent hover:bg-white/5 text-neutral-300 hover:text-white font-medium;
+    @apply bg-transparent hover:bg-white/5 text-text-secondary hover:text-text-primary font-medium;
   }
 
   .btn-danger {
@@ -27,15 +31,15 @@
 
   /* IconButton Variants */
   .btn-icon-ghost {
-    @apply bg-transparent hover:bg-white/5 text-neutral-400 hover:text-white;
+    @apply bg-transparent hover:bg-white/5 text-text-muted hover:text-text-primary;
   }
 
   .btn-icon-secondary {
-    @apply bg-neutral-800 hover:bg-neutral-700 text-neutral-400 hover:text-white border border-neutral-700;
+    @apply bg-surface-200 hover:bg-surface-300 text-text-secondary hover:text-text-primary border border-surface-300;
   }
 
   .btn-icon-outline {
-    @apply bg-transparent border border-neutral-700 hover:border-neutral-500 hover:bg-white/5 text-neutral-400 hover:text-white;
+    @apply bg-transparent border border-surface-300 hover:border-primary hover:bg-primary/5 text-text-secondary hover:text-primary;
   }
 
   .btn-icon-danger {

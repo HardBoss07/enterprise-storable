@@ -1,21 +1,30 @@
 @theme {
-  --color-primary-accent: #3b82f6;
-  --color-bg-main: #171717;
-  --color-bg-sidebar: #262626;
-  --color-text-muted: #a3a3a3;
+  --color-primary: #ff007f;
+  --color-accent: #ffff00;
+  
+  --color-bg-main: #0a0a0a;
+  --color-bg-sidebar: #121212;
+  --color-surface-100: #1a1a1a;
+  --color-surface-200: #2a2a2a;
+  --color-surface-300: #3a3a3a;
+  
+  --color-text-primary: #ffffff;
+  --color-text-secondary: #a3a3a3;
+  --color-text-muted: #737373;
 }
 
 :root {
   --background: var(--color-bg-main);
   --background-muted: var(--color-bg-sidebar);
 
-  --text: #e5e5e5;
-  --text-muted: var(--color-text-muted);
+  --text: var(--color-text-primary);
+  --text-muted: var(--color-text-secondary);
 
-  --border: #404040;
-  --link: #f5f5f5;
+  --border: var(--color-surface-300);
+  --link: var(--color-accent);
 
-  --primary-accent: var(--color-primary-accent);
+  --primary: var(--color-primary);
+  --accent: var(--color-accent);
 }
 
 * {
@@ -23,5 +32,6 @@
 }
 
 ::selection {
-  background: theme(colors.zinc.700);
+  background: var(--color-primary);
+  color: #000;
 }

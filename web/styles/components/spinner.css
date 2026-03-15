@@ -5,7 +5,7 @@
   }
 
   .spinner-element {
-    @apply animate-spin rounded-full border-b-primary-accent border-neutral-700;
+    @apply animate-spin rounded-full border-b-primary border-surface-300;
   }
 
   .spinner-sm {

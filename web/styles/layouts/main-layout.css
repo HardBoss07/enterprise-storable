@@ -1,21 +1,21 @@
 @layer components {
   .app-header {
-    @apply bg-neutral-900 text-white shadow-md border-b border-neutral-800;
+    @apply bg-bg-main text-white shadow-xl border-b border-surface-300;
   }
 
   .app-sidebar {
-    @apply w-64 bg-neutral-800 text-white p-4;
+    @apply w-64 bg-bg-sidebar text-white p-4 border-r border-surface-300;
   }
 
   .app-footer {
-    @apply bg-neutral-900 text-white;
+    @apply bg-bg-main text-text-muted border-t border-surface-300;
   }
 
   .nav-link {
-    @apply py-2 px-4 rounded-md hover:bg-neutral-700 transition-colors text-sm font-medium;
+    @apply flex items-center gap-3 py-2.5 px-4 rounded-xl hover:bg-surface-200 hover:text-primary transition-all text-sm font-medium text-text-secondary;
   }
 
   .sidebar-link-active {
-    @apply bg-neutral-700 text-white;
+    @apply bg-primary/10 text-primary border border-primary/20 shadow-lg shadow-primary/5;
   }
 }
