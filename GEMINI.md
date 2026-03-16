@@ -152,6 +152,25 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [ ] **Feature:** Implementation of "Change Password" (with current password verification) and "Change Email" flows.
 - [ ] **Security:** Implement the "Nuclear Option" - a "Delete Account" flow that recursively wipes the user's database entries and physical `/storage` directory after a "Confirm Password" warning.
 
+### [ ] Phase 10: User Onboarding & Branding
+
+- [ ] **UI:** Create a high-conversion Landing Page at `/` featuring project info, feature showcases (dummy components), and a prominent Login CTA.
+- [ ] **Navigation:** Move the existing File Explorer/Dashboard to `/home`.
+- [ ] **Logic:** Implement "First Login" interceptor. If `user.password == 'root'`, redirect to a mandatory `/setup/change-password` flow.
+- [ ] **Footer:** Standardize global footer with Creator links and GitHub repository integration.
+
+### [ ] Phase 11: Admin Control & Session Management
+
+- [ ] **Logic:** Implement a Session Registry in `storable-core`.
+- [ ] **API:** `POST /api/admin/sessions/revoke-all` (Logic: Invalidate all JWTs/Sessions except for UID `root`).
+- [ ] **UI:** Add "Nuclear Session Reset" button to the Admin Panel.
+
+### [ ] Phase 12: Self-Hosting & Portability (The "Final Wrap")
+
+- [ ] **Config:** Refactor Spring Boot to use `${ENV_VAR}` mapping for all `application.yaml` properties, ensuring 100% `.env` driven configuration.
+- [ ] **Docker:** Multi-stage `Dockerfile` to compile Java and Next.js into a single, optimized production image.
+- [ ] **Documentation:** Create a `docker-compose.yml` template and "One-Click" setup guide for Portainer/Nginx Proxy Manager users.
+
 ---
 
 ## Technical Decisions & Architecture (Updated)

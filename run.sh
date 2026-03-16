@@ -14,7 +14,7 @@ function show_help() {
     echo "  down      Stop and remove containers"
     echo "  build     Rebuild images and start"
     echo "  logs      Tail logs for all services"
-    echo "  db-shell  Open MySQL terminal"
+    echo "  db        Open MySQL terminal"
     echo "  clean     Stop and REMOVE all volumes (Wipe DB)"
     echo "  restart   Quick restart of containers"
     echo "  status    Show running containers"
@@ -36,7 +36,7 @@ case "$1" in
     logs)
         docker-compose logs -f
         ;;
-    db-shell)
+    db)
         echo -e "${GREEN}Connecting to MySQL...${NC}"
         docker exec -it mysql_db mysql -u root -p
         ;;

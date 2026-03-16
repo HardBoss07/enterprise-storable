@@ -8,7 +8,7 @@ function Show-Help {
     Write-Host "  down      Stop and remove containers"
     Write-Host "  build     Rebuild images and start"
     Write-Host "  logs      Tail logs for all services"
-    Write-Host "  db-shell  Open MySQL terminal (Requires root password)"
+    Write-Host "  db  Open MySQL terminal (Requires root password)"
     Write-Host "  clean     Stop and REMOVE all volumes (Wipe DB)" -ForegroundColor Red
     Write-Host "  status    Show running containers"
     Write-Host "  restart   Quick restart of all containers"
@@ -31,7 +31,7 @@ switch ($args[0]) {
     "logs" {
         docker-compose logs -f
     }
-    "db-shell" {
+    "db" {
         Write-Host "Connecting to MySQL (mysql_db)..." -ForegroundColor Green
         docker exec -it mysql_db mysql -u root -p
     }
