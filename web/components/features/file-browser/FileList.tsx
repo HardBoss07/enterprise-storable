@@ -15,6 +15,7 @@ interface FileListProps {
   onRename: (nodeId: number, newName: string) => void;
   onDuplicate: (nodeId: number) => void;
   onMove: (nodeId: number) => void;
+  onShare?: (node: FileNode) => void;
   onToggleFavorite?: (nodeId: number, isFavorite: boolean) => void;
   onJumpToLocation?: (parentId: number | null) => void;
   isCreatingFolder?: boolean;
@@ -37,6 +38,7 @@ export default function FileList({
   onRename,
   onDuplicate,
   onMove,
+  onShare,
   onToggleFavorite,
   onJumpToLocation,
   isCreatingFolder,
@@ -124,6 +126,7 @@ export default function FileList({
             onRename={onRename}
             onDuplicate={onDuplicate}
             onMove={onMove}
+            onShare={onShare}
             onToggleFavorite={onToggleFavorite}
             onJumpToLocation={onJumpToLocation}
             isInitialRenaming={renamingNodeId === file.id}

@@ -4,7 +4,7 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context/AuthContext";
 import { usePathname } from "next/navigation";
-import { Folder, Clock, Trash2, Shield, Settings, Star } from "lucide-react";
+import { Folder, Clock, Trash2, Shield, Settings, Star, Users } from "lucide-react";
 
 /**
  * Renders the sidebar with navigation links.
@@ -17,6 +17,7 @@ export default function Sidebar() {
     { href: "/", label: "My Files", icon: Folder },
     { href: "/recent", label: "Recent", icon: Clock },
     { href: "/favorites", label: "Favorites", icon: Star },
+    { href: "/shared", label: "Shared with me", icon: Users },
     { href: "/trash", label: "Trash", icon: Trash2 },
   ];
 

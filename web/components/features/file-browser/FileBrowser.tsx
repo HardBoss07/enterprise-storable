@@ -10,6 +10,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/context/ToastContext";
 import MoveModal from "./MoveModal";
+import ShareModal from "./ShareModal";
 import { FileNode } from "@/types/api";
 
 interface FileBrowserProps {
@@ -45,6 +46,7 @@ export default function FileBrowser({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [movingNode, setMovingNode] = useState<FileNode | null>(null);
+  const [sharingNode, setSharingNode] = useState<FileNode | null>(null);
   const [renamingNodeId, setRenamingNodeId] = useState<number | null>(null);
 
   const handleCreateFolder = () => {
@@ -164,6 +166,7 @@ export default function FileBrowser({
           onRename={handleRename}
           onDuplicate={handleDuplicate}
           onMove={handleMoveClick}
+          onShare={(node) => setSharingNode(node)}
           onToggleFavorite={toggleFavorite}
           isCreatingFolder={isCreatingFolder}
           onCreateFolder={createFolder}
@@ -179,6 +182,12 @@ export default function FileBrowser({
           nodeToMove={movingNode}
           onClose={() => setMovingNode(null)}
           onMove={handleMoveConfirm}
+        />
+      )}
+      {sharingNode && (
+        <ShareModal
+          node={sharingNode}
+          onClose={() => setSharingNode(null)}
         />
       )}
     </div>

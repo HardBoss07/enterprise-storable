@@ -11,12 +11,14 @@ import {
   ArrowRightLeft,
   Star,
   ExternalLink,
+  Share2,
 } from "lucide-react";
 import { downloadFileAsBlob } from "@/lib/api/file";
 import { formatBytes } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
+import { useAuth } from "@/context/AuthContext";
 import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
@@ -27,6 +29,7 @@ interface FileListItemProps {
   onRename: (nodeId: number, newName: string) => void;
   onDuplicate: (nodeId: number) => void;
   onMove: (nodeId: number) => void;
+  onShare?: (node: FileNode) => void;
   onToggleFavorite?: (nodeId: number, isFavorite: boolean) => void;
   onJumpToLocation?: (parentId: number | null) => void;
   isInitialRenaming?: boolean;
@@ -36,8 +39,6 @@ interface FileListItemProps {
 /**
  * Renders a single row in the file list.
  * @param node The file or folder data.
- * @param onFolderClick Callback when a folder is clicked.
- * @param onDelete Callback when the delete button is clicked.
  */
 export default function FileListItem({
   node,
@@ -46,6 +47,7 @@ export default function FileListItem({
   onRename,
   onDuplicate,
   onMove,
+  onShare,
   onToggleFavorite,
   onJumpToLocation,
   isInitialRenaming,
@@ -53,9 +55,13 @@ export default function FileListItem({
 }: FileListItemProps) {
   const { showToast } = useToast();
   const { confirm } = useConfirm();
+  const { user } = useAuth();
   const [isRenaming, setIsRenaming] = useState(isInitialRenaming || false);
   const [newName, setNewName] = useState(node.name);
   const inputRef = useRef<HTMLInputElement>(null);
+
+  // Check if current user is owner
+  const isOwner = user?.id === node.ownerId;
 
   useEffect(() => {
     if (isInitialRenaming) {
@@ -248,6 +254,20 @@ export default function FileListItem({
             iconSize={14}
             title="Move"
           />
+          {isOwner && onShare && (
+            <IconButton
+              icon={Share2}
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare(node);
+              }}
+              className="action-btn text-primary"
+              variant="ghost"
+              size="sm"
+              iconSize={14}
+              title="Share"
+            />
+          )}
           <IconButton
             icon={Trash2}
             onClick={handleDelete}

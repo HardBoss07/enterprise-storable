@@ -12,6 +12,7 @@ import MoveModal from "@/components/features/file-browser/MoveModal";
 import { moveNode } from "@/lib/api/file";
 import { Star } from "lucide-react";
 import EmptyState from "@/components/shared/EmptyState";
+import ShareModal from "@/components/features/file-browser/ShareModal";
 
 /**
  * Favorites page component.
@@ -21,8 +22,10 @@ export default function FavoritesPage() {
   const [files, setFiles] = useState<FileNode[]>([]);
   const [loading, setLoading] = useState(true);
   const [movingNode, setMovingNode] = useState<FileNode | null>(null);
+  const [sharingNode, setSharingNode] = useState<FileNode | null>(null);
   const { showToast } = useToast();
   const router = useRouter();
+
 
   const fetchFavorites = async () => {
     try {
@@ -136,6 +139,7 @@ export default function FavoritesPage() {
             onRename={handleRename}
             onDuplicate={handleDuplicate}
             onMove={handleMoveClick}
+            onShare={(node) => setSharingNode(node)}
             onToggleFavorite={handleToggleFavorite}
             onJumpToLocation={handleJumpToLocation}
           />
@@ -148,6 +152,13 @@ export default function FavoritesPage() {
           nodeToMove={movingNode}
           onClose={() => setMovingNode(null)}
           onMove={handleMoveConfirm}
+        />
+      )}
+
+      {sharingNode && (
+        <ShareModal
+          node={sharingNode}
+          onClose={() => setSharingNode(null)}
         />
       )}
     </PageContainer>
