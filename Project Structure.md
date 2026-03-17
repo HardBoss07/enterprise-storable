@@ -20,12 +20,14 @@ enterprise-storable/
 │   │       │                   ├── controller/
 │   │       │                   │   ├── AdminController.java
 │   │       │                   │   ├── AuthController.java
-│   │       │                   │   └── FileController.java
+│   │       │                   │   ├── FileController.java
+│   │       │                   │   └── SharingController.java
 │   │       │                   ├── exception/
 │   │       │                   │   └── GlobalExceptionHandler.java
 │   │       │                   ├── request/
 │   │       │                   │   ├── CreateFolderRequest.java
-│   │       │                   │   └── RecursiveFolderRequest.java
+│   │       │                   │   ├── RecursiveFolderRequest.java
+│   │       │                   │   └── ShareRequest.java
 │   │       │                   ├── security/
 │   │       │                   │   ├── JwtAuthenticationFilter.java
 │   │       │                   │   └── SecurityConfig.java
@@ -42,10 +44,12 @@ enterprise-storable/
 │   │                   └── storable/
 │   │                       └── common/
 │   │                           ├── dto/
+│   │                           │   ├── AccessPrivilegeDto.java
 │   │                           │   ├── FileMetadataDto.java
 │   │                           │   ├── GlobalSettingsDto.java
 │   │                           │   ├── TrashMetadataDto.java
-│   │                           │   └── UserDto.java
+│   │                           │   ├── UserDto.java
+│   │                           │   └── UserLookupDto.java
 │   │                           ├── entity/
 │   │                           │   ├── AccessPrivilege.java
 │   │                           │   ├── FileNode.java
@@ -86,6 +90,8 @@ enterprise-storable/
 │   │                               ├── FileServiceImpl.java
 │   │                               ├── GlobalTimeProvider.java
 │   │                               ├── LocalStorageService.java
+│   │                               ├── SharingService.java
+│   │                               ├── SharingServiceImpl.java
 │   │                               ├── StorageService.java
 │   │                               └── TrashCleanupService.java
 │   └── pom.xml
@@ -123,6 +129,8 @@ enterprise-storable/
 │   │   │   └── page.tsx
 │   │   ├── register/
 │   │   │   └── page.tsx
+│   │   ├── shared/
+│   │   │   └── page.tsx
 │   │   ├── trash/
 │   │   │   └── page.tsx
 │   │   ├── Providers.tsx
@@ -136,7 +144,8 @@ enterprise-storable/
 │   │   │   │   ├── FileBrowser.tsx
 │   │   │   │   ├── FileList.tsx
 │   │   │   │   ├── FileListItem.tsx
-│   │   │   │   └── MoveModal.tsx
+│   │   │   │   ├── MoveModal.tsx
+│   │   │   │   └── ShareModal.tsx
 │   │   │   ├── recent/
 │   │   │   │   ├── RecentTable.tsx
 │   │   │   │   └── RecentTableRow.tsx
@@ -173,6 +182,7 @@ enterprise-storable/
 │   │   │   ├── auth.ts
 │   │   │   ├── client.ts
 │   │   │   ├── file.ts
+│   │   │   ├── sharing.ts
 │   │   │   └── trash.ts
 │   │   ├── file-constants.ts
 │   │   ├── mock-data.ts

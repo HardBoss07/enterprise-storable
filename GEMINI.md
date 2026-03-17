@@ -78,7 +78,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 7: Advanced Discovery & Organization (In Progress) | **Last Updated:** 2026-03-15
+> **Status:** Phase 9: User Profile & Account Lifecycle (In Progress) | **Last Updated:** 2026-03-17
 
 ### [x] Phase 1: Infrastructure & Skeleton
 
@@ -120,9 +120,9 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **UI:** Delete action in File Explorer.
 - [x] **Admin:** Comprehensive Admin Panel for User Management and Global Settings.
 - [x] **Logic:** Implement Global Time Offset solution (UTC to Local Time display).
-- [ ] **Data:** Add `AccessPrivilege` table (VIEW, EDIT, OWNER).
-- [ ] **Logic:** Logic to check permissions before returning `FileNode` data.
-- [ ] **UI:** "Share" modal mock-up.
+- [x] **Data:** Implement the `AccessPrivilege` schema to support granular sharing (VIEW, EDIT, OWNER).
+- [x] **Logic:** Logic to check permissions before returning `FileNode` data.
+- [x] **UI:** "Share" modal mock-up.
 
 ### [x] Phase 6: Design System & Global UI Refinement
 
@@ -139,12 +139,12 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **Search:** Implement a global search bar in the Header with debounced API calls to filter the user's `FileNodes`.
 - [x] **Public Space:** Initialize a "Public" root-level folder with universal `VIEW/EDIT` permissions for all authenticated users.
 
-### [ ] Phase 8: Social Sharing & Permissions
+### [x] Phase 8: Social Sharing & Permissions
 
 - [x] **Data:** Implement the `AccessPrivilege` schema to support granular sharing (VIEW, EDIT, OWNER).
-- [ ] **Logic:** Develop the sharing engine—allowing users to lookup other users by email/username and assign specific rights to a `FileNode`.
-- [ ] **UI:** Build the "Share" modal with user search and a permission toggle list.
-- [ ] **Validation:** Ensure the backend enforces these permissions on every CRUD operation.
+- [x] **Logic:** Develop the sharing engine—allowing users to lookup other users by email/username and assign specific rights to a `FileNode`.
+- [x] **UI:** Build the "Share" modal with user search and a permission toggle list.
+- [x] **Validation:** Ensure the backend enforces these permissions on every CRUD operation.
 
 ### [ ] Phase 9: User Profile & Account Lifecycle
 
@@ -191,6 +191,12 @@ This file is the **Source of Truth** for the project. Every session should begin
 - **Automation:** Implemented a transactional registration flow that creates a user in `users` and their corresponding home folder in `nodes` (named after the username, parented to Root ID 1).
 - **Recent Files:** Added `GET /api/files/recent` to fetch the 5 most recently modified files for the current user. UI synced with Trash page design.
 
+### Social Sharing & Permissions (Phase 8)
+
+- **Engine:** Implemented `SharingService` to handle granular permissions (VIEW, EDIT, OWNER) with recursive inheritance (children inherit parent permissions).
+- **UI:** Added "Shared with me" section and a "Share" modal with user lookup (by email/username) and permission management.
+- **Validation:** Updated `FileService` to enforce permissions on all CRUD operations using the sharing engine.
+
 ---
 
 ## Clarifications Needed
@@ -212,3 +218,5 @@ Whenever you ask me to "Implement X," my first task (if successful) is to run a 
 - [x] Guest User still gets created but no file entires for guest user are created
 - [x] Downloading doesn't work, gives me a 403 Error
 - [ ] Upload of larger files gets a NET::CONNECTION_ABORTED error with "Maximum upload size exceeded" (about limit of 1K)
+- [ ] On shared files the options (deleting, moving etc) are still visible, but when trying to delete something i have only view privileges to it doesnt actually delete
+- [ ] Each modal / popup should be cancellable by pressing 'Esc' which doesnt perform anything and just returns to the previous state
