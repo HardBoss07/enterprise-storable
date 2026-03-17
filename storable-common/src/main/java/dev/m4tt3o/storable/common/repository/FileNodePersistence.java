@@ -61,4 +61,10 @@ public interface FileNodePersistence {
 
     /** Checks if a node with the given name exists in the parent globally (any owner, any state). */
     boolean existsByNameAndParentGlobal(String name, Long parentId);
+
+    /** Retrieves all favorite nodes for an owner. */
+    List<FileMetadataDto> findFavorites(String ownerId);
+
+    /** Toggles the favorite status of a node. */
+    FileMetadataDto toggleFavorite(Long id, boolean isFavorite, String ownerId);
 }

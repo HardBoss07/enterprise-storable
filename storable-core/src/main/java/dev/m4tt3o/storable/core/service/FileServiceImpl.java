@@ -388,6 +388,22 @@ public class FileServiceImpl implements FileService {
         return persistence.findRecentFiles(ownerId);
     }
 
+    @Override
+    public List<FileMetadataDto> getFavorites(String ownerId) {
+        log.info("Retrieving favorites for owner: {}", ownerId);
+        return persistence.findFavorites(ownerId);
+    }
+
+    @Override
+    @Transactional
+    public FileMetadataDto toggleFavorite(Long nodeId, boolean isFavorite, String ownerId) {
+        log.info("Toggling favorite for node: {} to: {} for owner: {}", nodeId, isFavorite, ownerId);
+        // Verify existence and ownership
+        persistence.findByIdAndOwner(nodeId, ownerId)
+                .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + nodeId));
+        return persistence.toggleFavorite(nodeId, isFavorite, ownerId);
+    }
+
     private boolean isSubfolder(Long folderId, Long targetParentId, String ownerId) {
         if (targetParentId == null || targetParentId == 0 || targetParentId == 1L) return false;
         if (folderId.equals(targetParentId)) return true;

@@ -71,4 +71,10 @@ public interface FileService {
 
     /** Retrieves the 5 most recently modified files for a specific owner. */
     List<FileMetadataDto> getRecentFiles(String ownerId);
+
+    /** Retrieves all favorite nodes for a specific owner. */
+    List<FileMetadataDto> getFavorites(String ownerId);
+
+    /** Toggles the favorite status of a node. */
+    FileMetadataDto toggleFavorite(Long nodeId, boolean isFavorite, String ownerId);
 }

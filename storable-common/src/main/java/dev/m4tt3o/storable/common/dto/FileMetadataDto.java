@@ -16,6 +16,7 @@ public record FileMetadataDto(
     boolean isDeleted,
     LocalDateTime deletedAt,
     String originalPath,
+    boolean isFavorite,
     String ownerId,
     Long parentId,
     boolean folder

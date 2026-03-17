@@ -271,6 +271,25 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
         return repository.findByNameAndParentIdGlobal(name, parentId).isPresent();
     }
 
+    @Override
+    /** Retrieves all favorite nodes for an owner. */
+    public List<FileMetadataDto> findFavorites(String ownerId) {
+        log.debug("Finding favorites for owner: {}", ownerId);
+        return repository.findByOwnerIdAndIsFavoriteTrueAndIsDeletedFalse(ownerId).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    /** Toggles the favorite status of a node. */
+    public FileMetadataDto toggleFavorite(Long id, boolean isFavorite, String ownerId) {
+        log.info("Setting favorite status to {} for node ID: {} and owner: {}", isFavorite, id, ownerId);
+        FileNode node = repository.findByIdAndAuthorizedOwner(id, ownerId)
+                .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + id));
+        node.setFavorite(isFavorite);
+        return toDto(repository.save(node));
+    }
+
     /**
      * Maps a FileNode entity to a FileMetadataDto record.
      */
@@ -286,6 +305,7 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
             node.isDeleted(),
             node.getDeletedAt(),
             node.getOriginalPath(),
+            node.isFavorite(),
             node.getOwnerId(),
             node.getParentId(),
             node.getKind() == FileNode.NodeKind.folder
