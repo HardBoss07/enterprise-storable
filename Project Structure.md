@@ -47,11 +47,13 @@ enterprise-storable/
 │   │                           │   ├── TrashMetadataDto.java
 │   │                           │   └── UserDto.java
 │   │                           ├── entity/
+│   │                           │   ├── AccessPrivilege.java
 │   │                           │   ├── FileNode.java
 │   │                           │   ├── SystemSetting.java
 │   │                           │   ├── User.java
 │   │                           │   └── UserRole.java
 │   │                           └── repository/
+│   │                               ├── AccessPrivilegeRepository.java
 │   │                               ├── FileNodePersistence.java
 │   │                               ├── FileNodeRepository.java
 │   │                               ├── SystemSettingRepository.java
@@ -113,6 +115,8 @@ enterprise-storable/
 │   │   │   │   └── page.tsx
 │   │   │   ├── layout.tsx
 │   │   │   └── page.tsx
+│   │   ├── favorites/
+│   │   │   └── page.tsx
 │   │   ├── login/
 │   │   │   └── page.tsx
 │   │   ├── recent/
@@ -147,6 +151,7 @@ enterprise-storable/
 │   │   │   ├── AppLayout.tsx
 │   │   │   ├── Footer.tsx
 │   │   │   ├── Header.tsx
+│   │   │   ├── SearchBar.tsx
 │   │   │   └── Sidebar.tsx
 │   │   ├── shared/
 │   │   │   ├── EmptyState.tsx
