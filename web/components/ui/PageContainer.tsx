@@ -4,6 +4,7 @@ interface PageContainerProps {
   children: React.ReactNode;
   className?: string;
   title?: string;
+  description?: string;
   actions?: React.ReactNode;
 }
 
@@ -14,17 +15,25 @@ export const PageContainer = ({
   children,
   className = '',
   title,
+  description,
   actions,
 }: PageContainerProps) => {
   return (
     <div className={`flex flex-col h-full w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 ${className}`}>
-      {(title || actions) && (
+      {(title || description || actions) && (
         <div className="flex items-center justify-between mb-8">
-          {title && (
-            <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-              {title}
-            </h1>
-          )}
+          <div>
+            {title && (
+              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
+                {title}
+              </h1>
+            )}
+            {description && (
+              <p className="mt-2 text-sm text-neutral-400">
+                {description}
+              </p>
+            )}
+          </div>
           {actions && <div className="flex items-center gap-3">{actions}</div>}
         </div>
       )}

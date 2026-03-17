@@ -78,12 +78,9 @@ export default function TrashPage() {
   return (
     <PageContainer
       title="Trash"
+      description={`Items in trash will be permanently deleted after ${retentionDays} days.`}
       actions={PageActions}
     >
-      <p className={CLASSES.subtitle}>
-        Items in trash will be permanently deleted after {retentionDays} days.
-      </p>
-      
       <div className="mt-8">
         {trashItems.length === 0 ? (
           <EmptyState icon={Info} title="Your trash is empty." />

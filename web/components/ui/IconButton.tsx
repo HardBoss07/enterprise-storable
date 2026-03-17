@@ -10,6 +10,7 @@ interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> 
   size?: "sm" | "md" | "lg";
   iconSize?: number;
   isLoading?: boolean;
+  iconProps?: React.SVGProps<SVGSVGElement>;
 }
 
 /**
@@ -24,6 +25,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       size = "md",
       iconSize = 18,
       isLoading,
+      iconProps,
       ...props
     },
     ref,
@@ -58,8 +60,9 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
       >
         <Icon
           size={iconSize}
+          {...iconProps}
           // Only the icon gets the spin
-          className={cn(isLoading && "animate-spin")}
+          className={cn(isLoading && "animate-spin", iconProps?.className)}
         />
       </button>
     );

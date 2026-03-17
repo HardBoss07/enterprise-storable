@@ -68,11 +68,10 @@ export default function RecentPage() {
   }
 
   return (
-    <PageContainer title="Recent Files">
-      <p className={CLASSES.subtitle}>
-        Showing your 5 most recently modified files.
-      </p>
-
+    <PageContainer
+      title="Recent Files"
+      description="Showing your 5 most recently modified files."
+    >
       <div className="mt-8">
         {files.length === 0 ? (
           <EmptyState
