@@ -217,4 +217,22 @@ public class FileController {
         log.info("Request to get recent files for user: {}", user.getUsername());
         return fileService.getRecentFiles(user.id());
     }
+
+    @GetMapping("/favorites")
+    /** Retrieves all favorite nodes for the current user. */
+    public List<FileMetadataDto> getFavorites(@AuthenticationPrincipal CustomUserDetails user) {
+        log.info("Request to get favorites for user: {}", user.getUsername());
+        return fileService.getFavorites(user.id());
+    }
+
+    @PatchMapping("/{nodeId}/favorite")
+    /** Toggles the favorite status of a node. */
+    public FileMetadataDto toggleFavorite(@PathVariable Long nodeId, @RequestBody Map<String, Boolean> body, @AuthenticationPrincipal CustomUserDetails user) {
+        Boolean isFavorite = body.get("isFavorite");
+        if (isFavorite == null) {
+            throw new IllegalArgumentException("isFavorite field is required");
+        }
+        log.info("Request to toggle favorite for node: {} to: {} by user: {}", nodeId, isFavorite, user.getUsername());
+        return fileService.toggleFavorite(nodeId, isFavorite, user.id());
+    }
 }

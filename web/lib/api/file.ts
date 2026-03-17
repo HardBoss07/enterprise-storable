@@ -154,3 +154,36 @@ export async function moveNode(
 export async function getRecentFiles(): Promise<FileNode[]> {
   return apiRequest<FileNode[]>("/api/files/recent");
 }
+
+/**
+ * Fetches all favorite nodes for the current user.
+ */
+export async function getFavorites(): Promise<FileNode[]> {
+  return apiRequest<FileNode[]>("/api/files/favorites");
+}
+
+/**
+ * Toggles the favorite status of a node.
+ */
+export async function toggleFavorite(
+  nodeId: number,
+  isFavorite: boolean,
+): Promise<FileNode> {
+  return apiRequest<FileNode>(`/api/files/${nodeId}/favorite`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ isFavorite }),
+  });
+}
+
+/**
+ * Searches for nodes by name and kind for a specific owner.
+ */
+export async function searchFiles(
+  query: string,
+  kind?: string,
+): Promise<FileNode[]> {
+  const params = new URLSearchParams({ query });
+  if (kind) params.append("kind", kind);
+  return apiRequest<FileNode[]>(`/api/files/search?${params.toString()}`);
+}

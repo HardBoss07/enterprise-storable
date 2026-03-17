@@ -8,6 +8,8 @@ export interface FileNode {
   modifiedAt: string;
   isDeleted: boolean;
   deletedAt: string | null;
+  originalPath: string | null;
+  isFavorite: boolean;
   ownerId: string;
   parentId: number | null;
   folder: boolean;
