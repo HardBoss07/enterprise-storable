@@ -47,6 +47,9 @@ public class FileNode {
     @Column(name = "original_path")
     private String originalPath;
 
+    @Column(name = "is_favorite", nullable = false)
+    private boolean isFavorite = false;
+
     @Column(name = "owner_id", nullable = false)
     private String ownerId;
 

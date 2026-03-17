@@ -27,6 +27,7 @@ CREATE TABLE nodes (
     is_deleted BOOLEAN NOT NULL DEFAULT FALSE,
     deleted_at DATETIME NULL,
     original_path VARCHAR(1024) NULL,
+    is_favorite BOOLEAN NOT NULL DEFAULT FALSE,
     FOREIGN KEY (owner_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (parent_id) REFERENCES nodes(id) ON DELETE CASCADE,
     UNIQUE KEY node_unique_per_parent (parent_id, name),
@@ -36,4 +37,14 @@ CREATE TABLE nodes (
 CREATE TABLE system_settings (
     setting_key VARCHAR(255) PRIMARY KEY,
     setting_value VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE access_privileges (
+    id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    node_id BIGINT UNSIGNED NOT NULL,
+    user_id VARCHAR(36) NOT NULL,
+    level ENUM('VIEW', 'EDIT', 'OWNER') NOT NULL,
+    FOREIGN KEY (node_id) REFERENCES nodes(id) ON DELETE CASCADE,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY privilege_unique (node_id, user_id)
 );
