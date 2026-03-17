@@ -37,6 +37,7 @@ export default function FileBrowser({
     renameFile,
     duplicateFile,
     moveFile,
+    toggleFavorite,
     isCreatingFolder,
     triggerCreateFolder,
     cancelCreateFolder,
@@ -163,6 +164,7 @@ export default function FileBrowser({
           onRename={handleRename}
           onDuplicate={handleDuplicate}
           onMove={handleMoveClick}
+          onToggleFavorite={toggleFavorite}
           isCreatingFolder={isCreatingFolder}
           onCreateFolder={createFolder}
           onCancelCreateFolder={cancelCreateFolder}

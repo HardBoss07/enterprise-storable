@@ -12,6 +12,7 @@ import {
   renameNode,
   duplicateFile,
   moveNode,
+  toggleFavorite,
 } from "@/lib/api/file";
 
 /**
@@ -186,6 +187,24 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     }
   };
 
+  /**
+   * Toggles the favorite status of a node.
+   * @param nodeId The ID of the node to toggle.
+   * @param isFavorite The new favorite status.
+   */
+  const handleToggleFavorite = async (nodeId: number, isFavorite: boolean) => {
+    try {
+      await toggleFavorite(nodeId, isFavorite);
+      // Optimistic update
+      setFiles((prev) =>
+        prev.map((f) => (f.id === nodeId ? { ...f, isFavorite } : f)),
+      );
+    } catch (err) {
+      console.error("Failed to toggle favorite:", err);
+      throw new Error("Failed to toggle favorite");
+    }
+  };
+
   return {
     files,
     path,
@@ -203,5 +222,6 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     renameFile: handleRename,
     duplicateFile: handleDuplicate,
     moveFile: handleMove,
+    toggleFavorite: handleToggleFavorite,
   };
 }

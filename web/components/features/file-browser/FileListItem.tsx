@@ -9,6 +9,8 @@ import {
   SquarePen,
   Copy,
   ArrowRightLeft,
+  Star,
+  ExternalLink,
 } from "lucide-react";
 import { downloadFileAsBlob } from "@/lib/api/file";
 import { formatBytes } from "@/lib/utils";
@@ -16,6 +18,7 @@ import { IconButton } from "@/components/ui/IconButton";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
 import { useState, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
 
 interface FileListItemProps {
   node: FileNode;
@@ -24,6 +27,8 @@ interface FileListItemProps {
   onRename: (nodeId: number, newName: string) => void;
   onDuplicate: (nodeId: number) => void;
   onMove: (nodeId: number) => void;
+  onToggleFavorite?: (nodeId: number, isFavorite: boolean) => void;
+  onJumpToLocation?: (parentId: number | null) => void;
   isInitialRenaming?: boolean;
   onCancelRename?: () => void;
 }
@@ -41,6 +46,8 @@ export default function FileListItem({
   onRename,
   onDuplicate,
   onMove,
+  onToggleFavorite,
+  onJumpToLocation,
   isInitialRenaming,
   onCancelRename,
 }: FileListItemProps) {
@@ -133,6 +140,13 @@ export default function FileListItem({
     onMove(node.id);
   };
 
+  const handleToggleFavorite = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (onToggleFavorite) {
+      onToggleFavorite(node.id, !node.isFavorite);
+    }
+  };
+
   const submitRename = () => {
     if (newName.trim() && newName.trim() !== node.name) {
       onRename(node.id, newName.trim());
@@ -184,6 +198,16 @@ export default function FileListItem({
 
       <div className="flex items-center space-x-2">
         <div className="hidden group-hover:flex px-2 space-x-1">
+          <IconButton
+            icon={Star}
+            onClick={handleToggleFavorite}
+            className={cn("action-btn", node.isFavorite ? "text-accent" : "text-text-muted hover:text-accent")}
+            variant="ghost"
+            size="sm"
+            iconSize={14}
+            title={node.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+            iconProps={{ fill: node.isFavorite ? "currentColor" : "none" }}
+          />
           {!node.folder && (
             <IconButton
               icon={Download}
@@ -233,6 +257,20 @@ export default function FileListItem({
             iconSize={14}
             title="Delete"
           />
+          {onJumpToLocation && (
+            <IconButton
+              icon={ExternalLink}
+              onClick={(e) => {
+                e.stopPropagation();
+                onJumpToLocation(node.parentId);
+              }}
+              className="action-btn text-blue-500"
+              variant="ghost"
+              size="sm"
+              iconSize={14}
+              title="Jump to Location"
+            />
+          )}
         </div>
 
         <div className="w-40 text-text-muted text-sm hidden sm:block">

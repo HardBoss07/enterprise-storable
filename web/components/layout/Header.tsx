@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { Search, User as UserIcon, LogOut } from "lucide-react";
+import { User as UserIcon, LogOut } from "lucide-react";
+import SearchBar from "./SearchBar";
 
 /**
  * Standardized application header with branding, search, and user controls.
@@ -24,13 +25,8 @@ export default function Header() {
             <span>Storable</span>
           </Link>
           
-          <div className="hidden md:flex relative group">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors" size={18} />
-            <input 
-              type="text" 
-              placeholder="Search files..." 
-              className="bg-surface-100 border border-surface-300 rounded-xl py-2 pl-10 pr-4 text-sm w-64 lg:w-96 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary/20 transition-all text-text-primary"
-            />
+          <div className="hidden md:flex">
+            <SearchBar />
           </div>
         </div>
 

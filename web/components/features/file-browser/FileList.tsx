@@ -15,6 +15,8 @@ interface FileListProps {
   onRename: (nodeId: number, newName: string) => void;
   onDuplicate: (nodeId: number) => void;
   onMove: (nodeId: number) => void;
+  onToggleFavorite?: (nodeId: number, isFavorite: boolean) => void;
+  onJumpToLocation?: (parentId: number | null) => void;
   isCreatingFolder?: boolean;
   onCreateFolder?: (name: string) => void;
   onCancelCreateFolder?: () => void;
@@ -35,6 +37,8 @@ export default function FileList({
   onRename,
   onDuplicate,
   onMove,
+  onToggleFavorite,
+  onJumpToLocation,
   isCreatingFolder,
   onCreateFolder,
   onCancelCreateFolder,
@@ -120,6 +124,8 @@ export default function FileList({
             onRename={onRename}
             onDuplicate={onDuplicate}
             onMove={onMove}
+            onToggleFavorite={onToggleFavorite}
+            onJumpToLocation={onJumpToLocation}
             isInitialRenaming={renamingNodeId === file.id}
             onCancelRename={onCancelRename}
           />
