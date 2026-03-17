@@ -126,7 +126,6 @@ enterprise-storable/
 │   │   ├── trash/
 │   │   │   └── page.tsx
 │   │   ├── Providers.tsx
-│   │   ├── favicon.ico
 │   │   ├── globals.css
 │   │   ├── layout.tsx
 │   │   └── page.tsx
@@ -179,6 +178,9 @@ enterprise-storable/
 │   │   ├── mock-data.ts
 │   │   └── utils.ts
 │   ├── public/
+│   │   └── logo/
+│   │       ├── icon.svg
+│   │       └── logo.svg
 │   ├── styles/
 │   │   ├── base/
 │   │   │   ├── reset.css

@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { User as UserIcon, LogOut } from "lucide-react";
@@ -17,12 +18,16 @@ export default function Header() {
         <div className="flex items-center gap-8">
           <Link
             href="/"
-            className="text-2xl font-black tracking-tighter text-white hover:text-primary transition-all flex items-center gap-2 group"
+            className="flex items-center gap-2 group"
           >
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center group-hover:rotate-12 transition-transform shadow-lg shadow-primary/20">
-              <div className="w-4 h-4 bg-black rounded-sm" />
-            </div>
-            <span>Storable</span>
+            <Image 
+              src="/logo/logo.svg" 
+              alt="Storable Logo" 
+              width={130} 
+              height={30} 
+              className="group-hover:opacity-80 transition-opacity"
+              priority
+            />
           </Link>
           
           <div className="hidden md:flex">

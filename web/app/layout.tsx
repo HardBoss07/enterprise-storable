@@ -14,6 +14,9 @@ const robotoSans = Roboto({
 export const metadata: Metadata = {
   title: "Storable",
   description: "Storable - A Place to store your documents",
+  icons: {
+    icon: "/logo/icon.svg",
+  },
 };
 
 export default function RootLayout({

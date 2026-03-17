@@ -4,6 +4,7 @@ import { useAuth } from "@/context/AuthContext";
 import { registerUser as registerApi } from "@/lib/api/auth";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 
 export default function RegisterPage() {
@@ -34,9 +35,20 @@ export default function RegisterPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-[80vh]">
+      <div className="mb-8 flex flex-col items-center gap-2">
+        <Link href="/">
+          <Image 
+            src="/logo/logo.svg" 
+            alt="Storable Logo" 
+            width={180} 
+            height={40} 
+            priority
+          />
+        </Link>
+      </div>
       <div className="bg-neutral-800 p-8 rounded-lg shadow-lg w-full max-w-md border border-neutral-700">
         <h2 className="text-2xl font-bold mb-6 text-center text-white">
-          Create Account
+          Create your account
         </h2>
         {error && (
           <div className="bg-red-900/50 text-red-200 p-3 rounded mb-4 text-sm border border-red-800">
