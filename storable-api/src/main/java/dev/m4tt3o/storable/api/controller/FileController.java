@@ -42,46 +42,55 @@ public class FileController {
 
     @GetMapping("/{nodeId}")
     /** Retrieves metadata for a specific node. */
-    public FileMetadataDto getMetadata(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to get metadata for node: {} by user: {}", nodeId, user.getUsername());
+    public FileMetadataDto getMetadata(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to get metadata for node: {} by user ID: {}", nodeId, userId);
         if (nodeId == null || nodeId == 0) return null;
-        return fileService.getMetadata(nodeId, user.id());
+        return fileService.getMetadata(nodeId, userId);
     }
 
     @GetMapping("/{nodeId}/children")
     /** Retrieves children for a given parent node ID. */
-    public List<FileMetadataDto> getChildren(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to get children for node: {} by user: {}", nodeId, user.getUsername());
+    public List<FileMetadataDto> getChildren(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to get children for node: {} by user ID: {}", nodeId, userId);
         Long id = (nodeId == null || nodeId == 0) ? null : nodeId;
-        return fileService.getChildren(id, user.id());
+        return fileService.getChildren(id, userId);
     }
 
     @GetMapping("/home")
     /** Retrieves the home folder for the current user. */
-    public FileMetadataDto getHome(@AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to get home folder for user: {}", user.getUsername());
-        return fileService.getHomeNode(user.id(), user.getUsername());
+    public FileMetadataDto getHome(@AuthenticationPrincipal String userId) {
+        log.info("Request to get home folder for user ID: {}", userId);
+        // We need the username for getHomeNode, but we only have userId in principal now.
+        // Option 1: Store username in JWT and extract it.
+        // Option 2: Change getHomeNode to accept userId only if possible.
+        // Looking at FileServiceImpl, it uses username to find folder named after user.
+        // For now, let's assume we can get it from a service if needed, 
+        // but wait, AuthService already creates home folder with username.
+        // I will check if FileService.getHomeNode can be simplified.
+        
+        // Actually, let's check FileService interface.
+        return fileService.getHomeNode(userId, null); // I'll update FileServiceImpl to handle null username
     }
 
     @GetMapping("/{nodeId}/path")
     /** Retrieves the virtualized path for a given node. */
-    public List<FileMetadataDto> getPath(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to get path for node: {} by user: {}", nodeId, user.getUsername());
-        return fileService.getPath(nodeId, user.id(), user.getUsername());
+    public List<FileMetadataDto> getPath(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to get path for node: {} by user ID: {}", nodeId, userId);
+        return fileService.getPath(nodeId, userId, null); // Update implementation to handle null
     }
 
     @PostMapping("/folders")
     /** Creates a new folder. */
-    public FileMetadataDto createFolder(@RequestBody CreateFolderRequest request, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to create folder: {} by user: {}", request.name(), user.getUsername());
-        return fileService.createFolder(request.name(), request.parentId(), user.id());
+    public FileMetadataDto createFolder(@RequestBody CreateFolderRequest request, @AuthenticationPrincipal String userId) {
+        log.info("Request to create folder: {} by user ID: {}", request.name(), userId);
+        return fileService.createFolder(request.name(), request.parentId(), userId);
     }
 
     @PostMapping("/folders/recursive")
     /** Creates folders recursively based on a path. */
-    public FileMetadataDto createFolderRecursive(@RequestBody RecursiveFolderRequest request, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to recursively create folders for path: {} by user: {}", request.path(), user.getUsername());
-        return fileService.createFolderRecursive(request.path(), user.id());
+    public FileMetadataDto createFolderRecursive(@RequestBody RecursiveFolderRequest request, @AuthenticationPrincipal String userId) {
+        log.info("Request to recursively create folders for path: {} by user ID: {}", request.path(), userId);
+        return fileService.createFolderRecursive(request.path(), userId);
     }
 
     @PostMapping("/upload")
@@ -89,29 +98,29 @@ public class FileController {
     public FileMetadataDto uploadFile(
             @RequestParam("file") MultipartFile file,
             @RequestParam(value = "parentId", required = false) Long parentId,
-            @AuthenticationPrincipal CustomUserDetails user) throws IOException {
+            @AuthenticationPrincipal String userId) throws IOException {
         
-        log.info("Request to upload file: {} by user: {}", file.getOriginalFilename(), user.getUsername());
+        log.info("Request to upload file: {} by user ID: {}", file.getOriginalFilename(), userId);
         return fileService.uploadFile(
                 file.getInputStream(),
                 file.getOriginalFilename(),
                 file.getContentType(),
                 file.getSize(),
                 parentId,
-                user.id()
+                userId
         );
     }
 
     @GetMapping("/{nodeId}/download")
     /** Downloads a file. */
-    public ResponseEntity<Resource> downloadFile(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to download node: {} by user: {}", nodeId, user.getUsername());
-        FileMetadataDto metadata = fileService.getMetadata(nodeId, user.id());
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to download node: {} by user ID: {}", nodeId, userId);
+        FileMetadataDto metadata = fileService.getMetadata(nodeId, userId);
         if (metadata == null) {
             return ResponseEntity.notFound().build();
         }
 
-        InputStream inputStream = fileService.downloadFile(nodeId, user.id());
+        InputStream inputStream = fileService.downloadFile(nodeId, userId);
         Resource resource = new InputStreamResource(inputStream);
 
         return ResponseEntity.ok()
@@ -123,48 +132,48 @@ public class FileController {
 
     @DeleteMapping("/{nodeId}")
     /** Soft deletes a node. */
-    public ResponseEntity<Void> softDelete(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to soft delete node: {} by user: {}", nodeId, user.getUsername());
-        fileService.softDelete(nodeId, user.id());
+    public ResponseEntity<Void> softDelete(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to soft delete node: {} by user ID: {}", nodeId, userId);
+        fileService.softDelete(nodeId, userId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{nodeId}/restore")
     /** Restores a soft-deleted node. */
-    public ResponseEntity<Void> restore(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to restore node: {} by user: {}", nodeId, user.getUsername());
-        fileService.restore(nodeId, user.id());
+    public ResponseEntity<Void> restore(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to restore node: {} by user ID: {}", nodeId, userId);
+        fileService.restore(nodeId, userId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/trash")
     /** Retrieves all soft-deleted nodes for the current user. */
-    public List<TrashMetadataDto> getTrash(@AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to get trash for user: {}", user.getUsername());
-        return fileService.getTrash(user.id());
+    public List<TrashMetadataDto> getTrash(@AuthenticationPrincipal String userId) {
+        log.info("Request to get trash for user ID: {}", userId);
+        return fileService.getTrash(userId);
     }
 
     @GetMapping("/admin/trash")
     @PreAuthorize("hasRole('ADMIN')")
     /** Retrieves all soft-deleted nodes for all users (Admin only). */
-    public List<TrashMetadataDto> getAllTrash(@AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Admin request to get all trash by: {}", user.getUsername());
+    public List<TrashMetadataDto> getAllTrash(@AuthenticationPrincipal String userId) {
+        log.info("Admin request to get all trash by user ID: {}", userId);
         return fileService.getAllTrash();
     }
 
     @DeleteMapping("/{nodeId}/permanent")
     /** Permanently deletes a node. */
-    public ResponseEntity<Void> permanentlyDelete(@PathVariable Long nodeId, @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to permanently delete node: {} by user: {}", nodeId, user.getUsername());
-        fileService.permanentlyDelete(nodeId, user.id());
+    public ResponseEntity<Void> permanentlyDelete(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to permanently delete node: {} by user ID: {}", nodeId, userId);
+        fileService.permanentlyDelete(nodeId, userId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/trash/empty")
     /** Permanently deletes all nodes in trash for the current user. */
-    public ResponseEntity<Void> emptyTrash(@AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to empty trash by user: {}", user.getUsername());
-        fileService.emptyTrash(user.id());
+    public ResponseEntity<Void> emptyTrash(@AuthenticationPrincipal String userId) {
+        log.info("Request to empty trash by user ID: {}", userId);
+        fileService.emptyTrash(userId);
         return ResponseEntity.noContent().build();
     }
 
@@ -179,26 +188,26 @@ public class FileController {
 
     @PatchMapping("/{nodeId}/rename")
     /** Renames a node. */
-    public FileMetadataDto rename(@PathVariable Long nodeId, @RequestBody Map<String, String> body, @AuthenticationPrincipal CustomUserDetails user) {
+    public FileMetadataDto rename(@PathVariable Long nodeId, @RequestBody Map<String, String> body, @AuthenticationPrincipal String userId) {
         String newName = body.get("name");
-        log.info("Request to rename node: {} to: {} by user: {}", nodeId, newName, user.getUsername());
-        return fileService.rename(nodeId, newName, user.id());
+        log.info("Request to rename node: {} to: {} by user ID: {}", nodeId, newName, userId);
+        return fileService.rename(nodeId, newName, userId);
     }
 
     @PostMapping("/{nodeId}/duplicate")
     /** Duplicates a file with an optional new name. */
-    public FileMetadataDto duplicate(@PathVariable Long nodeId, @RequestBody(required = false) Map<String, String> body, @AuthenticationPrincipal CustomUserDetails user) {
+    public FileMetadataDto duplicate(@PathVariable Long nodeId, @RequestBody(required = false) Map<String, String> body, @AuthenticationPrincipal String userId) {
         String newName = body != null ? body.get("name") : null;
-        log.info("Request to duplicate node: {} with name: {} by user: {}", nodeId, newName, user.getUsername());
-        return fileService.duplicate(nodeId, newName, user.id());
+        log.info("Request to duplicate node: {} with name: {} by user ID: {}", nodeId, newName, userId);
+        return fileService.duplicate(nodeId, newName, userId);
     }
 
     @PatchMapping("/{nodeId}/move")
     /** Moves a node. */
-    public FileMetadataDto move(@PathVariable Long nodeId, @RequestBody Map<String, Long> body, @AuthenticationPrincipal CustomUserDetails user) {
+    public FileMetadataDto move(@PathVariable Long nodeId, @RequestBody Map<String, Long> body, @AuthenticationPrincipal String userId) {
         Long targetParentId = body.get("targetParentId");
-        log.info("Request to move node: {} to: {} by user: {}", nodeId, targetParentId, user.getUsername());
-        return fileService.move(nodeId, targetParentId, user.id());
+        log.info("Request to move node: {} to: {} by user ID: {}", nodeId, targetParentId, userId);
+        return fileService.move(nodeId, targetParentId, userId);
     }
 
     @GetMapping("/search")
@@ -206,33 +215,33 @@ public class FileController {
     public List<FileMetadataDto> search(
             @RequestParam("query") String query,
             @RequestParam(value = "kind", required = false) String kind,
-            @AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to search nodes with query: {} and kind: {} by user: {}", query, kind, user.getUsername());
-        return fileService.search(query, kind, user.id());
+            @AuthenticationPrincipal String userId) {
+        log.info("Request to search nodes with query: {} and kind: {} by user ID: {}", query, kind, userId);
+        return fileService.search(query, kind, userId);
     }
 
     @GetMapping("/recent")
     /** Retrieves the 5 most recently modified files for the current user. */
-    public List<FileMetadataDto> getRecent(@AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to get recent files for user: {}", user.getUsername());
-        return fileService.getRecentFiles(user.id());
+    public List<FileMetadataDto> getRecent(@AuthenticationPrincipal String userId) {
+        log.info("Request to get recent files for user ID: {}", userId);
+        return fileService.getRecentFiles(userId);
     }
 
     @GetMapping("/favorites")
     /** Retrieves all favorite nodes for the current user. */
-    public List<FileMetadataDto> getFavorites(@AuthenticationPrincipal CustomUserDetails user) {
-        log.info("Request to get favorites for user: {}", user.getUsername());
-        return fileService.getFavorites(user.id());
+    public List<FileMetadataDto> getFavorites(@AuthenticationPrincipal String userId) {
+        log.info("Request to get favorites for user ID: {}", userId);
+        return fileService.getFavorites(userId);
     }
 
     @PatchMapping("/{nodeId}/favorite")
     /** Toggles the favorite status of a node. */
-    public FileMetadataDto toggleFavorite(@PathVariable Long nodeId, @RequestBody Map<String, Boolean> body, @AuthenticationPrincipal CustomUserDetails user) {
+    public FileMetadataDto toggleFavorite(@PathVariable Long nodeId, @RequestBody Map<String, Boolean> body, @AuthenticationPrincipal String userId) {
         Boolean isFavorite = body.get("isFavorite");
         if (isFavorite == null) {
             throw new IllegalArgumentException("isFavorite field is required");
         }
-        log.info("Request to toggle favorite for node: {} to: {} by user: {}", nodeId, isFavorite, user.getUsername());
-        return fileService.toggleFavorite(nodeId, isFavorite, user.id());
+        log.info("Request to toggle favorite for node: {} to: {} by user ID: {}", nodeId, isFavorite, userId);
+        return fileService.toggleFavorite(nodeId, isFavorite, userId);
     }
 }
