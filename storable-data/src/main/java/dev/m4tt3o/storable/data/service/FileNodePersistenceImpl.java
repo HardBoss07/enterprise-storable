@@ -1,5 +1,7 @@
 package dev.m4tt3o.storable.data.service;
 
+import dev.m4tt3o.storable.common.entity.AccessPrivilege;
+import dev.m4tt3o.storable.common.repository.AccessPrivilegeRepository;
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
 import dev.m4tt3o.storable.common.repository.FileNodePersistence;
 import dev.m4tt3o.storable.common.entity.FileNode;
@@ -8,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -22,6 +25,7 @@ import java.util.stream.Collectors;
 public class FileNodePersistenceImpl implements FileNodePersistence {
 
     private final FileNodeRepository repository;
+    private final AccessPrivilegeRepository privilegeRepository;
 
     @Override
     /** Retrieves children of a given parent node for a specific owner. */
@@ -32,6 +36,16 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
         List<FileNode> nodes = repository.findByParentIdAndAuthorizedOwner(targetParentId, ownerId);
             
         return nodes.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    /** Finds multiple nodes by their IDs. */
+    public List<FileMetadataDto> findByIds(List<Long> ids) {
+        log.debug("Finding nodes by IDs: {}", ids);
+        if (ids == null || ids.isEmpty()) return List.of();
+        return repository.findAllById(ids).stream()
                 .map(this::toDto)
                 .collect(Collectors.toList());
     }
@@ -65,6 +79,7 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     }
 
     @Override
+    @Transactional
     /** Saves a folder node. */
     public FileMetadataDto saveFolder(String name, Long parentId, String ownerId, String storageKey) {
         log.debug("Saving folder node: {}", name);
@@ -76,10 +91,12 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
         node.setKind(FileNode.NodeKind.folder);
         node.setMime("directory");
         
-        return toDto(repository.save(node));
+        FileNode savedNode = repository.saveAndFlush(node);
+        return toDto(savedNode);
     }
 
     @Override
+    @Transactional
     /** Saves a file node. */
     public FileMetadataDto saveFile(String name, Long parentId, String ownerId, String storageKey, String mime, Long size) {
         log.debug("Saving file node: {}", name);
@@ -92,7 +109,8 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
         node.setMime(mime);
         node.setSize(size);
         
-        return toDto(repository.save(node));
+        FileNode savedNode = repository.saveAndFlush(node);
+        return toDto(savedNode);
     }
 
     @Override

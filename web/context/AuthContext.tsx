@@ -10,6 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 
 interface User {
+  id: string;
   username: string;
   token: string;
   role: string;
@@ -17,7 +18,7 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (token: string, username: string, role: string) => void;
+  login: (token: string, username: string, userId: string, role: string) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -32,24 +33,27 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     // Load from local storage on mount
     const token = localStorage.getItem("token");
     const username = localStorage.getItem("username");
+    const userId = localStorage.getItem("userId");
     const role = localStorage.getItem("role");
 
-    if (token && username && role) {
-      setUser({ token, username, role });
+    if (token && username && userId && role) {
+      setUser({ token, username, id: userId, role });
     }
   }, []);
 
-  const login = (token: string, username: string, role: string) => {
+  const login = (token: string, username: string, userId: string, role: string) => {
     localStorage.setItem("token", token);
     localStorage.setItem("username", username);
+    localStorage.setItem("userId", userId);
     localStorage.setItem("role", role);
-    setUser({ token, username, role });
+    setUser({ token, username, id: userId, role });
     router.push("/");
   };
 
   const logout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("username");
+    localStorage.removeItem("userId");
     localStorage.removeItem("role");
     setUser(null);
     router.push("/login");

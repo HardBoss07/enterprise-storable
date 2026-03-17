@@ -18,7 +18,7 @@ export default function LoginPage() {
     setError("");
     try {
       const res = await loginApi({ username, password });
-      login(res.token, res.username, res.role);
+      login(res.token, res.username, res.userId, res.role);
       // login function handles redirect usually, but duplicate just in case
     } catch (err: any) {
       setError(err.message || "Login failed");

@@ -50,8 +50,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
                 if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
+                    // Extract ID if it's our CustomUserDetails
+                    Object principal = userDetails.getUsername(); // fallback
+                    if (userDetails instanceof dev.m4tt3o.storable.core.security.CustomUserDetails custom) {
+                        principal = custom.id();
+                    }
+
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
+                            principal,
                             null,
                             userDetails.getAuthorities()
                     );
