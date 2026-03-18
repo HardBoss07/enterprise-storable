@@ -47,6 +47,16 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
     fetchPrivileges();
   }, [node.id]);
 
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        onClose();
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [onClose]);
+
   const fetchPrivileges = async () => {
     try {
       setLoadingPrivileges(true);
@@ -285,7 +295,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                 ))}
 
                 {privileges.length === 0 && !loadingPrivileges && (
-                  <div className="text-center py-6 text-text-muted italic text-sm">
+                  <div className="text-center py-6 text-text-muted text-sm">
                     Only you can access this item.
                   </div>
                 )}

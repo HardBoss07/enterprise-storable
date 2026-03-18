@@ -7,6 +7,7 @@ import React, {
   useCallback,
   ReactNode,
   useRef,
+  useEffect,
 } from "react";
 import { Button } from "@/components/ui/Button";
 import { AlertTriangle } from "lucide-react";
@@ -52,10 +53,20 @@ export const ConfirmProvider = ({ children }: { children: ReactNode }) => {
     resolveRef.current(true);
   };
 
-  const handleCancel = () => {
+  const handleCancel = useCallback(() => {
     setIsOpen(false);
     resolveRef.current(false);
-  };
+  }, []);
+
+  useEffect(() => {
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && isOpen) {
+        handleCancel();
+      }
+    };
+    window.addEventListener("keydown", handleEsc);
+    return () => window.removeEventListener("keydown", handleEsc);
+  }, [isOpen, handleCancel]);
 
   return (
     <ConfirmContext.Provider value={{ confirm }}>

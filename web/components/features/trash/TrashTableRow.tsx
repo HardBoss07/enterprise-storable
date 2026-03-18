@@ -29,7 +29,7 @@ export function TrashTableRow({
 
   return (
     <div className="table-row-grid group">
-      <div className="col-span-5 flex items-center space-x-4 min-w-0">
+      <div className="col-span-4 flex items-center space-x-4 min-w-0">
         <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
           <FileIcon
             extension={metadata.name.split(".").pop()}
@@ -55,11 +55,12 @@ export function TrashTableRow({
           : "--"}
       </div>
 
-      <div className="col-span-2 flex items-center justify-end space-x-2">
+      <div className="col-span-3 flex items-center justify-end space-x-2">
         <StatusBadge
-          label={`${daysRemaining} days left`}
-          isWarning={daysRemaining <= 5}
-        />
+          variant={daysRemaining <= 5 ? "warning" : "neutral"}
+        >
+          {daysRemaining} days left
+        </StatusBadge>
 
         <IconButton
           icon={RotateCcw}

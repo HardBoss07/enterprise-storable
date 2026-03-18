@@ -23,10 +23,10 @@ export function TrashTable({
   return (
     <div className="card-surface overflow-hidden">
       <div className="table-header-grid">
-        <div className="col-span-5 flex items-center ml-10">Name</div>
+        <div className="col-span-4 flex items-center ml-10">Name</div>
         <div className="col-span-3">Deleted At</div>
         <div className="col-span-2 text-right">Size</div>
-        <div className="col-span-2 text-right">Days Left</div>
+        <div className="col-span-3 text-right">Days Left</div>
       </div>
 
       <div className="space-y-1">
