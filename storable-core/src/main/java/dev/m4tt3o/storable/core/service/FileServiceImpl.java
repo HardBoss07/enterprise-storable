@@ -42,7 +42,7 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("Access denied: You don't have permission to view this folder.");
         }
 
-        return persistence.findChildren(targetId, ownerId);
+        return enrichDtos(persistence.findChildren(targetId, ownerId), ownerId);
     }
 
     @Override
@@ -56,7 +56,8 @@ public class FileServiceImpl implements FileService {
         }
 
         // We use a more generic fetch here since sharing is allowed
-        return persistence.findByIds(List.of(nodeId)).stream().findFirst().orElse(null);
+        FileMetadataDto dto = persistence.findByIds(List.of(nodeId)).stream().findFirst().orElse(null);
+        return enrichDto(dto, ownerId);
     }
 
     @Override
@@ -173,7 +174,8 @@ public class FileServiceImpl implements FileService {
     public FileMetadataDto getHomeNode(String ownerId, String username) {
         log.info("Retrieving home node for owner: {} and username: {}", ownerId, username);
         if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)) {
-            return persistence.findByIdAndOwner(1L, ownerId).orElseThrow();
+            FileMetadataDto root = persistence.findByIdAndOwner(1L, ownerId).orElseThrow();
+            return enrichDto(root, ownerId);
         }
 
         String resolvedUsername = username;
@@ -184,8 +186,9 @@ public class FileServiceImpl implements FileService {
         }
         final String effectiveUsername = resolvedUsername;
 
-        return persistence.findByNameParentAndOwner(effectiveUsername, 1L, ownerId)
+        FileMetadataDto home = persistence.findByNameParentAndOwner(effectiveUsername, 1L, ownerId)
                 .orElseThrow(() -> new RuntimeException("Home folder not found for user: " + effectiveUsername));
+        return enrichDto(home, ownerId);
     }
 
     @Override
@@ -215,34 +218,39 @@ public class FileServiceImpl implements FileService {
             tempId = node.parentId();
         }
 
+        List<FileMetadataDto> finalPath;
         if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)) {
-            return pathArr;
-        }
+            finalPath = pathArr;
+        } else {
+            String effectiveUsername = username;
+            if (effectiveUsername == null) {
+                effectiveUsername = userRepository.findById(ownerId)
+                        .map(dev.m4tt3o.storable.common.entity.User::getUsername)
+                        .orElse(null);
+            }
 
-        String effectiveUsername = username;
-        if (effectiveUsername == null) {
-            effectiveUsername = userRepository.findById(ownerId)
-                    .map(dev.m4tt3o.storable.common.entity.User::getUsername)
-                    .orElse(null);
-        }
+            if (effectiveUsername == null) {
+                finalPath = pathArr;
+            } else {
+                // Truncate path for regular users: everything after the home folder (ID where name=username, parent=1)
+                int homeIndex = -1;
+                for (int i = 0; i < pathArr.size(); i++) {
+                    FileMetadataDto node = pathArr.get(i);
+                    if (effectiveUsername.equals(node.name()) && node.parentId() != null && node.parentId() == 1L) {
+                        homeIndex = i;
+                        break;
+                    }
+                }
 
-        if (effectiveUsername == null) return pathArr;
-
-        // Truncate path for regular users: everything after the home folder (ID where name=username, parent=1)
-        int homeIndex = -1;
-        for (int i = 0; i < pathArr.size(); i++) {
-            FileMetadataDto node = pathArr.get(i);
-            if (effectiveUsername.equals(node.name()) && node.parentId() != null && node.parentId() == 1L) {
-                homeIndex = i;
-                break;
+                if (homeIndex != -1) {
+                    finalPath = pathArr.subList(homeIndex + 1, pathArr.size());
+                } else {
+                    finalPath = pathArr;
+                }
             }
         }
-
-        if (homeIndex != -1) {
-            return pathArr.subList(homeIndex + 1, pathArr.size());
-        }
-
-        return pathArr;
+        
+        return enrichDtos(finalPath, ownerId);
     }
 
     @Override
@@ -252,6 +260,14 @@ public class FileServiceImpl implements FileService {
         if (!sharingService.hasPermission(nodeId, ownerId, dev.m4tt3o.storable.common.entity.AccessPrivilege.PrivilegeLevel.OWNER)) {
             throw new RuntimeException("Access denied: You don't have permission to delete this node.");
         }
+        
+        FileMetadataDto node = persistence.findByIds(List.of(nodeId)).stream().findFirst()
+                .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
+        
+        if (node.parentId() != null && node.parentId() == 1L) {
+            throw new RuntimeException("Access denied: Cannot delete a root-level directory.");
+        }
+
         persistence.softDelete(nodeId, ownerId);
     }
 
@@ -268,17 +284,16 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<TrashMetadataDto> getTrash(String ownerId) {
         log.info("Retrieving trash for owner: {}", ownerId);
-        return persistence.findTrash(ownerId).stream()
-                .map(this::toTrashDto)
-                .collect(Collectors.toList());
+        return enrichTrashDtos(persistence.findTrash(ownerId), ownerId);
     }
 
     @Override
     public List<TrashMetadataDto> getAllTrash() {
         log.info("Retrieving all trash for ADMIN");
-        return persistence.findAllTrash().stream()
-                .map(this::toTrashDto)
-                .collect(Collectors.toList());
+        // For admin trash, we don't necessarily have a specific user context for privileges
+        // but we'll use the system admin UUID.
+        String adminId = "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+        return enrichTrashDtos(persistence.findAllTrash(), adminId);
     }
 
     @Override
@@ -315,6 +330,11 @@ public class FileServiceImpl implements FileService {
         FileMetadataDto node = persistence.findByIds(List.of(nodeId)).stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
 
+        // Root Node Protection
+        if (node.parentId() != null && node.parentId() == 1L) {
+             throw new RuntimeException("Access denied: Cannot rename root-level directories.");
+        }
+
         String finalName = newName;
         if (!node.folder()) {
             // Validate: No invalid characters
@@ -345,7 +365,8 @@ public class FileServiceImpl implements FileService {
 
         // Note: rename implementation in persistence still uses findByIdAndOwner, I might need to update it
         // Or just use the original owner of the node.
-        return persistence.rename(nodeId, finalName, node.ownerId());
+        FileMetadataDto renamed = persistence.rename(nodeId, finalName, node.ownerId());
+        return enrichDto(renamed, ownerId);
     }
 
     @Override
@@ -405,7 +426,8 @@ public class FileServiceImpl implements FileService {
         storageService.copy(original.storageKey(), newStorageKey);
 
         // Save Metadata - Duplicate belongs to the one who duplicated it
-        return persistence.saveFile(finalName, original.parentId(), ownerId, newStorageKey, original.mime(), original.size());
+        FileMetadataDto saved = persistence.saveFile(finalName, original.parentId(), ownerId, newStorageKey, original.mime(), original.size());
+        return enrichDto(saved, ownerId);
     }
 
     @Override
@@ -424,6 +446,11 @@ public class FileServiceImpl implements FileService {
         FileMetadataDto node = persistence.findByIds(List.of(nodeId)).stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
 
+        // Root Node Protection
+        if (node.parentId() != null && node.parentId() == 1L) {
+             throw new RuntimeException("Access denied: Cannot move root-level directories.");
+        }
+
         // Circular Reference Protection
         if (node.folder()) {
             if (isSubfolder(nodeId, targetParentId, ownerId)) {
@@ -436,27 +463,32 @@ public class FileServiceImpl implements FileService {
              throw new RuntimeException("Cannot move a node to itself.");
         }
 
-        return persistence.move(nodeId, targetParentId, node.ownerId());
+        FileMetadataDto moved = persistence.move(nodeId, targetParentId, node.ownerId());
+        return enrichDto(moved, ownerId);
     }
 
     @Override
     public List<FileMetadataDto> search(String query, String kind, String ownerId) {
         log.info("Searching for nodes with query: {} and kind: {} for owner: {}", query, kind, ownerId);
-        // Search still only returns owned items for now. 
-        // Including shared items in search would require a complex query or post-filtering.
-        return persistence.search(query, kind, ownerId);
+        List<FileMetadataDto> results;
+        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)) {
+            results = persistence.searchGlobal(query, kind);
+        } else {
+            results = persistence.search(query, kind, ownerId);
+        }
+        return enrichDtos(results, ownerId);
     }
 
     @Override
     public List<FileMetadataDto> getRecentFiles(String ownerId) {
         log.info("Retrieving recent files for owner: {}", ownerId);
-        return persistence.findRecentFiles(ownerId);
+        return enrichDtos(persistence.findRecentFiles(ownerId), ownerId);
     }
 
     @Override
     public List<FileMetadataDto> getFavorites(String ownerId) {
         log.info("Retrieving favorites for owner: {}", ownerId);
-        return persistence.findFavorites(ownerId);
+        return enrichDtos(persistence.findFavorites(ownerId), ownerId);
     }
 
     @Override
@@ -470,7 +502,26 @@ public class FileServiceImpl implements FileService {
         FileMetadataDto node = persistence.findByIds(List.of(nodeId)).stream().findFirst()
                 .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
 
-        return persistence.toggleFavorite(nodeId, isFavorite, node.ownerId());
+        FileMetadataDto toggled = persistence.toggleFavorite(nodeId, isFavorite, node.ownerId());
+        return enrichDto(toggled, ownerId);
+    }
+
+    private FileMetadataDto enrichDto(FileMetadataDto dto, String userId) {
+        if (dto == null) return null;
+        return new FileMetadataDto(
+                dto.id(), dto.name(), dto.size(), dto.mime(), dto.storageKey(),
+                dto.createdAt(), dto.modifiedAt(), dto.isDeleted(), dto.deletedAt(),
+                dto.originalPath(), dto.isFavorite(), dto.ownerId(), dto.parentId(),
+                dto.folder(), sharingService.getHighestPrivilege(dto.id(), userId)
+        );
+    }
+
+    private List<FileMetadataDto> enrichDtos(List<FileMetadataDto> dtos, String userId) {
+        return dtos.stream().map(d -> enrichDto(d, userId)).collect(Collectors.toList());
+    }
+
+    private List<TrashMetadataDto> enrichTrashDtos(List<FileMetadataDto> dtos, String userId) {
+        return dtos.stream().map(d -> toTrashDto(enrichDto(d, userId))).collect(Collectors.toList());
     }
 
     private boolean isSubfolder(Long folderId, Long targetParentId, String ownerId) {
