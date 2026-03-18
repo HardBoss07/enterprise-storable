@@ -177,11 +177,11 @@ export default function FileListItem({
       onClick={handleClick}
     >
       <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
-        <FileIcon 
-          extension={node.name.split(".").pop()} 
-          mime={node.mime} 
-          isFolder={node.folder} 
-          size={22} 
+        <FileIcon
+          extension={node.name.split(".").pop()}
+          mime={node.mime}
+          isFolder={node.folder}
+          size={22}
         />
       </div>
       <div className="flex-1 min-w-0 flex items-center h-10">
@@ -207,11 +207,18 @@ export default function FileListItem({
           <IconButton
             icon={Star}
             onClick={handleToggleFavorite}
-            className={cn("action-btn", node.isFavorite ? "text-accent" : "text-text-muted hover:text-accent")}
+            className={cn(
+              "action-btn",
+              node.isFavorite
+                ? "text-accent"
+                : "text-text-muted hover:text-accent",
+            )}
             variant="ghost"
             size="sm"
             iconSize={14}
-            title={node.isFavorite ? "Remove from Favorites" : "Add to Favorites"}
+            title={
+              node.isFavorite ? "Remove from Favorites" : "Add to Favorites"
+            }
             iconProps={{ fill: node.isFavorite ? "currentColor" : "none" }}
           />
           {!node.folder && (

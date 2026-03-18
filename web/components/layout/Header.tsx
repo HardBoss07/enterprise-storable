@@ -16,20 +16,17 @@ export default function Header() {
     <header className="app-header">
       <div className="flex h-16 items-center justify-between px-6 lg:px-8">
         <div className="flex items-center gap-8">
-          <Link
-            href="/"
-            className="flex items-center gap-2 group"
-          >
-            <Image 
-              src="/logo/logo.svg" 
-              alt="Storable Logo" 
-              width={130} 
-              height={30} 
+          <Link href="/" className="flex items-center gap-2 group">
+            <Image
+              src="/logo/logo.svg"
+              alt="Storable Logo"
+              width={130}
+              height={30}
               className="group-hover:opacity-80 transition-opacity"
               priority
             />
           </Link>
-          
+
           <div className="hidden md:flex">
             <SearchBar />
           </div>
@@ -40,7 +37,9 @@ export default function Header() {
             <div className="flex items-center space-x-4">
               <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-100 border border-surface-300 rounded-xl">
                 <UserIcon size={16} className="text-primary" />
-                <span className="text-sm font-bold text-text-primary">{user.username}</span>
+                <span className="text-sm font-bold text-text-primary">
+                  {user.username}
+                </span>
               </div>
               <button
                 onClick={logout}

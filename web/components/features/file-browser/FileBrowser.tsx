@@ -185,10 +185,7 @@ export default function FileBrowser({
         />
       )}
       {sharingNode && (
-        <ShareModal
-          node={sharingNode}
-          onClose={() => setSharingNode(null)}
-        />
+        <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />
       )}
     </div>
   );

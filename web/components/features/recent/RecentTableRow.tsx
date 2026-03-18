@@ -22,11 +22,11 @@ export function RecentTableRow({ file, onNavigate }: RecentTableRowProps) {
     <div className="table-row-grid group">
       <div className="col-span-6 flex items-center space-x-4 min-w-0">
         <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
-          <FileIcon 
-            extension={file.name.split(".").pop()} 
-            mime={file.mime} 
-            isFolder={file.folder} 
-            size={22} 
+          <FileIcon
+            extension={file.name.split(".").pop()}
+            mime={file.mime}
+            isFolder={file.folder}
+            size={22}
           />
         </div>
         <span className="text-neutral-100 font-medium truncate">

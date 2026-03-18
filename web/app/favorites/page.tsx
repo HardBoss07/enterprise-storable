@@ -2,7 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { FileNode } from "@/types/api";
-import { getFavorites, toggleFavorite, softDeleteNode, renameNode, duplicateFile } from "@/lib/api/file";
+import {
+  getFavorites,
+  toggleFavorite,
+  softDeleteNode,
+  renameNode,
+  duplicateFile,
+} from "@/lib/api/file";
 import { PageContainer } from "@/components/ui/PageContainer";
 import FileList from "@/components/features/file-browser/FileList";
 import { Spinner } from "@/components/ui/Spinner";
@@ -25,7 +31,6 @@ export default function FavoritesPage() {
   const [sharingNode, setSharingNode] = useState<FileNode | null>(null);
   const { showToast } = useToast();
   const router = useRouter();
-
 
   const fetchFavorites = async () => {
     try {
@@ -56,7 +61,10 @@ export default function FavoritesPage() {
       } else {
         fetchFavorites();
       }
-      showToast(isFavorite ? "Added to favorites" : "Removed from favorites", "success");
+      showToast(
+        isFavorite ? "Added to favorites" : "Removed from favorites",
+        "success",
+      );
     } catch (error) {
       showToast("Failed to update favorite status", "error");
     }
@@ -121,7 +129,10 @@ export default function FavoritesPage() {
   };
 
   return (
-    <PageContainer title="Favorites" description="Manage your most important files and folders.">
+    <PageContainer
+      title="Favorites"
+      description="Manage your most important files and folders."
+    >
       <div className="card-surface">
         {loading ? (
           <Spinner size="lg" className="h-64" />
@@ -156,10 +167,7 @@ export default function FavoritesPage() {
       )}
 
       {sharingNode && (
-        <ShareModal
-          node={sharingNode}
-          onClose={() => setSharingNode(null)}
-        />
+        <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />
       )}
     </PageContainer>
   );

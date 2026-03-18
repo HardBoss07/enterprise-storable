@@ -29,11 +29,11 @@ export default function LoginPage() {
     <div className="flex flex-col items-center justify-center min-h-[80vh]">
       <div className="mb-8 flex flex-col items-center gap-2">
         <Link href="/">
-          <Image 
-            src="/logo/logo.svg" 
-            alt="Storable Logo" 
-            width={180} 
-            height={40} 
+          <Image
+            src="/logo/logo.svg"
+            alt="Storable Logo"
+            width={180}
+            height={40}
             priority
           />
         </Link>

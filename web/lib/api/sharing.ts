@@ -29,23 +29,29 @@ export async function getSharedWithMe(): Promise<FileNode[]> {
  * Looks up users by email or username.
  */
 export async function lookupUsers(query: string): Promise<UserLookup[]> {
-  return apiRequest<UserLookup[]>(`/api/sharing/users?query=${encodeURIComponent(query)}`);
+  return apiRequest<UserLookup[]>(
+    `/api/sharing/users?query=${encodeURIComponent(query)}`,
+  );
 }
 
 /**
  * Fetches all privileges for a node.
  */
-export async function getNodePrivileges(nodeId: number): Promise<AccessPrivilege[]> {
-  return apiRequest<AccessPrivilege[]>(`/api/sharing/nodes/${nodeId}/privileges`);
+export async function getNodePrivileges(
+  nodeId: number,
+): Promise<AccessPrivilege[]> {
+  return apiRequest<AccessPrivilege[]>(
+    `/api/sharing/nodes/${nodeId}/privileges`,
+  );
 }
 
 /**
  * Shares a node with another user.
  */
 export async function shareNode(
-  nodeId: number, 
-  targetUserId: string, 
-  level: PrivilegeLevel
+  nodeId: number,
+  targetUserId: string,
+  level: PrivilegeLevel,
 ): Promise<AccessPrivilege> {
   return apiRequest<AccessPrivilege>(`/api/sharing/nodes/${nodeId}/share`, {
     method: "POST",
@@ -58,22 +64,31 @@ export async function shareNode(
  * Updates an existing privilege.
  */
 export async function updatePrivilege(
-  nodeId: number, 
-  targetUserId: string, 
-  level: PrivilegeLevel
+  nodeId: number,
+  targetUserId: string,
+  level: PrivilegeLevel,
 ): Promise<AccessPrivilege> {
-  return apiRequest<AccessPrivilege>(`/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`, {
-    method: "PUT",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ targetUserId, level }),
-  });
+  return apiRequest<AccessPrivilege>(
+    `/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`,
+    {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ targetUserId, level }),
+    },
+  );
 }
 
 /**
  * Removes a privilege.
  */
-export async function removePrivilege(nodeId: number, targetUserId: string): Promise<void> {
-  return apiRequest<void>(`/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`, {
-    method: "DELETE",
-  });
+export async function removePrivilege(
+  nodeId: number,
+  targetUserId: string,
+): Promise<void> {
+  return apiRequest<void>(
+    `/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`,
+    {
+      method: "DELETE",
+    },
+  );
 }

@@ -2,17 +2,25 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FileNode } from "@/types/api";
-import { 
-  lookupUsers, 
-  getNodePrivileges, 
-  shareNode, 
-  updatePrivilege, 
-  removePrivilege, 
-  UserLookup, 
+import {
+  lookupUsers,
+  getNodePrivileges,
+  shareNode,
+  updatePrivilege,
+  removePrivilege,
+  UserLookup,
   AccessPrivilege,
-  PrivilegeLevel
+  PrivilegeLevel,
 } from "@/lib/api/sharing";
-import { X, Search, User, Trash2, ShieldCheck, Loader2, ChevronDown } from "lucide-react";
+import {
+  X,
+  Search,
+  User,
+  Trash2,
+  ShieldCheck,
+  Loader2,
+  ChevronDown,
+} from "lucide-react";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
@@ -69,7 +77,8 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
         const results = await lookupUsers(value);
         // Filter out users who already have access
         const filtered = results.filter(
-          u => !privileges.some(p => p.userId === u.id) && u.id !== node.ownerId
+          (u) =>
+            !privileges.some((p) => p.userId === u.id) && u.id !== node.ownerId,
         );
         setSearchResults(filtered);
       } catch (error) {
@@ -127,14 +136,23 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
               Manage who can access this {node.folder ? "folder" : "file"}.
             </p>
           </div>
-          <IconButton icon={X} onClick={onClose} variant="ghost" className="text-text-muted hover:text-text-primary" />
+          <IconButton
+            icon={X}
+            onClick={onClose}
+            variant="ghost"
+            className="text-text-muted hover:text-text-primary"
+          />
         </div>
 
         <div className="p-6 space-y-6">
           {/* Search Box */}
           <div className="relative">
             <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-text-muted">
-              {searching ? <Loader2 size={18} className="animate-spin text-primary" /> : <Search size={18} />}
+              {searching ? (
+                <Loader2 size={18} className="animate-spin text-primary" />
+              ) : (
+                <Search size={18} />
+              )}
             </div>
             <input
               type="text"
@@ -157,8 +175,12 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                       <User size={16} />
                     </div>
                     <div>
-                      <div className="font-bold text-text-primary">{user.username}</div>
-                      <div className="text-xs text-text-muted">{user.email}</div>
+                      <div className="font-bold text-text-primary">
+                        {user.username}
+                      </div>
+                      <div className="text-xs text-text-muted">
+                        {user.email}
+                      </div>
                     </div>
                   </button>
                 ))}
@@ -171,7 +193,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
             <h3 className="text-xs font-black uppercase tracking-wider text-text-muted">
               Who has access
             </h3>
-            
+
             {loadingPrivileges ? (
               <div className="flex justify-center py-4">
                 <Loader2 size={24} className="animate-spin text-primary" />
@@ -186,7 +208,9 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                     </div>
                     <div>
                       <div className="font-bold text-text-primary">Owner</div>
-                      <div className="text-xs text-text-muted">Creator of this item</div>
+                      <div className="text-xs text-text-muted">
+                        Creator of this item
+                      </div>
                     </div>
                   </div>
                   <div className="text-xs font-black text-accent bg-accent/10 px-3 py-1 rounded-full uppercase">
@@ -195,34 +219,59 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                 </div>
 
                 {privileges.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between p-3 hover:bg-surface-200 rounded-2xl border border-transparent hover:border-surface-300 transition-all group">
+                  <div
+                    key={p.id}
+                    className="flex items-center justify-between p-3 hover:bg-surface-200 rounded-2xl border border-transparent hover:border-surface-300 transition-all group"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
                         <User size={20} />
                       </div>
                       <div>
-                        <div className="font-bold text-text-primary">{p.username}</div>
+                        <div className="font-bold text-text-primary">
+                          {p.username}
+                        </div>
                         <div className="text-xs text-text-muted">{p.email}</div>
                       </div>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <div className="relative inline-flex items-center group/select">
                         <select
                           value={p.level}
-                          onChange={(e) => handleUpdateLevel(p.userId, e.target.value as PrivilegeLevel)}
+                          onChange={(e) =>
+                            handleUpdateLevel(
+                              p.userId,
+                              e.target.value as PrivilegeLevel,
+                            )
+                          }
                           className="appearance-none bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 text-xs font-bold rounded-full pl-4 pr-8 py-1.5 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary uppercase tracking-tighter"
                         >
-                          <option value="VIEW" className="bg-bg-sidebar text-text-primary">Can view</option>
-                          <option value="EDIT" className="bg-bg-sidebar text-text-primary">Can edit</option>
-                          <option value="OWNER" className="bg-bg-sidebar text-text-primary">Full access</option>
+                          <option
+                            value="VIEW"
+                            className="bg-bg-sidebar text-text-primary"
+                          >
+                            Can view
+                          </option>
+                          <option
+                            value="EDIT"
+                            className="bg-bg-sidebar text-text-primary"
+                          >
+                            Can edit
+                          </option>
+                          <option
+                            value="OWNER"
+                            className="bg-bg-sidebar text-text-primary"
+                          >
+                            Full access
+                          </option>
                         </select>
-                        <ChevronDown 
-                          size={12} 
+                        <ChevronDown
+                          size={12}
                           className="absolute right-2.5 pointer-events-none text-primary/50"
                         />
                       </div>
-                      
+
                       <IconButton
                         icon={Trash2}
                         onClick={() => handleRemovePrivilege(p.userId)}
@@ -246,7 +295,11 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
         </div>
 
         <div className="p-6 bg-surface-200/50 flex justify-end">
-          <Button onClick={onClose} variant="primary" className="px-8 font-black uppercase tracking-tighter">
+          <Button
+            onClick={onClose}
+            variant="primary"
+            className="px-8 font-black uppercase tracking-tighter"
+          >
             Done
           </Button>
         </div>

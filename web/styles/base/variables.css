@@ -1,13 +1,13 @@
 @theme {
   --color-primary: #d80b69;
   --color-accent: #ffd405;
-  
+
   --color-bg-main: #0a0a0a;
   --color-bg-sidebar: #121212;
   --color-surface-100: #1a1a1a;
   --color-surface-200: #2a2a2a;
   --color-surface-300: #3a3a3a;
-  
+
   --color-text-primary: #ffffff;
   --color-text-secondary: #a3a3a3;
   --color-text-muted: #737373;

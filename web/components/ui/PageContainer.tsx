@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 interface PageContainerProps {
   children: React.ReactNode;
@@ -13,13 +13,15 @@ interface PageContainerProps {
  */
 export const PageContainer = ({
   children,
-  className = '',
+  className = "",
   title,
   description,
   actions,
 }: PageContainerProps) => {
   return (
-    <div className={`flex flex-col h-full w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 ${className}`}>
+    <div
+      className={`flex flex-col h-full w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6 ${className}`}
+    >
       {(title || description || actions) && (
         <div className="flex items-center justify-between mb-8">
           <div>
@@ -29,17 +31,13 @@ export const PageContainer = ({
               </h1>
             )}
             {description && (
-              <p className="mt-2 text-sm text-neutral-400">
-                {description}
-              </p>
+              <p className="mt-2 text-sm text-neutral-400">{description}</p>
             )}
           </div>
           {actions && <div className="flex items-center gap-3">{actions}</div>}
         </div>
       )}
-      <div className="flex-1 min-h-0">
-        {children}
-      </div>
+      <div className="flex-1 min-h-0">{children}</div>
     </div>
   );
 };

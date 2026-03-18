@@ -18,7 +18,12 @@ interface User {
 
 interface AuthContextType {
   user: User | null;
-  login: (token: string, username: string, userId: string, role: string) => void;
+  login: (
+    token: string,
+    username: string,
+    userId: string,
+    role: string,
+  ) => void;
   logout: () => void;
   isAuthenticated: boolean;
 }
@@ -41,7 +46,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   }, []);
 
-  const login = (token: string, username: string, userId: string, role: string) => {
+  const login = (
+    token: string,
+    username: string,
+    userId: string,
+    role: string,
+  ) => {
     localStorage.setItem("token", token);
     localStorage.setItem("username", username);
     localStorage.setItem("userId", userId);

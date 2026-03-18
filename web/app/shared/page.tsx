@@ -29,7 +29,7 @@ export default function SharedPage() {
       setLoading(true);
       const data = await getSharedWithMe();
       // Filter out files owned by the current user
-      const filtered = data.filter(file => file.ownerId !== user?.id);
+      const filtered = data.filter((file) => file.ownerId !== user?.id);
       setFiles(filtered);
     } catch (error) {
       console.error("Failed to fetch shared files:", error);
@@ -55,8 +55,8 @@ export default function SharedPage() {
         </div>
       ) : files.length > 0 ? (
         <div className="bg-surface-100 rounded-2xl border border-surface-300 overflow-hidden shadow-sm p-4">
-          <FileList 
-            files={files} 
+          <FileList
+            files={files}
             onFolderClick={handleFolderClick}
             onDelete={() => {}} // Basic view-only for shared items list
             onRename={() => {}}
@@ -75,10 +75,7 @@ export default function SharedPage() {
       )}
 
       {sharingNode && (
-        <ShareModal
-          node={sharingNode}
-          onClose={() => setSharingNode(null)}
-        />
+        <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />
       )}
     </PageContainer>
   );
