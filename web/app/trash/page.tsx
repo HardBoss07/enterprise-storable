@@ -7,7 +7,6 @@ import { Trash2, AlertCircle, Info } from "lucide-react";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { TrashTable } from "@/components/features/trash/TrashTable";
 import { RetentionSettings } from "@/components/features/trash/RetentionSettings";
-
 import { PageContainer } from "@/components/ui/PageContainer";
 
 /**

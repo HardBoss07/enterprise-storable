@@ -1,4 +1,4 @@
-import { Folder, LucideIcon, File, FileText } from "lucide-react";
+import { Folder } from "lucide-react";
 import { getFileConfig } from "@/lib/file-constants";
 import { cn } from "@/lib/utils";
 

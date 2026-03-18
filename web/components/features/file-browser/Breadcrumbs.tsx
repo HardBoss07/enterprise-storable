@@ -2,7 +2,6 @@
 
 import { FileNode } from "@/types/api";
 import { Home, ChevronRight } from "lucide-react";
-import { cn } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
 
 interface BreadcrumbsProps {

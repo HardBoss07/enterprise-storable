@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect } from "react";
 import { FileNode } from "@/types/api";
 import { getFileList, getFilePath, getHomeFolder } from "@/lib/api/file";
 import { apiRequest } from "@/lib/api/client";

@@ -3,7 +3,6 @@
 import { FileNode } from "@/types/api";
 import FileListItem from "./FileListItem";
 import { useMemo } from "react";
-import { cn } from "@/lib/utils";
 
 import { FileIcon } from "@/components/icons/FileIcon";
 import { useState, useEffect, useRef } from "react";

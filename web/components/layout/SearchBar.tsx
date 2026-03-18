@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import {
   Search as SearchIcon,
   X,
-  File,
   Folder as FolderIcon,
 } from "lucide-react";
 import { FileNode } from "@/types/api";

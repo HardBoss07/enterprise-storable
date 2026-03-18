@@ -8,10 +8,8 @@ import FileList from "@/components/features/file-browser/FileList";
 import EmptyState from "@/components/shared/EmptyState";
 import { Users } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
-
 import { useRouter } from "next/navigation";
 import ShareModal from "@/components/features/file-browser/ShareModal";
-
 import { useAuth } from "@/context/AuthContext";
 
 /**

@@ -1,6 +1,5 @@
 package dev.m4tt3o.storable.data.service;
 
-import dev.m4tt3o.storable.common.entity.AccessPrivilege;
 import dev.m4tt3o.storable.common.repository.AccessPrivilegeRepository;
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
 import dev.m4tt3o.storable.common.repository.FileNodePersistence;
@@ -8,7 +7,6 @@ import dev.m4tt3o.storable.common.entity.FileNode;
 import dev.m4tt3o.storable.common.repository.FileNodeRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 

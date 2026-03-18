@@ -10,7 +10,6 @@ import { Spinner } from "@/components/ui/Spinner";
 import { EmptyState } from "@/components/shared/EmptyState";
 import { Button } from "@/components/ui/Button";
 import { RecentTable } from "@/components/features/recent/RecentTable";
-
 import { PageContainer } from "@/components/ui/PageContainer";
 
 /**

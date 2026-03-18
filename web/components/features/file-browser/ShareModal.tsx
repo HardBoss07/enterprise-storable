@@ -24,7 +24,6 @@ import {
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
 import { useToast } from "@/context/ToastContext";
-import { cn } from "@/lib/utils";
 
 interface ShareModalProps {
   node: FileNode;

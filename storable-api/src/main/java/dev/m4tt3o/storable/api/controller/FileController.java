@@ -4,7 +4,6 @@ import dev.m4tt3o.storable.api.request.CreateFolderRequest;
 import dev.m4tt3o.storable.api.request.RecursiveFolderRequest;
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
 import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
-import dev.m4tt3o.storable.core.security.CustomUserDetails;
 import dev.m4tt3o.storable.core.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
