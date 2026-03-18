@@ -19,6 +19,6 @@
 @layer components {
   /* --- Empty State --- */
   .empty-state-container {
-    @apply bg-bg-sidebar rounded-xl shadow-2xl border border-surface-300 py-20 flex flex-col items-center justify-center text-text-muted italic;
+    @apply bg-bg-sidebar rounded-xl shadow-2xl border border-surface-300 py-20 flex flex-col items-center justify-center text-text-muted;
   }
 }

@@ -35,7 +35,7 @@ export function FileIcon({
   if (isFolder) {
     return (
       <Folder
-        className={cn("text-blue-400", className)}
+        className={cn("text-accent", className)}
         size={size}
         {...props}
       />
@@ -66,5 +66,5 @@ export function FileIcon({
  * Simple folder icon component for standalone use.
  */
 export function FolderIcon(props: React.ComponentProps<"svg">) {
-  return <Folder className="text-blue-400" {...props} />;
+  return <Folder className="text-accent" {...props} />;
 }

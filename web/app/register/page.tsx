@@ -62,7 +62,7 @@ export default function RegisterPage() {
             </label>
             <input
               type="text"
-              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -74,7 +74,7 @@ export default function RegisterPage() {
             </label>
             <input
               type="email"
-              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -86,7 +86,7 @@ export default function RegisterPage() {
             </label>
             <input
               type="password"
-              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -102,7 +102,7 @@ export default function RegisterPage() {
                 "w-full bg-neutral-900 border rounded p-2 text-white outline-none transition-all focus:ring-2",
                 confirmPassword && password !== confirmPassword
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-neutral-700 focus:ring-blue-500",
+                  : "border-neutral-700 focus:ring-primary",
               )}
               value={confirmPassword}
               onChange={(e) => setConfirmPassword(e.target.value)}
@@ -111,14 +111,14 @@ export default function RegisterPage() {
           </div>
           <button
             type="submit"
-            className="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors"
+            className="w-full bg-primary hover:bg-primary-dark text-black font-black py-3 px-4 rounded-xl transition-all uppercase tracking-tight shadow-lg shadow-primary/20 active:scale-95"
           >
             Register
           </button>
         </form>
-        <div className="mt-4 text-center text-sm text-neutral-400">
+        <div className="mt-6 text-center text-sm text-neutral-400">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-400 hover:underline">
+          <Link href="/login" className="text-accent hover:underline font-bold">
             Login
           </Link>
         </div>

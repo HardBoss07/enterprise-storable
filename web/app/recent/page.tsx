@@ -53,7 +53,7 @@ export default function RecentPage() {
     subtitle: "text-text-muted text-sm mt-1",
     errorBox:
       "bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-md flex items-center",
-    footer: "mt-4 text-xs text-neutral-500 text-center italic",
+    footer: "mt-4 text-xs text-neutral-500 text-center",
   };
 
   if (loading) return <Spinner size="lg" className="h-64" />;

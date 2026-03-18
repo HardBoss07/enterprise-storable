@@ -54,7 +54,7 @@ export default function LoginPage() {
             </label>
             <input
               type="text"
-              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               required
@@ -66,7 +66,7 @@ export default function LoginPage() {
             </label>
             <input
               type="password"
-              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-blue-500 outline-none transition-all"
+              className="w-full bg-neutral-900 border border-neutral-700 rounded p-2 text-white focus:ring-2 focus:ring-primary outline-none transition-all"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               required
@@ -74,14 +74,14 @@ export default function LoginPage() {
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded transition-colors"
+            className="w-full bg-primary hover:bg-primary-dark text-black font-black py-3 px-4 rounded-xl transition-all uppercase tracking-tight shadow-lg shadow-primary/20 active:scale-95"
           >
             Login
           </button>
         </form>
-        <div className="mt-4 text-center text-sm text-neutral-400">
+        <div className="mt-6 text-center text-sm text-neutral-400">
           Don't have an account?{" "}
-          <Link href="/register" className="text-blue-400 hover:underline">
+          <Link href="/register" className="text-accent hover:underline font-bold">
             Register
           </Link>
         </div>

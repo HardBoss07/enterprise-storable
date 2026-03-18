@@ -209,7 +209,7 @@ export default function UserManagementPage() {
         </table>
 
         {users.length === 0 && (
-          <div className="p-12 text-center text-text-muted italic">
+          <div className="p-12 text-center text-text-muted">
             No users found in the system.
           </div>
         )}

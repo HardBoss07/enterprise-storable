@@ -113,7 +113,7 @@ export default function FileList({
       )}
 
       {sortedFiles.length === 0 && !isCreatingFolder ? (
-        <div className="flex flex-col items-center justify-center h-48 text-text-muted italic">
+        <div className="flex flex-col items-center justify-center h-48 text-text-muted">
           <p>This folder is empty</p>
         </div>
       ) : (

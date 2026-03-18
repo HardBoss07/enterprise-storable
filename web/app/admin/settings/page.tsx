@@ -91,7 +91,7 @@ export default function GlobalSettingsPage() {
               }
               className="w-32 bg-surface-100 border border-surface-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-text-primary"
             />
-            <span className="text-sm text-text-muted italic">
+            <span className="text-sm text-text-muted">
               Items older than this will be automatically purged from the trash.
             </span>
           </div>
@@ -161,7 +161,7 @@ export default function GlobalSettingsPage() {
               </div>
             )}
           </div>
-          <p className="text-xs text-text-muted italic">
+          <p className="text-xs text-text-muted">
             This affects display dates and background tasks like trash cleanup
             schedules.
           </p>

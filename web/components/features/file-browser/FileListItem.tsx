@@ -16,6 +16,7 @@ import {
 import { downloadFileAsBlob } from "@/lib/api/file";
 import { formatBytes } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
+import { StatusBadge } from "@/components/shared/StatusBadge";
 import { useToast } from "@/context/ToastContext";
 import { useConfirm } from "@/context/ConfirmContext";
 import { useAuth } from "@/context/AuthContext";
@@ -171,6 +172,24 @@ export default function FileListItem({
     }
   };
 
+  // Permission checks
+  const canEdit = node.privilege === "EDIT" || node.privilege === "OWNER";
+  const canManage = node.privilege === "OWNER";
+  const isRootLevel = node.parentId === 1;
+
+  // Map privileges to UI labels
+  const privilegeLabels = {
+    VIEW: "Read Only",
+    EDIT: "Editor",
+    OWNER: "Owner",
+  };
+
+  const privilegeColors = {
+    VIEW: "info" as const,
+    EDIT: "warning" as const,
+    OWNER: "success" as const,
+  };
+
   return (
     <div
       className="flex items-center space-x-4 p-2 interactive-surface group"
@@ -196,9 +215,19 @@ export default function FileListItem({
             className="input-field w-full max-w-sm h-8 py-0 px-2 text-sm border-primary focus:ring-primary/30"
           />
         ) : (
-          <p className="text-text-primary font-bold m-0 truncate leading-none group-hover:text-primary transition-colors">
-            {node.name}
-          </p>
+          <div className="flex items-center space-x-2 truncate">
+            <p className="text-text-primary font-bold m-0 truncate leading-none group-hover:text-primary transition-colors">
+              {node.name}
+            </p>
+            {node.privilege && node.privilege !== "OWNER" && (
+              <StatusBadge
+                variant={privilegeColors[node.privilege]}
+                className="text-[10px] py-0 px-1.5 h-4"
+              >
+                {privilegeLabels[node.privilege]}
+              </StatusBadge>
+            )}
+          </div>
         )}
       </div>
 
@@ -232,16 +261,18 @@ export default function FileListItem({
               title="Download"
             />
           )}
-          <IconButton
-            icon={SquarePen}
-            onClick={handleRenameClick}
-            className="action-btn"
-            variant="ghost"
-            size="sm"
-            iconSize={14}
-            title="Rename"
-          />
-          {!node.folder && (
+          {canEdit && !isRootLevel && (
+            <IconButton
+              icon={SquarePen}
+              onClick={handleRenameClick}
+              className="action-btn"
+              variant="ghost"
+              size="sm"
+              iconSize={14}
+              title="Rename"
+            />
+          )}
+          {!node.folder && canEdit && (
             <IconButton
               icon={Copy}
               onClick={handleDuplicateClick}
@@ -252,16 +283,18 @@ export default function FileListItem({
               title="Create Copy"
             />
           )}
-          <IconButton
-            icon={ArrowRightLeft}
-            onClick={handleMoveClick}
-            className="action-btn"
-            variant="ghost"
-            size="sm"
-            iconSize={14}
-            title="Move"
-          />
-          {isOwner && onShare && (
+          {canEdit && !isRootLevel && (
+            <IconButton
+              icon={ArrowRightLeft}
+              onClick={handleMoveClick}
+              className="action-btn"
+              variant="ghost"
+              size="sm"
+              iconSize={14}
+              title="Move"
+            />
+          )}
+          {canManage && onShare && (
             <IconButton
               icon={Share2}
               onClick={(e) => {
@@ -275,15 +308,17 @@ export default function FileListItem({
               title="Share"
             />
           )}
-          <IconButton
-            icon={Trash2}
-            onClick={handleDelete}
-            className="action-btn text-red-500 hover:text-red-400"
-            variant="ghost"
-            size="sm"
-            iconSize={14}
-            title="Delete"
-          />
+          {canManage && !isRootLevel && (
+            <IconButton
+              icon={Trash2}
+              onClick={handleDelete}
+              className="action-btn text-red-500 hover:text-red-400"
+              variant="ghost"
+              size="sm"
+              iconSize={14}
+              title="Delete"
+            />
+          )}
           {onJumpToLocation && (
             <IconButton
               icon={ExternalLink}

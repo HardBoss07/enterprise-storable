@@ -99,7 +99,7 @@ export default function SearchBar() {
       {isOpen && (
         <div className="absolute top-full left-0 right-0 mt-2 bg-surface-200 border border-surface-300 rounded-xl shadow-2xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2 duration-200">
           {loading ? (
-            <div className="p-4 text-center text-text-muted text-sm italic">
+            <div className="p-4 text-center text-text-muted text-sm">
               Searching...
             </div>
           ) : results.length > 0 ? (
@@ -131,7 +131,7 @@ export default function SearchBar() {
               ))}
             </div>
           ) : (
-            <div className="p-4 text-center text-text-muted text-sm italic">
+            <div className="p-4 text-center text-text-muted text-sm">
               No results found for "{query}"
             </div>
           )}
