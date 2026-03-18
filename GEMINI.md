@@ -78,7 +78,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 9: User Profile & Account Lifecycle (In Progress) | **Last Updated:** 2026-03-17
+> **Status:** Phase 9: User Profile & Account Lifecycle (In Progress) | **Last Updated:** 2026-03-18
 
 ### [x] Phase 1: Infrastructure & Skeleton
 
@@ -217,6 +217,13 @@ Whenever you ask me to "Implement X," my first task (if successful) is to run a 
 
 - [x] Guest User still gets created but no file entires for guest user are created
 - [x] Downloading doesn't work, gives me a 403 Error
-- [ ] Upload of larger files gets a NET::CONNECTION_ABORTED error with "Maximum upload size exceeded" (about limit of 1K)
-- [ ] On shared files the options (deleting, moving etc) are still visible, but when trying to delete something i have only view privileges to it doesnt actually delete
-- [ ] Each modal / popup should be cancellable by pressing 'Esc' which doesnt perform anything and just returns to the previous state
+- [x] Upload of larger files gets a NET::CONNECTION_ABORTED error with "Maximum upload size exceeded" (about limit of 1K)
+- [x] On shared files the options (deleting, moving etc) are still visible, but when trying to delete something i have only view privileges to it doesnt actually delete
+- [x] Each modal / popup should be cancellable by pressing 'Esc' which doesnt perform anything and just returns to the previous state
+- [x] Nodes directly below root shouldnt be able to be moved or renamed
+- [x] Clear distictions on what privildges differences there are between "FULL ACCESS", "READ", "EDIT" inside UI
+- [x] Search bar for root user (all with ADMIN role) doesnt work since search bar searches based off what is owned, not what is visible to user
+- [x] Folder Color should be the accent yellow
+- [x] Remove italics from all frontend stuff
+- [x] Use brand colors during login / registration process
+- [x] Search bar should be hidden if no one is logged in

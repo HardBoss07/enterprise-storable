@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "fix-line-endings": "find . \\( -path \"./node_modules\" -o -path \"./.next\" -o -path \"./.git\" \\) -prune -o -type f -exec unix2dos {} +",
+    "format": "npx prettier . --write && npm run fix-line-endings"
   },
   "dependencies": {
     "date-fns": "^4.1.0",

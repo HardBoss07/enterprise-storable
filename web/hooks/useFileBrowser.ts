@@ -32,6 +32,15 @@ export function useFileBrowser(initialFolderId: number | null = null) {
   const [isCreatingFolder, setIsCreatingFolder] = useState<boolean>(false);
 
   /**
+   * Sync currentFolderId state with initialFolderId prop when it changes.
+   */
+  useEffect(() => {
+    if (initialFolderId !== undefined && initialFolderId !== currentFolderId) {
+      setCurrentFolderId(initialFolderId);
+    }
+  }, [initialFolderId]);
+
+  /**
    * Fetches the home folder ID.
    */
   useEffect(() => {
