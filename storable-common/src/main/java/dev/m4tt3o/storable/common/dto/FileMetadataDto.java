@@ -1,5 +1,6 @@
 package dev.m4tt3o.storable.common.dto;
 
+import dev.m4tt3o.storable.common.entity.AccessPrivilege.PrivilegeLevel;
 import java.time.LocalDateTime;
 
 /**
@@ -19,5 +20,6 @@ public record FileMetadataDto(
     boolean isFavorite,
     String ownerId,
     Long parentId,
-    boolean folder
+    boolean folder,
+    PrivilegeLevel privilege
 ) {}

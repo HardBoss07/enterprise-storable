@@ -13,6 +13,7 @@ export interface FileNode {
   ownerId: string;
   parentId: number | null;
   folder: boolean;
+  privilege: "VIEW" | "EDIT" | "OWNER" | null;
 }
 
 export interface CreateFolderPayload {

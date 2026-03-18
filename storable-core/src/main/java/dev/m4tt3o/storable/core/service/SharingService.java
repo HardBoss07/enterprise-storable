@@ -31,4 +31,7 @@ public interface SharingService {
 
     /** Check if a user has a specific permission level on a node. */
     boolean hasPermission(Long nodeId, String userId, PrivilegeLevel requiredLevel);
+
+    /** Get the highest privilege level a user has on a node. */
+    PrivilegeLevel getHighestPrivilege(Long nodeId, String userId);
 }

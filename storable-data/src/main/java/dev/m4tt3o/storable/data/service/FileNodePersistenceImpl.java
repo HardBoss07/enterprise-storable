@@ -283,6 +283,24 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     }
 
     @Override
+    /** Searches for nodes by name and kind globally (for ADMIN). */
+    public List<FileMetadataDto> searchGlobal(String query, String kind) {
+        log.debug("Searching globally for nodes with query: {} and kind: {}", query, kind);
+        FileNode.NodeKind nodeKind = null;
+        if (kind != null) {
+            try {
+                nodeKind = FileNode.NodeKind.valueOf(kind.toLowerCase());
+            } catch (IllegalArgumentException e) {
+                // Ignore invalid kind
+            }
+        }
+
+        return repository.searchGlobal(query, nodeKind).stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     /** Checks if a node with the given name exists in the parent globally (any owner, any state). */
     public boolean existsByNameAndParentGlobal(String name, Long parentId) {
         log.debug("Checking global existence for name: {} and parent: {}", name, parentId);
@@ -326,7 +344,8 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
             node.isFavorite(),
             node.getOwnerId(),
             node.getParentId(),
-            node.getKind() == FileNode.NodeKind.folder
+            node.getKind() == FileNode.NodeKind.folder,
+            null // Privilege will be enriched by the Service layer
         );
     }
 }

@@ -129,29 +129,34 @@ public class SharingServiceImpl implements SharingService {
 
     @Override
     public boolean hasPermission(Long nodeId, String userId, PrivilegeLevel requiredLevel) {
-        // Root admin always has full access
-        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) return true;
+        PrivilegeLevel actualLevel = getHighestPrivilege(nodeId, userId);
+        return actualLevel != null && compareLevels(actualLevel, requiredLevel) >= 0;
+    }
+
+    @Override
+    public PrivilegeLevel getHighestPrivilege(Long nodeId, String userId) {
+        // Root admin always has full access (OWNER)
+        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) return PrivilegeLevel.OWNER;
 
         Optional<FileNode> nodeOpt = nodeRepository.findById(nodeId);
-        if (nodeOpt.isEmpty()) return false;
+        if (nodeOpt.isEmpty()) return null;
         FileNode node = nodeOpt.get();
 
         // Owner always has full access
-        if (node.getOwnerId().equals(userId)) return true;
+        if (node.getOwnerId().equals(userId)) return PrivilegeLevel.OWNER;
 
         // Check explicit privilege
         Optional<AccessPrivilege> privilegeOpt = privilegeRepository.findByNodeIdAndUserId(nodeId, userId);
         if (privilegeOpt.isPresent()) {
-            PrivilegeLevel actualLevel = privilegeOpt.get().getLevel();
-            return compareLevels(actualLevel, requiredLevel) >= 0;
+            return privilegeOpt.get().getLevel();
         }
 
-        // Recursive check: If parent has permission, child inherits it
+        // Recursive check: Inherit from parent
         if (node.getParentId() != null && node.getParentId() != 1L) {
-            return hasPermission(node.getParentId(), userId, requiredLevel);
+            return getHighestPrivilege(node.getParentId(), userId);
         }
 
-        return false;
+        return null;
     }
 
     private int compareLevels(PrivilegeLevel actual, PrivilegeLevel required) {
