@@ -44,6 +44,9 @@ public interface FileNodeRepository extends JpaRepository<FileNode, Long> {
     @Query("SELECT f FROM FileNode f WHERE f.ownerId = :ownerId AND f.name LIKE %:query% AND (:kind IS NULL OR f.kind = :kind) AND f.isDeleted = false")
     List<FileNode> search(String query, FileNode.NodeKind kind, String ownerId);
 
+    @Query("SELECT f FROM FileNode f WHERE f.name LIKE %:query% AND (:kind IS NULL OR f.kind = :kind) AND f.isDeleted = false")
+    List<FileNode> searchGlobal(String query, FileNode.NodeKind kind);
+
     @Query("SELECT f FROM FileNode f WHERE f.name = :name AND (f.parentId = :parentId OR (f.parentId IS NULL AND :parentId IS NULL))")
     Optional<FileNode> findByNameAndParentIdGlobal(String name, Long parentId);
 
