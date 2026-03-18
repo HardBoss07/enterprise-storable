@@ -11,6 +11,9 @@ public interface FileNodePersistence {
     /** Retrieves children of a given parent node for a specific owner. */
     List<FileMetadataDto> findChildren(Long parentId, String ownerId);
     
+    /** Retrieves children of a given parent node regardless of owner (Access control handled by service). */
+    List<FileMetadataDto> findChildrenGlobal(Long parentId);
+
     /** Finds multiple nodes by their IDs. */
     List<FileMetadataDto> findByIds(List<Long> ids);
 

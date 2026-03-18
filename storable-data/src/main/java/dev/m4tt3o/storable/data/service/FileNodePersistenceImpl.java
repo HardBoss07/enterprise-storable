@@ -39,6 +39,18 @@ public class FileNodePersistenceImpl implements FileNodePersistence {
     }
 
     @Override
+    /** Retrieves children of a given parent node regardless of owner (Access control handled by service). */
+    public List<FileMetadataDto> findChildrenGlobal(Long parentId) {
+        log.debug("Finding global children for parent ID: {}", parentId);
+        Long targetParentId = (parentId == null || parentId == 0) ? 1L : parentId;
+        List<FileNode> nodes = repository.findByParentIdAndIsDeletedFalse(targetParentId);
+            
+        return nodes.stream()
+                .map(this::toDto)
+                .collect(Collectors.toList());
+    }
+
+    @Override
     /** Finds multiple nodes by their IDs. */
     public List<FileMetadataDto> findByIds(List<Long> ids) {
         log.debug("Finding nodes by IDs: {}", ids);

@@ -41,7 +41,7 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("Access denied: You don't have permission to view this folder.");
         }
 
-        return enrichDtos(persistence.findChildren(targetId, ownerId), ownerId);
+        return enrichDtos(persistence.findChildrenGlobal(targetId), ownerId);
     }
 
     @Override

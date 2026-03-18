@@ -2,7 +2,7 @@ USE storable;
 
 -- Creating backend database user with limited permissions
 CREATE USER 'backend_user'@'%' IDENTIFIED BY 'backend_password';
-GRANT SELECT, INSERT, UPDATE, DELETE ON storable.* TO 'backend_user'@'%';
+GRANT SELECT, INSERT, UPDATE, DELETE, ALTER, REFERENCES ON storable.* TO 'backend_user'@'%';
 FLUSH PRIVILEGES;
 
 -- Basic system settings

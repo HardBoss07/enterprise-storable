@@ -37,6 +37,8 @@ public interface FileNodeRepository extends JpaRepository<FileNode, Long> {
 
     List<FileNode> findByParentId(Long parentId);
 
+    List<FileNode> findByParentIdAndIsDeletedFalse(Long parentId);
+
     List<FileNode> findByOwnerId(String ownerId);
 
     @Query("SELECT f FROM FileNode f WHERE f.ownerId = :ownerId AND f.name LIKE %:query% AND (:kind IS NULL OR f.kind = :kind) AND f.isDeleted = false")
