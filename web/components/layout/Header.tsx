@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { User as UserIcon, LogOut } from "lucide-react";
+import { User as UserIcon, LogOut, Settings } from "lucide-react";
 import SearchBar from "./SearchBar";
 import { usePathname } from "next/navigation";
 
@@ -89,6 +89,13 @@ function UserMenu({ user, onLogout }: { user: any; onLogout: () => void }) {
 
   return (
     <div className="flex items-center space-x-4">
+      <Link
+        href="/settings"
+        className="p-2 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
+        title="Settings"
+      >
+        <Settings size={20} />
+      </Link>
       <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-100 border border-surface-300 rounded-xl">
         <UserIcon size={16} className="text-primary" />
         <span className="text-sm font-bold text-text-primary">

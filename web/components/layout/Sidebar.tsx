@@ -12,6 +12,7 @@ import {
   Settings,
   Star,
   Users,
+  UserCircle,
 } from "lucide-react";
 
 /**
@@ -37,6 +38,9 @@ export default function Sidebar() {
       icon: Settings,
     });
   }
+
+  // Account should always be the last item
+  navLinks.push({ href: "/settings", label: "Account", icon: UserCircle });
 
   return (
     <aside className="app-sidebar hidden md:block">
