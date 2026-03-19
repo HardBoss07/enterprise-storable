@@ -18,6 +18,7 @@ function show_help() {
     echo "  clean     Stop and REMOVE all volumes (Wipe DB)"
     echo "  restart   Quick restart of containers"
     echo "  status    Show running containers"
+    echo "  format    Run Prettier and fix line endings"
 }
 
 case "$1" in
@@ -54,6 +55,22 @@ case "$1" in
         ;;
     status)
         docker-compose ps
+        ;;
+    format)
+        echo -e "${GREEN}Running Prettier...${NC}"
+        npx prettier . --write
+        
+        echo -e "${GREEN}Converting line endings to CRLF...${NC}"
+        find . \( \
+            -path "./node_modules" -o \
+            -path "./web/node_modules" -o \
+            -path "./web/.next" -o \
+            -path "./.git" -o \
+            -path "*/target" -o \
+            -path "*/bin" \
+        \) -prune -o -type f -exec unix2dos {} +
+        
+        echo -e "${GREEN}Formatting complete!${NC}"
         ;;
     *)
         show_help
