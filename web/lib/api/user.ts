@@ -7,11 +7,14 @@ export const userApi = {
   /**
    * Updates the password for the current user.
    */
-  changePassword: async (data: { currentPassword: string; newPassword: string }) => {
+  changePassword: async (data: {
+    currentPassword: string;
+    newPassword: string;
+  }) => {
     return apiRequest("/api/users/me/password", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   },
 
@@ -22,7 +25,7 @@ export const userApi = {
     return apiRequest("/api/users/me/email", {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
   },
 
@@ -33,7 +36,7 @@ export const userApi = {
     return apiRequest("/api/users/me", {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
-  }
+  },
 };

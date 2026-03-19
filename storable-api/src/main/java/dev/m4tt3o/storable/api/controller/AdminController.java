@@ -5,13 +5,12 @@ import dev.m4tt3o.storable.common.dto.UserDto;
 import dev.m4tt3o.storable.common.entity.UserRole;
 import dev.m4tt3o.storable.core.service.AdminService;
 import dev.m4tt3o.storable.core.service.ConfigService;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 /**
  * Controller for administrative actions including user management and system-wide configurations.
@@ -45,7 +44,10 @@ public class AdminController {
 
     @PatchMapping("/users/{id}/role")
     /** Updates a user's role. */
-    public ResponseEntity<Void> updateUserRole(@PathVariable String id, @RequestBody String role) {
+    public ResponseEntity<Void> updateUserRole(
+        @PathVariable String id,
+        @RequestBody String role
+    ) {
         log.info("Admin request: Update user {} role to {}", id, role);
         // Remove extra quotes if role is passed as a raw string in JSON
         String cleanedRole = role.replace("\"", "");
@@ -60,29 +62,34 @@ public class AdminController {
     public ResponseEntity<GlobalSettingsDto> getSettings() {
         log.info("Admin request: Fetch global settings");
         GlobalSettingsDto settings = new GlobalSettingsDto(
-                configService.getTrashRetentionDays(),
-                configService.getSystemTimezone()
+            configService.getTrashRetentionDays(),
+            configService.getSystemTimezone()
         );
         return ResponseEntity.ok(settings);
     }
 
     @PatchMapping("/settings")
     /** Updates global configuration settings. */
-    public ResponseEntity<Void> updateSettings(@RequestBody GlobalSettingsDto settings) {
+    public ResponseEntity<Void> updateSettings(
+        @RequestBody GlobalSettingsDto settings
+    ) {
         log.info("Admin request: Update global settings");
-        
+
         if (settings.trashRetentionDays() < 0) {
             return ResponseEntity.badRequest().build();
         }
-        
+
         if (!settings.isValidTimezone()) {
-            log.warn("Invalid timezone provided: {}", settings.systemTimezone());
+            log.warn(
+                "Invalid timezone provided: {}",
+                settings.systemTimezone()
+            );
             return ResponseEntity.badRequest().build();
         }
 
         configService.setTrashRetentionDays(settings.trashRetentionDays());
         configService.setSystemTimezone(settings.systemTimezone());
-        
+
         return ResponseEntity.noContent().build();
     }
 }

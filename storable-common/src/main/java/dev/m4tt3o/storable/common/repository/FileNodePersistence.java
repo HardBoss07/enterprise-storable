@@ -10,7 +10,7 @@ import java.util.Optional;
 public interface FileNodePersistence {
     /** Retrieves children of a given parent node for a specific owner. */
     List<FileMetadataDto> findChildren(Long parentId, String ownerId);
-    
+
     /** Retrieves children of a given parent node regardless of owner (Access control handled by service). */
     List<FileMetadataDto> findChildrenGlobal(Long parentId);
 
@@ -19,21 +19,41 @@ public interface FileNodePersistence {
 
     /** Finds a node by its ID and owner. */
     Optional<FileMetadataDto> findByIdAndOwner(Long id, String ownerId);
-    
+
     /** Calculates the total size of files for an owner. */
     long sumSizeByOwnerId(String ownerId);
-    
+
     /** Saves a folder node. */
-    FileMetadataDto saveFolder(String name, Long parentId, String ownerId, String storageKey);
-    
+    FileMetadataDto saveFolder(
+        String name,
+        Long parentId,
+        String ownerId,
+        String storageKey
+    );
+
     /** Saves a file node. */
-    FileMetadataDto saveFile(String name, Long parentId, String ownerId, String storageKey, String mime, Long size);
-    
+    FileMetadataDto saveFile(
+        String name,
+        Long parentId,
+        String ownerId,
+        String storageKey,
+        String mime,
+        Long size
+    );
+
     /** Finds a folder by owner, parent, and name. */
-    Optional<FileMetadataDto> findFolder(String ownerId, Long parentId, String name);
+    Optional<FileMetadataDto> findFolder(
+        String ownerId,
+        Long parentId,
+        String name
+    );
 
     /** Finds a node by its name, parent, and owner. */
-    Optional<FileMetadataDto> findByNameParentAndOwner(String name, Long parentId, String ownerId);
+    Optional<FileMetadataDto> findByNameParentAndOwner(
+        String name,
+        Long parentId,
+        String ownerId
+    );
 
     /** Soft deletes a node and all its children. */
     void softDelete(Long id, String ownerId);

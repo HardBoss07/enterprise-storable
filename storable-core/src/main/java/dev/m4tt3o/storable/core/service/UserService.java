@@ -27,11 +27,16 @@ public class UserService {
      * @param newPassword The new password to set.
      */
     @Transactional
-    public void changePassword(String userId, String currentPassword, String newPassword) {
+    public void changePassword(
+        String userId,
+        String currentPassword,
+        String newPassword
+    ) {
         log.info("Changing password for user: {}", userId);
-        
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        User user = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
             throw new RuntimeException("Incorrect current password");
@@ -55,8 +60,9 @@ public class UserService {
             throw new RuntimeException("Email already exists");
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
         user.setEmail(newEmail);
         userRepository.save(user);
@@ -74,14 +80,21 @@ public class UserService {
 
         if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) {
             log.warn("Attempted to delete the root admin user!");
-            throw new RuntimeException("The root admin user cannot be deleted.");
+            throw new RuntimeException(
+                "The root admin user cannot be deleted."
+            );
         }
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository
+            .findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (!passwordEncoder.matches(passwordConfirmation, user.getPassword())) {
-            throw new RuntimeException("Incorrect password for account deletion confirmation");
+        if (
+            !passwordEncoder.matches(passwordConfirmation, user.getPassword())
+        ) {
+            throw new RuntimeException(
+                "Incorrect password for account deletion confirmation"
+            );
         }
 
         // Delegate deletion logic to AdminService (it already handles full cleanup)

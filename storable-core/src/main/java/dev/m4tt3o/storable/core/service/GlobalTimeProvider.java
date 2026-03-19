@@ -1,12 +1,11 @@
 package dev.m4tt3o.storable.core.service;
 
 import jakarta.annotation.PostConstruct;
+import java.time.ZoneId;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-
-import java.time.ZoneId;
 
 /**
  * Provides a cached ZoneId for the global system timezone.
@@ -34,7 +33,10 @@ public class GlobalTimeProvider {
             this.cachedZoneId = ZoneId.of(timezone);
             log.info("Global timezone cache refreshed: {}", timezone);
         } catch (Exception e) {
-            log.error("Invalid timezone found in settings: {}. Defaulting to UTC.", timezone);
+            log.error(
+                "Invalid timezone found in settings: {}. Defaulting to UTC.",
+                timezone
+            );
             this.cachedZoneId = ZoneId.of("UTC");
         }
     }

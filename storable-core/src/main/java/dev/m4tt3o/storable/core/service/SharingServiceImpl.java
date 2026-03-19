@@ -9,14 +9,13 @@ import dev.m4tt3o.storable.common.entity.User;
 import dev.m4tt3o.storable.common.repository.AccessPrivilegeRepository;
 import dev.m4tt3o.storable.common.repository.FileNodeRepository;
 import dev.m4tt3o.storable.common.repository.UserRepository;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -32,23 +31,45 @@ public class SharingServiceImpl implements SharingService {
     public List<UserLookupDto> lookupUsers(String query) {
         log.info("Looking up users with query: {}", query);
         if (query == null || query.isBlank()) return List.of();
-        
-        return userRepository.searchUsers(query).stream()
-                .map(u -> new UserLookupDto(u.getId(), u.getUsername(), u.getEmail()))
-                .collect(Collectors.toList());
+
+        return userRepository
+            .searchUsers(query)
+            .stream()
+            .map(u ->
+                new UserLookupDto(u.getId(), u.getUsername(), u.getEmail())
+            )
+            .collect(Collectors.toList());
     }
 
     @Override
     @Transactional
-    public AccessPrivilegeDto shareNode(Long nodeId, String targetUserId, PrivilegeLevel level, String requesterId) {
-        log.info("Sharing node {} with user {} at level {}", nodeId, targetUserId, level);
+    public AccessPrivilegeDto shareNode(
+        Long nodeId,
+        String targetUserId,
+        PrivilegeLevel level,
+        String requesterId
+    ) {
+        log.info(
+            "Sharing node {} with user {} at level {}",
+            nodeId,
+            targetUserId,
+            level
+        );
 
-        FileNode node = nodeRepository.findById(nodeId)
-                .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
+        FileNode node = nodeRepository
+            .findById(nodeId)
+            .orElseThrow(() ->
+                new RuntimeException("Node not found: " + nodeId)
+            );
 
         // Only owner or those with OWNER permission can share
-        if (!node.getOwnerId().equals(requesterId) && !hasPermission(nodeId, requesterId, PrivilegeLevel.OWNER)) {
-            throw new RuntimeException("Access denied: You don't have permission to share this node.");
+        if (
+            !node.getOwnerId().equals(requesterId) &&
+            !hasPermission(nodeId, requesterId, PrivilegeLevel.OWNER)
+        ) {
+            throw new RuntimeException(
+                "Access denied: You don't have permission to share this node."
+            );
         }
 
         // Cannot share with yourself (you are already owner)
@@ -57,11 +78,15 @@ public class SharingServiceImpl implements SharingService {
         }
 
         // Check if user exists
-        User targetUser = userRepository.findById(targetUserId)
-                .orElseThrow(() -> new RuntimeException("Target user not found: " + targetUserId));
+        User targetUser = userRepository
+            .findById(targetUserId)
+            .orElseThrow(() ->
+                new RuntimeException("Target user not found: " + targetUserId)
+            );
 
         // Check if already shared
-        Optional<AccessPrivilege> existing = privilegeRepository.findByNodeIdAndUserId(nodeId, targetUserId);
+        Optional<AccessPrivilege> existing =
+            privilegeRepository.findByNodeIdAndUserId(nodeId, targetUserId);
         AccessPrivilege privilege;
         if (existing.isPresent()) {
             privilege = existing.get();
@@ -79,64 +104,111 @@ public class SharingServiceImpl implements SharingService {
 
     @Override
     @Transactional
-    public AccessPrivilegeDto updatePrivilege(Long nodeId, String targetUserId, PrivilegeLevel level, String requesterId) {
+    public AccessPrivilegeDto updatePrivilege(
+        Long nodeId,
+        String targetUserId,
+        PrivilegeLevel level,
+        String requesterId
+    ) {
         return shareNode(nodeId, targetUserId, level, requesterId);
     }
 
     @Override
     @Transactional
-    public void removePrivilege(Long nodeId, String targetUserId, String requesterId) {
-        log.info("Removing privilege for node {} and user {}", nodeId, targetUserId);
+    public void removePrivilege(
+        Long nodeId,
+        String targetUserId,
+        String requesterId
+    ) {
+        log.info(
+            "Removing privilege for node {} and user {}",
+            nodeId,
+            targetUserId
+        );
 
-        FileNode node = nodeRepository.findById(nodeId)
-                .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
+        FileNode node = nodeRepository
+            .findById(nodeId)
+            .orElseThrow(() ->
+                new RuntimeException("Node not found: " + nodeId)
+            );
 
-        if (!node.getOwnerId().equals(requesterId) && !hasPermission(nodeId, requesterId, PrivilegeLevel.OWNER)) {
-            throw new RuntimeException("Access denied: You don't have permission to manage shares for this node.");
+        if (
+            !node.getOwnerId().equals(requesterId) &&
+            !hasPermission(nodeId, requesterId, PrivilegeLevel.OWNER)
+        ) {
+            throw new RuntimeException(
+                "Access denied: You don't have permission to manage shares for this node."
+            );
         }
 
         privilegeRepository.deleteByNodeIdAndUserId(nodeId, targetUserId);
     }
 
     @Override
-    public List<AccessPrivilegeDto> getPrivileges(Long nodeId, String requesterId) {
+    public List<AccessPrivilegeDto> getPrivileges(
+        Long nodeId,
+        String requesterId
+    ) {
         log.info("Fetching privileges for node {}", nodeId);
 
-        FileNode node = nodeRepository.findById(nodeId)
-                .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
+        FileNode node = nodeRepository
+            .findById(nodeId)
+            .orElseThrow(() ->
+                new RuntimeException("Node not found: " + nodeId)
+            );
 
-        if (!node.getOwnerId().equals(requesterId) && !hasPermission(nodeId, requesterId, PrivilegeLevel.VIEW)) {
-            throw new RuntimeException("Access denied: You don't have permission to view shares for this node.");
+        if (
+            !node.getOwnerId().equals(requesterId) &&
+            !hasPermission(nodeId, requesterId, PrivilegeLevel.VIEW)
+        ) {
+            throw new RuntimeException(
+                "Access denied: You don't have permission to view shares for this node."
+            );
         }
 
-        return privilegeRepository.findByNodeId(nodeId).stream()
-                .map(p -> {
-                    User user = userRepository.findById(p.getUserId()).orElse(null);
-                    return toDto(p, user);
-                })
-                .collect(Collectors.toList());
+        return privilegeRepository
+            .findByNodeId(nodeId)
+            .stream()
+            .map(p -> {
+                User user = userRepository.findById(p.getUserId()).orElse(null);
+                return toDto(p, user);
+            })
+            .collect(Collectors.toList());
     }
 
     @Override
-    public List<dev.m4tt3o.storable.common.dto.FileMetadataDto> getSharedWithMe(String userId) {
+    public List<dev.m4tt3o.storable.common.dto.FileMetadataDto> getSharedWithMe(
+        String userId
+    ) {
         log.info("Fetching nodes shared with user {}", userId);
-        List<Long> sharedNodeIds = privilegeRepository.findByUserId(userId).stream()
-                .map(AccessPrivilege::getNodeId)
-                .collect(Collectors.toList());
-        
+        List<Long> sharedNodeIds = privilegeRepository
+            .findByUserId(userId)
+            .stream()
+            .map(AccessPrivilege::getNodeId)
+            .collect(Collectors.toList());
+
         return persistence.findByIds(sharedNodeIds);
     }
 
     @Override
-    public boolean hasPermission(Long nodeId, String userId, PrivilegeLevel requiredLevel) {
+    public boolean hasPermission(
+        Long nodeId,
+        String userId,
+        PrivilegeLevel requiredLevel
+    ) {
         PrivilegeLevel actualLevel = getHighestPrivilege(nodeId, userId);
-        return actualLevel != null && compareLevels(actualLevel, requiredLevel) >= 0;
+        return (
+            actualLevel != null &&
+            compareLevels(actualLevel, requiredLevel) >= 0
+        );
     }
 
     @Override
     public PrivilegeLevel getHighestPrivilege(Long nodeId, String userId) {
         // Root admin always has full access (OWNER)
-        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) return PrivilegeLevel.OWNER;
+        if (
+            "f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)
+        ) return PrivilegeLevel.OWNER;
 
         Optional<FileNode> nodeOpt = nodeRepository.findById(nodeId);
         if (nodeOpt.isEmpty()) return null;
@@ -146,7 +218,8 @@ public class SharingServiceImpl implements SharingService {
         if (node.getOwnerId().equals(userId)) return PrivilegeLevel.OWNER;
 
         // Check explicit privilege
-        Optional<AccessPrivilege> privilegeOpt = privilegeRepository.findByNodeIdAndUserId(nodeId, userId);
+        Optional<AccessPrivilege> privilegeOpt =
+            privilegeRepository.findByNodeIdAndUserId(nodeId, userId);
         if (privilegeOpt.isPresent()) {
             return privilegeOpt.get().getLevel();
         }
@@ -166,12 +239,12 @@ public class SharingServiceImpl implements SharingService {
 
     private AccessPrivilegeDto toDto(AccessPrivilege p, User user) {
         return new AccessPrivilegeDto(
-                p.getId(),
-                p.getNodeId(),
-                p.getUserId(),
-                user != null ? user.getUsername() : "Unknown",
-                user != null ? user.getEmail() : "Unknown",
-                p.getLevel()
+            p.getId(),
+            p.getNodeId(),
+            p.getUserId(),
+            user != null ? user.getUsername() : "Unknown",
+            user != null ? user.getEmail() : "Unknown",
+            p.getLevel()
         );
     }
 }

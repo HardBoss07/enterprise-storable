@@ -2,15 +2,14 @@ package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.core.config.StorageProperties;
 import jakarta.annotation.PostConstruct;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
@@ -32,12 +31,26 @@ public class LocalStorageService implements StorageService {
     @Override
     public void store(InputStream inputStream, String storageKey) {
         try {
-            Path destinationFile = this.rootLocation.resolve(Paths.get(storageKey)).normalize().toAbsolutePath();
-            if (!destinationFile.getParent().startsWith(this.rootLocation.toAbsolutePath())) {
-                throw new RuntimeException("Cannot store file outside current directory.");
+            Path destinationFile = this.rootLocation.resolve(
+                    Paths.get(storageKey)
+                )
+                .normalize()
+                .toAbsolutePath();
+            if (
+                !destinationFile
+                    .getParent()
+                    .startsWith(this.rootLocation.toAbsolutePath())
+            ) {
+                throw new RuntimeException(
+                    "Cannot store file outside current directory."
+                );
             }
             Files.createDirectories(destinationFile.getParent());
-            Files.copy(inputStream, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(
+                inputStream,
+                destinationFile,
+                StandardCopyOption.REPLACE_EXISTING
+            );
         } catch (IOException e) {
             throw new RuntimeException("Failed to store file.", e);
         }
@@ -66,15 +79,31 @@ public class LocalStorageService implements StorageService {
     @Override
     public void copy(String sourceKey, String destinationKey) {
         try {
-            Path sourceFile = this.rootLocation.resolve(Paths.get(sourceKey)).normalize().toAbsolutePath();
-            Path destinationFile = this.rootLocation.resolve(Paths.get(destinationKey)).normalize().toAbsolutePath();
-            
-            if (!destinationFile.getParent().startsWith(this.rootLocation.toAbsolutePath())) {
-                throw new RuntimeException("Cannot copy file outside current directory.");
+            Path sourceFile = this.rootLocation.resolve(Paths.get(sourceKey))
+                .normalize()
+                .toAbsolutePath();
+            Path destinationFile = this.rootLocation.resolve(
+                    Paths.get(destinationKey)
+                )
+                .normalize()
+                .toAbsolutePath();
+
+            if (
+                !destinationFile
+                    .getParent()
+                    .startsWith(this.rootLocation.toAbsolutePath())
+            ) {
+                throw new RuntimeException(
+                    "Cannot copy file outside current directory."
+                );
             }
-            
+
             Files.createDirectories(destinationFile.getParent());
-            Files.copy(sourceFile, destinationFile, StandardCopyOption.REPLACE_EXISTING);
+            Files.copy(
+                sourceFile,
+                destinationFile,
+                StandardCopyOption.REPLACE_EXISTING
+            );
         } catch (IOException e) {
             throw new RuntimeException("Failed to copy file.", e);
         }

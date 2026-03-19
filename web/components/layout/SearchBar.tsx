@@ -1,11 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import {
-  Search as SearchIcon,
-  X,
-  Folder as FolderIcon,
-} from "lucide-react";
+import { Search as SearchIcon, X, Folder as FolderIcon } from "lucide-react";
 import { FileNode } from "@/types/api";
 import { searchFiles } from "@/lib/api/file";
 import { useRouter } from "next/navigation";

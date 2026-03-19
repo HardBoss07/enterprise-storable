@@ -1,13 +1,12 @@
 package dev.m4tt3o.storable.common.entity;
 
 import jakarta.persistence.*;
+import java.time.LocalDateTime;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "nodes")
@@ -61,6 +60,7 @@ public class FileNode {
     private NodeKind kind;
 
     public enum NodeKind {
-        file, folder
+        file,
+        folder,
     }
 }

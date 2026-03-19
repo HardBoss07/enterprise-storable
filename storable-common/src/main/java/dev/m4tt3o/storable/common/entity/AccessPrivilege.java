@@ -27,6 +27,8 @@ public class AccessPrivilege {
     private PrivilegeLevel level;
 
     public enum PrivilegeLevel {
-        VIEW, EDIT, OWNER
+        VIEW,
+        EDIT,
+        OWNER,
     }
 }

@@ -5,5 +5,5 @@ package dev.m4tt3o.storable.common.entity;
  */
 public enum UserRole {
     USER,
-    ADMIN
+    ADMIN,
 }

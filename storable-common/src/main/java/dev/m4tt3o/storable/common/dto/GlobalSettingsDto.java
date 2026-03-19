@@ -5,10 +5,7 @@ import java.time.ZoneId;
 /**
  * DTO for global system settings.
  */
-public record GlobalSettingsDto(
-    int trashRetentionDays,
-    String systemTimezone
-) {
+public record GlobalSettingsDto(int trashRetentionDays, String systemTimezone) {
     /**
      * Validates if the provided timezone is a valid IANA timezone.
      */

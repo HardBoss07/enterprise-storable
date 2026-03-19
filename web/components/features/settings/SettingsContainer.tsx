@@ -42,7 +42,10 @@ export default function SettingsContainer() {
       await userApi.changeEmail({ newEmail: email });
       showToast("Email updated successfully.", "success");
     } catch (error: any) {
-      showToast(error.response?.data?.message || "Failed to update email.", "error");
+      showToast(
+        error.response?.data?.message || "Failed to update email.",
+        "error",
+      );
     } finally {
       setIsUpdatingEmail(false);
     }
@@ -61,8 +64,8 @@ export default function SettingsContainer() {
     }
 
     if (newPassword.length < 8) {
-        showToast("New password must be at least 8 characters long.", "error");
-        return;
+      showToast("New password must be at least 8 characters long.", "error");
+      return;
     }
 
     setIsUpdatingPassword(true);
@@ -73,7 +76,10 @@ export default function SettingsContainer() {
       setNewPassword("");
       setConfirmPassword("");
     } catch (error: any) {
-      showToast(error.response?.data?.message || "Failed to update password.", "error");
+      showToast(
+        error.response?.data?.message || "Failed to update password.",
+        "error",
+      );
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -87,7 +93,10 @@ export default function SettingsContainer() {
       setIsDeleteModalOpen(false);
       logout();
     } catch (error: any) {
-      showToast(error.response?.data?.message || "Failed to delete account.", "error");
+      showToast(
+        error.response?.data?.message || "Failed to delete account.",
+        "error",
+      );
     } finally {
       setIsDeletingAccount(false);
     }
@@ -102,14 +111,20 @@ export default function SettingsContainer() {
             <Mail size={20} className="text-primary" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-text-primary">Email Address</h2>
-            <p className="text-sm text-text-muted">Update your account email address.</p>
+            <h2 className="text-xl font-bold text-text-primary">
+              Email Address
+            </h2>
+            <p className="text-sm text-text-muted">
+              Update your account email address.
+            </p>
           </div>
         </div>
 
         <form onSubmit={handleUpdateEmail} className="space-y-4">
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-bold text-text-secondary ml-1">New Email Address</label>
+            <label className="text-sm font-bold text-text-secondary ml-1">
+              New Email Address
+            </label>
             <input
               type="email"
               value={email}
@@ -132,15 +147,22 @@ export default function SettingsContainer() {
             <Lock size={20} className="text-primary" />
           </div>
           <div>
-            <h2 className="text-xl font-bold text-text-primary">Change Password</h2>
-            <p className="text-sm text-text-muted">Ensure your account is using a long, random password to stay secure.</p>
+            <h2 className="text-xl font-bold text-text-primary">
+              Change Password
+            </h2>
+            <p className="text-sm text-text-muted">
+              Ensure your account is using a long, random password to stay
+              secure.
+            </p>
           </div>
         </div>
 
         <form onSubmit={handleUpdatePassword} className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-text-secondary ml-1">Current Password</label>
+              <label className="text-sm font-bold text-text-secondary ml-1">
+                Current Password
+              </label>
               <input
                 type="password"
                 value={currentPassword}
@@ -152,7 +174,9 @@ export default function SettingsContainer() {
             <div className="hidden md:block"></div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-text-secondary ml-1">New Password</label>
+              <label className="text-sm font-bold text-text-secondary ml-1">
+                New Password
+              </label>
               <input
                 type="password"
                 value={newPassword}
@@ -163,7 +187,9 @@ export default function SettingsContainer() {
             </div>
 
             <div className="flex flex-col gap-2">
-              <label className="text-sm font-bold text-text-secondary ml-1">Confirm New Password</label>
+              <label className="text-sm font-bold text-text-secondary ml-1">
+                Confirm New Password
+              </label>
               <input
                 type="password"
                 value={confirmPassword}
@@ -188,7 +214,9 @@ export default function SettingsContainer() {
             </div>
             <div>
               <h2 className="text-xl font-bold text-red-500">Danger Zone</h2>
-              <p className="text-sm text-text-muted">Irreversible and destructive actions.</p>
+              <p className="text-sm text-text-muted">
+                Irreversible and destructive actions.
+              </p>
             </div>
           </div>
 
@@ -196,7 +224,8 @@ export default function SettingsContainer() {
             <div className="space-y-1">
               <h3 className="font-bold text-text-primary">Delete Account</h3>
               <p className="text-sm text-text-muted max-w-md">
-                Permanently delete your account and all associated data. This action is irreversible.
+                Permanently delete your account and all associated data. This
+                action is irreversible.
               </p>
             </div>
             <Button

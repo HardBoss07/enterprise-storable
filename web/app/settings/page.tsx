@@ -8,7 +8,10 @@ import SettingsContainer from "@/components/features/settings/SettingsContainer"
  */
 export default function SettingsPage() {
   return (
-    <PageContainer title="Account Settings" description="Manage your profile, password, and account security.">
+    <PageContainer
+      title="Account Settings"
+      description="Manage your profile, password, and account security."
+    >
       <SettingsContainer />
     </PageContainer>
   );

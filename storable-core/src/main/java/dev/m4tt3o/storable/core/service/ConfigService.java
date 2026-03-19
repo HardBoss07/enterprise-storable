@@ -25,23 +25,38 @@ public class ConfigService {
     /** Retrieves the trash retention days from DB or default. */
     @Transactional(readOnly = true)
     public int getTrashRetentionDays() {
-        log.debug("Fetching trash retention days for key: {}", TRASH_RETENTION_KEY);
+        log.debug(
+            "Fetching trash retention days for key: {}",
+            TRASH_RETENTION_KEY
+        );
         try {
-            return repository.findById(TRASH_RETENTION_KEY)
-                    .map(s -> {
-                        try {
-                            return Integer.parseInt(s.getSettingValue());
-                        } catch (NumberFormatException e) {
-                            log.error("Invalid trash retention value in DB: {}", s.getSettingValue());
-                            return storageProperties.getTrashRetentionDays();
-                        }
-                    })
-                    .orElseGet(() -> {
-                        log.warn("Trash retention key not found in DB, using default: {}", storageProperties.getTrashRetentionDays());
+            return repository
+                .findById(TRASH_RETENTION_KEY)
+                .map(s -> {
+                    try {
+                        return Integer.parseInt(s.getSettingValue());
+                    } catch (NumberFormatException e) {
+                        log.error(
+                            "Invalid trash retention value in DB: {}",
+                            s.getSettingValue()
+                        );
                         return storageProperties.getTrashRetentionDays();
-                    });
+                    }
+                })
+                .orElseGet(() -> {
+                    log.warn(
+                        "Trash retention key not found in DB, using default: {}",
+                        storageProperties.getTrashRetentionDays()
+                    );
+                    return storageProperties.getTrashRetentionDays();
+                });
         } catch (Exception e) {
-            log.error("Database error while fetching system setting {}: {}", TRASH_RETENTION_KEY, e.getMessage(), e);
+            log.error(
+                "Database error while fetching system setting {}: {}",
+                TRASH_RETENTION_KEY,
+                e.getMessage(),
+                e
+            );
             return storageProperties.getTrashRetentionDays(); // Fallback to default on DB error
         }
     }
@@ -50,8 +65,11 @@ public class ConfigService {
     @Transactional
     public void setTrashRetentionDays(int days) {
         log.info("Updating global trash retention days to: {}", days);
-        SystemSetting setting = repository.findById(TRASH_RETENTION_KEY)
-                .orElse(new SystemSetting(TRASH_RETENTION_KEY, String.valueOf(days)));
+        SystemSetting setting = repository
+            .findById(TRASH_RETENTION_KEY)
+            .orElse(
+                new SystemSetting(TRASH_RETENTION_KEY, String.valueOf(days))
+            );
         setting.setSettingValue(String.valueOf(days));
         repository.save(setting);
     }
@@ -59,17 +77,19 @@ public class ConfigService {
     /** Retrieves the system timezone from DB or default. */
     @Transactional(readOnly = true)
     public String getSystemTimezone() {
-        return repository.findById(SYSTEM_TIMEZONE_KEY)
-                .map(SystemSetting::getSettingValue)
-                .orElse("UTC");
+        return repository
+            .findById(SYSTEM_TIMEZONE_KEY)
+            .map(SystemSetting::getSettingValue)
+            .orElse("UTC");
     }
 
     /** Updates the system timezone. */
     @Transactional
     public void setSystemTimezone(String timezone) {
         log.info("Updating global system timezone to: {}", timezone);
-        SystemSetting setting = repository.findById(SYSTEM_TIMEZONE_KEY)
-                .orElse(new SystemSetting(SYSTEM_TIMEZONE_KEY, timezone));
+        SystemSetting setting = repository
+            .findById(SYSTEM_TIMEZONE_KEY)
+            .orElse(new SystemSetting(SYSTEM_TIMEZONE_KEY, timezone));
         setting.setSettingValue(timezone);
         repository.save(setting);
     }

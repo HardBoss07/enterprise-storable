@@ -2,12 +2,11 @@ package dev.m4tt3o.storable.core.security;
 
 import dev.m4tt3o.storable.common.entity.User;
 import dev.m4tt3o.storable.common.entity.UserRole;
+import java.util.Collection;
+import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-
-import java.util.Collection;
-import java.util.Collections;
 
 public record CustomUserDetails(
     String id,
@@ -15,7 +14,6 @@ public record CustomUserDetails(
     String password,
     UserRole role
 ) implements UserDetails {
-
     public static CustomUserDetails fromEntity(User user) {
         return new CustomUserDetails(
             user.getId(),
@@ -27,7 +25,9 @@ public record CustomUserDetails(
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role));
+        return Collections.singletonList(
+            new SimpleGrantedAuthority("ROLE_" + role)
+        );
     }
 
     @Override

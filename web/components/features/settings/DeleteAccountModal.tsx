@@ -19,7 +19,7 @@ export default function DeleteAccountModal({
   isOpen,
   onClose,
   onConfirm,
-  isLoading
+  isLoading,
 }: DeleteAccountModalProps) {
   const [password, setPassword] = useState("");
 
@@ -57,9 +57,7 @@ export default function DeleteAccountModal({
             <div className="p-2 bg-red-500/10 rounded-lg">
               <ShieldAlert size={20} className="text-red-500" />
             </div>
-            <h3 className="text-xl font-bold text-red-500">
-              Nuclear Option
-            </h3>
+            <h3 className="text-xl font-bold text-red-500">Nuclear Option</h3>
           </div>
           <IconButton icon={X} onClick={onClose} variant="ghost" size="sm" />
         </div>
@@ -69,8 +67,11 @@ export default function DeleteAccountModal({
           <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex gap-3">
             <AlertTriangle className="text-red-500 shrink-0" size={20} />
             <div className="text-sm text-red-200/80 leading-relaxed">
-              <p className="font-bold text-red-500 mb-1">WARNING: IRREVERSIBLE ACTION</p>
-              Deleting your account will permanently wipe all your files, folders, and data. This cannot be undone.
+              <p className="font-bold text-red-500 mb-1">
+                WARNING: IRREVERSIBLE ACTION
+              </p>
+              Deleting your account will permanently wipe all your files,
+              folders, and data. This cannot be undone.
             </div>
           </div>
 

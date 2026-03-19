@@ -34,11 +34,7 @@ export function FileIcon({
   // Folders use a standard folder icon with a fixed color
   if (isFolder) {
     return (
-      <Folder
-        className={cn("text-accent", className)}
-        size={size}
-        {...props}
-      />
+      <Folder className={cn("text-accent", className)} size={size} {...props} />
     );
   }
 

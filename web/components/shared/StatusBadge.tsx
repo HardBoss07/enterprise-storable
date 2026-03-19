@@ -24,10 +24,10 @@ export interface StatusBadgeProps {
 /**
  * Molecule: A small, styled status indicator used for counts, tags, or warnings.
  */
-export function StatusBadge({ 
-  children, 
-  variant = "neutral", 
-  className 
+export function StatusBadge({
+  children,
+  variant = "neutral",
+  className,
 }: StatusBadgeProps) {
   const variantClasses = {
     neutral: "badge-neutral",
@@ -37,13 +37,7 @@ export function StatusBadge({
   };
 
   return (
-    <span
-      className={cn(
-        "badge",
-        variantClasses[variant],
-        className,
-      )}
-    >
+    <span className={cn("badge", variantClasses[variant], className)}>
       {children}
     </span>
   );

@@ -6,6 +6,5 @@ import jakarta.validation.constraints.NotBlank;
  * Request DTO for confirming account deletion with a password.
  */
 public record DeleteAccountRequest(
-    @NotBlank(message = "Password confirmation is required")
-    String password
+    @NotBlank(message = "Password confirmation is required") String password
 ) {}

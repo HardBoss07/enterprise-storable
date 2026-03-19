@@ -56,9 +56,7 @@ export function TrashTableRow({
       </div>
 
       <div className="col-span-3 flex items-center justify-end space-x-2">
-        <StatusBadge
-          variant={daysRemaining <= 5 ? "warning" : "neutral"}
-        >
+        <StatusBadge variant={daysRemaining <= 5 ? "warning" : "neutral"}>
           {daysRemaining} days left
         </StatusBadge>
 
