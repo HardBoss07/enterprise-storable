@@ -78,7 +78,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 9: User Profile & Account Lifecycle (In Progress) | **Last Updated:** 2026-03-18
+> **Status:** Phase 10: User Onboarding & Branding (In Progress) | **Last Updated:** 2026-03-19
 
 ### [x] Phase 1: Infrastructure & Skeleton
 
@@ -146,11 +146,11 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **UI:** Build the "Share" modal with user search and a permission toggle list.
 - [x] **Validation:** Ensure the backend enforces these permissions on every CRUD operation.
 
-### [ ] Phase 9: User Profile & Account Lifecycle
+### [x] Phase 9: User Profile & Account Lifecycle
 
-- [ ] **UI:** Create a "Settings" page accessible from the Header/Sidebar.
-- [ ] **Feature:** Implementation of "Change Password" (with current password verification) and "Change Email" flows.
-- [ ] **Security:** Implement the "Nuclear Option" - a "Delete Account" flow that recursively wipes the user's database entries and physical `/storage` directory after a "Confirm Password" warning.
+- [x] **UI:** Create a "Settings" page accessible from the Header/Sidebar.
+- [x] **Feature:** Implementation of "Change Password" (with current password verification) and "Change Email" flows.
+- [x] **Security:** Implement the "Nuclear Option" - a "Delete Account" flow that recursively wipes the user's database entries and physical `/storage` directory after a "Confirm Password" warning.
 
 ### [ ] Phase 10: User Onboarding & Branding
 

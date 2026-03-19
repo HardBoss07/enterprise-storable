@@ -21,11 +21,15 @@ enterprise-storable/
 │   │       │                   │   ├── AdminController.java
 │   │       │                   │   ├── AuthController.java
 │   │       │                   │   ├── FileController.java
-│   │       │                   │   └── SharingController.java
+│   │       │                   │   ├── SharingController.java
+│   │       │                   │   └── UserController.java
 │   │       │                   ├── exception/
 │   │       │                   │   └── GlobalExceptionHandler.java
 │   │       │                   ├── request/
+│   │       │                   │   ├── ChangeEmailRequest.java
+│   │       │                   │   ├── ChangePasswordRequest.java
 │   │       │                   │   ├── CreateFolderRequest.java
+│   │       │                   │   ├── DeleteAccountRequest.java
 │   │       │                   │   ├── RecursiveFolderRequest.java
 │   │       │                   │   └── ShareRequest.java
 │   │       │                   ├── security/
@@ -93,7 +97,8 @@ enterprise-storable/
 │   │                               ├── SharingService.java
 │   │                               ├── SharingServiceImpl.java
 │   │                               ├── StorageService.java
-│   │                               └── TrashCleanupService.java
+│   │                               ├── TrashCleanupService.java
+│   │                               └── UserService.java
 │   └── pom.xml
 ├── storable-data/
 │   ├── src/
@@ -129,6 +134,8 @@ enterprise-storable/
 │   │   │   └── page.tsx
 │   │   ├── register/
 │   │   │   └── page.tsx
+│   │   ├── settings/
+│   │   │   └── page.tsx
 │   │   ├── shared/
 │   │   │   └── page.tsx
 │   │   ├── trash/
@@ -149,6 +156,9 @@ enterprise-storable/
 │   │   │   ├── recent/
 │   │   │   │   ├── RecentTable.tsx
 │   │   │   │   └── RecentTableRow.tsx
+│   │   │   ├── settings/
+│   │   │   │   ├── DeleteAccountModal.tsx
+│   │   │   │   └── SettingsContainer.tsx
 │   │   │   └── trash/
 │   │   │       ├── RetentionSettings.tsx
 │   │   │       ├── TrashTable.tsx
@@ -183,9 +193,9 @@ enterprise-storable/
 │   │   │   ├── client.ts
 │   │   │   ├── file.ts
 │   │   │   ├── sharing.ts
-│   │   │   └── trash.ts
+│   │   │   ├── trash.ts
+│   │   │   └── user.ts
 │   │   ├── file-constants.ts
-│   │   ├── mock-data.ts
 │   │   └── utils.ts
 │   ├── public/
 │   │   └── logo/
