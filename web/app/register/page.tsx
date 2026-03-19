@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
     try {
       const res = await registerApi({ username, email, password });
-      login(res.token, res.username, res.userId, res.role);
+      login(res.token, res.username, res.email, res.userId, res.role);
     } catch (err: any) {
       setError(err.message || "Registration failed");
     }
