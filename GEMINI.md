@@ -69,16 +69,18 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ### 3. Frontend (Next.js 16 + Tailwind) Standards
 
-- **Atomic Composition:** Build UI from small, stateless atoms. Avoid "Mega-Components."
-- **Tailwind Refactoring:** Consolidate repetitive Tailwind strings into centralized CSS classes in `globals.css` using `@apply` for high-frequency patterns.
-- **Type Safety:** Strict TypeScript. Use `interface` for API contracts and `type` for internal shapes. No `any`.
-- **Logic Extraction:** Complex UI state or data processing must be moved into custom `hooks` or `utils`.
+- **Strict Atomic Design:** UI is built from stateless **Atoms** (`ui/`), combined into **Molecules** (`shared/`), and orchestrated by **Organisms** (`features/`).
+- **Logic Extraction:** All state, effects, and complex data handling are extracted into custom **Hooks**.
+- **Data Layer:** API calls are isolated in `lib/api/` and consumed via hooks or server actions.
+- **Tailwind Refactoring:** Repetitive styles are handled via centralized CSS or the `cn()` utility (clsx + tailwind-merge).
+- **Type Safety:** Strict TypeScript interfaces for all props. No `any`.
+- **Self-Documentation:** Every exported component, hook, or utility requires a JSDoc block.
 
 ---
 
 ## Interactive Roadmap
 
-> **Status:** Phase 10: User Onboarding & Branding (In Progress) | **Last Updated:** 2026-03-19
+> **Status:** Phase 10: User Onboarding & Branding (In Progress) | **Last Updated:** 2026-03-20
 
 ### [x] Phase 1: Infrastructure & Skeleton
 
@@ -196,6 +198,16 @@ This file is the **Source of Truth** for the project. Every session should begin
 - **Engine:** Implemented `SharingService` to handle granular permissions (VIEW, EDIT, OWNER) with recursive inheritance (children inherit parent permissions).
 - **UI:** Added "Shared with me" section and a "Share" modal with user lookup (by email/username) and permission management.
 - **Validation:** Updated `FileService` to enforce permissions on all CRUD operations using the sharing engine.
+
+### Strict Atomic Design System Refactor
+
+- **Architecture:** Transitioned to a "Strict Atomic Design System" to ensure modularity, scalability, and strict separation of concerns.
+- **Organization:**
+  - **Atoms (`components/ui/`):** Stateless, single-purpose primitives like `Button`, `IconButton`, `FileIcon`, `Spinner`.
+  - **Molecules (`components/shared/`):** Combinations of 2-3 UI primitives like `SearchBar`, `Breadcrumbs`, `UserMenu`, `StatusBadge`.
+  - **Organisms (`components/features/`):** Complex, domain-specific UI blocks like `FileBrowser`, `RecentTable`, `SettingsContainer`, `TrashTable`, and layout components (`Header`, `Sidebar`, `Footer`).
+- **Logic Separation:** Fully decoupled business logic from the UI layer using specialized custom **Hooks** (e.g., `useSearch`, `useMoveModal`, `useShareModal`, `useFileListItem`, `useSettings`).
+- **Standardization:** Implemented a global `cn()` utility for robust Tailwind class merging and enforced JSDoc documentation for all exported members to ensure maintainability.
 
 ---
 

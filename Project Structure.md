@@ -7,6 +7,7 @@ enterprise-storable/
 │   ├── indexes.sql
 │   ├── schema.sql
 │   └── test-data.sql
+├── node_modules/
 ├── storable-api/
 │   ├── src/
 │   │   └── main/
@@ -147,12 +148,16 @@ enterprise-storable/
 │   ├── components/
 │   │   ├── features/
 │   │   │   ├── file-browser/
-│   │   │   │   ├── Breadcrumbs.tsx
 │   │   │   │   ├── FileBrowser.tsx
 │   │   │   │   ├── FileList.tsx
 │   │   │   │   ├── FileListItem.tsx
 │   │   │   │   ├── MoveModal.tsx
 │   │   │   │   └── ShareModal.tsx
+│   │   │   ├── layout/
+│   │   │   │   ├── AppLayout.tsx
+│   │   │   │   ├── Footer.tsx
+│   │   │   │   ├── Header.tsx
+│   │   │   │   └── Sidebar.tsx
 │   │   │   ├── recent/
 │   │   │   │   ├── RecentTable.tsx
 │   │   │   │   └── RecentTableRow.tsx
@@ -163,19 +168,15 @@ enterprise-storable/
 │   │   │       ├── RetentionSettings.tsx
 │   │   │       ├── TrashTable.tsx
 │   │   │       └── TrashTableRow.tsx
-│   │   ├── icons/
-│   │   │   └── FileIcon.tsx
-│   │   ├── layout/
-│   │   │   ├── AppLayout.tsx
-│   │   │   ├── Footer.tsx
-│   │   │   ├── Header.tsx
-│   │   │   ├── SearchBar.tsx
-│   │   │   └── Sidebar.tsx
 │   │   ├── shared/
+│   │   │   ├── Breadcrumbs.tsx
 │   │   │   ├── EmptyState.tsx
-│   │   │   └── StatusBadge.tsx
+│   │   │   ├── SearchBar.tsx
+│   │   │   ├── StatusBadge.tsx
+│   │   │   └── UserMenu.tsx
 │   │   └── ui/
 │   │       ├── Button.tsx
+│   │       ├── FileIcon.tsx
 │   │       ├── IconButton.tsx
 │   │       ├── PageContainer.tsx
 │   │       └── Spinner.tsx
@@ -185,6 +186,11 @@ enterprise-storable/
 │   │   └── ToastContext.tsx
 │   ├── hooks/
 │   │   ├── useFileBrowser.ts
+│   │   ├── useFileListItem.ts
+│   │   ├── useMoveModal.ts
+│   │   ├── useSearch.ts
+│   │   ├── useSettings.ts
+│   │   ├── useShareModal.ts
 │   │   └── useTrash.ts
 │   ├── lib/
 │   │   ├── api/
@@ -236,8 +242,11 @@ enterprise-storable/
 ├── GEMINI.md
 ├── LICENSE
 ├── Project Structure.md
+├── README.md
 ├── Refactoring Prompts.md
 ├── docker-compose.yml
+├── package-lock.json
+├── package.json
 ├── pom.xml
 ├── run.ps1
 └── run.sh

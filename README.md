@@ -25,6 +25,7 @@
 ## 🛠️ Tech Stack
 
 ### Backend (`storable-backend`)
+
 - **Runtime:** Java 21 (utilizing Virtual Threads for high-throughput I/O).
 - **Framework:** Spring Boot 3.2.2.
 - **Security:** Spring Security + JWT (Stateless authentication).
@@ -32,6 +33,7 @@
 - **Architecture:** Multi-module Maven project (`api`, `core`, `data`, `common`).
 
 ### Frontend (`storable-frontend`)
+
 - **Framework:** Next.js 16 (App Router).
 - **Language:** TypeScript (Strict mode).
 - **Styling:** Tailwind CSS + Lucide Icons.
@@ -42,6 +44,7 @@
 ## 🏗️ Architecture Overview
 
 Storable separates the metadata from the physical storage:
+
 1. **Metadata Layer:** All folder structures, file names, permissions, and virtual paths are stored in MySQL.
 2. **Physical Layer:** Files are stored on disk using unique `UUID` storage keys, preventing filename collisions and improving directory performance.
 
@@ -59,9 +62,11 @@ graph TD
 ## 🚀 Quick Start
 
 ### Prerequisites
+
 - [Docker & Docker Compose](https://docs.docker.com/get-docker/)
 
 ### Launching the Environment
+
 1. Clone the repository:
    ```bash
    git clone https://github.com/yourusername/enterprise-storable.git
@@ -107,4 +112,4 @@ Distributed under the MIT License. See `LICENSE` for more information.
 
 ---
 
-*Built with ❤️ for the self-hosting community.*
+_Built with ❤️ for the self-hosting community._
