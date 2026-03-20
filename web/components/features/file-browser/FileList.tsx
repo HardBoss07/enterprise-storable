@@ -1,36 +1,50 @@
 "use client";
 
 import { FileNode } from "@/types/api";
-import FileListItem from "./FileListItem";
-import { useMemo } from "react";
-
-import { FileIcon } from "@/components/icons/FileIcon";
-import { useState, useEffect, useRef } from "react";
+import { FileListItem } from "./FileListItem";
+import { useMemo, useState, useEffect, useRef } from "react";
+import { FileIcon } from "@/components/ui/FileIcon";
+import { cn } from "@/lib/utils";
 
 interface FileListProps {
+  /** The list of file nodes to display. */
   files: FileNode[];
+  /** Callback function when a folder is clicked. */
   onFolderClick: (folderId: number) => void;
+  /** Callback function when a node is deleted. */
   onDelete: (nodeId: number) => void;
+  /** Callback function when a node is renamed. */
   onRename: (nodeId: number, newName: string) => void;
+  /** Callback function when a node is duplicated. */
   onDuplicate: (nodeId: number) => void;
+  /** Callback function when a node is moved. */
   onMove: (nodeId: number) => void;
+  /** Optional callback function when a node is shared. */
   onShare?: (node: FileNode) => void;
+  /** Optional callback function when a node is toggled as favorite. */
   onToggleFavorite?: (nodeId: number, isFavorite: boolean) => void;
+  /** Optional callback function to jump to the node's location. */
   onJumpToLocation?: (parentId: number | null) => void;
+  /** Whether the UI for creating a new folder should be shown. */
   isCreatingFolder?: boolean;
+  /** Callback function when a new folder is created. */
   onCreateFolder?: (name: string) => void;
+  /** Callback function when folder creation is cancelled. */
   onCancelCreateFolder?: () => void;
+  /** The ID of the node currently being renamed. */
   renamingNodeId?: number | null;
+  /** Callback function when renaming is cancelled. */
   onCancelRename?: () => void;
 }
 
 /**
- * Renders a list of files and folders with sorting.
- * @param files The list of file nodes to display.
- * @param onFolderClick Callback when a folder is clicked.
- * @param onDelete Callback when a node is deleted.
+ * Organism: Renders a list of files and folders with sorting.
+ * Manages the display of multiple FileListItems and the new folder creation state.
+ *
+ * @param {FileListProps} props - The component props.
+ * @returns {JSX.Element} The rendered FileList component.
  */
-export default function FileList({
+export function FileList({
   files,
   onFolderClick,
   onDelete,
@@ -56,16 +70,21 @@ export default function FileList({
     }
   }, [isCreatingFolder]);
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter" && newFolderName.trim()) {
+  /**
+   * Handles keyboard events for the new folder input.
+   * @param {React.KeyboardEvent} event - The keyboard event.
+   */
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" && newFolderName.trim()) {
       onCreateFolder?.(newFolderName.trim());
-    } else if (e.key === "Escape") {
+    } else if (event.key === "Escape") {
       onCancelCreateFolder?.();
     }
   };
 
   /**
    * Sorts files: Folders first, then alphabetically.
+   * Memoized to prevent unnecessary re-sorts.
    */
   const sortedFiles = useMemo(() => {
     return [...files].sort((a, b) => {
@@ -84,17 +103,17 @@ export default function FileList({
   return (
     <div className="space-y-1">
       <div className="list-header">
-        <div className="flex-1 min-w-0 ml-10">Name</div>
-        <div className="w-40 hidden sm:block">Last Modified</div>
+        <div className="ml-10 min-w-0 flex-1">Name</div>
+        <div className="hidden w-40 sm:block">Last Modified</div>
         <div className="w-24 text-right">File Size</div>
       </div>
 
       {isCreatingFolder && (
-        <div className="flex items-center space-x-4 p-2 bg-primary/10 border border-primary/20 rounded-lg animate-pulse">
-          <div className="flex items-center justify-center w-10 h-10">
+        <div className="flex animate-pulse items-center space-x-4 rounded-lg border border-primary/20 bg-primary/10 p-2">
+          <div className="flex h-10 w-10 items-center justify-center">
             <FileIcon isFolder={true} size={22} />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="min-w-0 flex-1">
             <input
               ref={inputRef}
               type="text"
@@ -106,13 +125,13 @@ export default function FileList({
               className="input-field w-full max-w-sm"
             />
           </div>
-          <div className="hidden sm:block w-40" />
+          <div className="hidden w-40 sm:block" />
           <div className="w-24 text-right text-text-muted">--</div>
         </div>
       )}
 
       {sortedFiles.length === 0 && !isCreatingFolder ? (
-        <div className="flex flex-col items-center justify-center h-48 text-text-muted">
+        <div className="flex h-48 flex-col items-center justify-center text-text-muted">
           <p>This folder is empty</p>
         </div>
       ) : (
@@ -136,3 +155,5 @@ export default function FileList({
     </div>
   );
 }
+
+export default FileList;

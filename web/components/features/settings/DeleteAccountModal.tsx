@@ -4,18 +4,27 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { X, ShieldAlert, AlertTriangle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DeleteAccountModalProps {
+  /** Whether the modal is currently open. */
   isOpen: boolean;
+  /** Callback function when the modal is closed. */
   onClose: () => void;
+  /** Callback function when account deletion is confirmed. */
   onConfirm: (password: string) => void;
+  /** Optional loading state for the confirmation button. */
   isLoading?: boolean;
 }
 
 /**
- * Modal for confirming account deletion with a password check.
+ * Molecule/Organism: Modal for confirming account deletion with a password check.
+ * Implements the "Nuclear Option" for account removal.
+ *
+ * @param {DeleteAccountModalProps} props - The component props.
+ * @returns {JSX.Element | null} The rendered DeleteAccountModal component or null if not open.
  */
-export default function DeleteAccountModal({
+export function DeleteAccountModal({
   isOpen,
   onClose,
   onConfirm,
@@ -30,8 +39,8 @@ export default function DeleteAccountModal({
   }, [isOpen]);
 
   useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
+    const handleEsc = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
         onClose();
       }
     };
@@ -41,21 +50,25 @@ export default function DeleteAccountModal({
 
   if (!isOpen) return null;
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  /**
+   * Handles the submission of the deletion confirmation form.
+   * @param {React.FormEvent} event - The form submission event.
+   */
+  const handleSubmit = (event: React.FormEvent) => {
+    event.preventDefault();
     if (password.trim()) {
       onConfirm(password);
     }
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-      <div className="bg-surface-200 border border-red-500/30 rounded-2xl w-full max-w-md shadow-2xl overflow-hidden flex flex-col animate-in fade-in zoom-in duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-4 backdrop-blur-md">
+      <div className="flex w-full max-w-md animate-in fade-in zoom-in flex-col overflow-hidden rounded-2xl border border-red-500/30 bg-surface-200 shadow-2xl duration-200">
         {/* Header */}
-        <div className="p-6 border-b border-surface-300 flex items-center justify-between bg-red-500/5">
+        <div className="flex items-center justify-between border-b border-surface-300 bg-red-500/5 p-6">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-red-500/10 rounded-lg">
-              <ShieldAlert size={20} className="text-red-500" />
+            <div className="rounded-lg bg-red-500/10 p-2 text-red-500">
+              <ShieldAlert size={20} />
             </div>
             <h3 className="text-xl font-bold text-red-500">Nuclear Option</h3>
           </div>
@@ -63,11 +76,11 @@ export default function DeleteAccountModal({
         </div>
 
         {/* Body */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
-          <div className="p-4 bg-red-500/10 border border-red-500/20 rounded-xl flex gap-3">
-            <AlertTriangle className="text-red-500 shrink-0" size={20} />
-            <div className="text-sm text-red-200/80 leading-relaxed">
-              <p className="font-bold text-red-500 mb-1">
+        <form onSubmit={handleSubmit} className="space-y-6 p-6">
+          <div className="flex gap-3 rounded-xl border border-red-500/20 bg-red-500/10 p-4">
+            <AlertTriangle className="shrink-0 text-red-500" size={20} />
+            <div className="text-sm leading-relaxed text-red-200/80">
+              <p className="mb-1 font-bold text-red-500 uppercase">
                 WARNING: IRREVERSIBLE ACTION
               </p>
               Deleting your account will permanently wipe all your files,
@@ -76,7 +89,7 @@ export default function DeleteAccountModal({
           </div>
 
           <div className="space-y-2">
-            <label className="text-sm font-bold text-text-secondary ml-1">
+            <label className="ml-1 text-sm font-bold text-text-secondary">
               Confirm with Password
             </label>
             <input
@@ -84,7 +97,7 @@ export default function DeleteAccountModal({
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="Enter your password"
-              className="w-full bg-surface-100 border border-surface-300 rounded-xl px-4 py-3 text-text-primary focus:ring-2 focus:ring-red-500/50 outline-none transition-all"
+              className="w-full rounded-xl border border-surface-300 bg-surface-100 px-4 py-3 text-text-primary outline-none transition-all focus:ring-2 focus:ring-red-500/50"
               autoFocus
               required
             />
@@ -115,3 +128,5 @@ export default function DeleteAccountModal({
     </div>
   );
 }
+
+export default DeleteAccountModal;

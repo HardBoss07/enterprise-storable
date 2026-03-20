@@ -3,22 +3,27 @@
 import { format } from "date-fns";
 import { RotateCcw, Trash2 } from "lucide-react";
 import { TrashItem } from "@/types/api";
-import { FileIcon } from "@/components/icons/FileIcon";
+import { FileIcon } from "@/components/ui/FileIcon";
 import { IconButton } from "@/components/ui/IconButton";
 import { StatusBadge } from "@/components/shared/StatusBadge";
 import { formatBytes } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface TrashTableRowProps {
-  /** The trash item data. */
+  /** The trash item data, including metadata and retention info. */
   item: TrashItem;
-  /** Callback to restore the item. */
+  /** Callback function to restore the item from trash. */
   onRestore: (id: number) => void;
-  /** Callback to permanently delete the item. */
+  /** Callback function to permanently delete the item. */
   onPermanentDelete: (id: number, name: string) => void;
 }
 
 /**
  * Molecule: A single row representing a soft-deleted file or folder in the Trash Table.
+ * Combines FileIcon (Atom), Name (Text), StatusBadge (Molecule), and Action buttons (Atoms).
+ *
+ * @param {TrashTableRowProps} props - The component props.
+ * @returns {JSX.Element} The rendered TrashTableRow component.
  */
 export function TrashTableRow({
   item,
@@ -28,9 +33,9 @@ export function TrashTableRow({
   const { metadata, daysRemaining } = item;
 
   return (
-    <div className="table-row-grid group">
-      <div className="col-span-4 flex items-center space-x-4 min-w-0">
-        <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
+    <div className="group table-row-grid">
+      <div className="col-span-4 flex min-w-0 items-center space-x-4">
+        <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
           <FileIcon
             extension={metadata.name.split(".").pop()}
             mime={metadata.mime}
@@ -38,18 +43,18 @@ export function TrashTableRow({
             size={22}
           />
         </div>
-        <span className="text-neutral-100 font-medium truncate">
+        <span className="truncate font-medium text-neutral-100 group-hover:text-primary transition-colors">
           {metadata.name}
         </span>
       </div>
 
-      <div className="col-span-3 text-text-muted text-sm">
+      <div className="col-span-3 text-sm text-text-muted">
         {metadata.deletedAt
           ? format(new Date(metadata.deletedAt), "MMM d, yyyy HH:mm")
           : "--"}
       </div>
 
-      <div className="col-span-2 text-text-muted text-sm text-right">
+      <div className="col-span-2 text-right text-sm text-text-muted">
         {!metadata.folder && metadata.size !== null
           ? formatBytes(metadata.size)
           : "--"}
@@ -83,3 +88,5 @@ export function TrashTableRow({
     </div>
   );
 }
+
+export default TrashTableRow;

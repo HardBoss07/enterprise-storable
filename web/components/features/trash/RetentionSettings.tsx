@@ -3,6 +3,7 @@
 import { Settings, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
+import { cn } from "@/lib/utils";
 
 interface RetentionSettingsProps {
   /** Current retention days in state. */
@@ -21,6 +22,10 @@ interface RetentionSettingsProps {
 
 /**
  * Organism: Admin configuration block for managing the global trash retention policy.
+ * Coordinates an input (Atom) and actions (Atoms) to manage a specific setting.
+ *
+ * @param {RetentionSettingsProps} props - The component props.
+ * @returns {JSX.Element} The rendered RetentionSettings component.
  */
 export function RetentionSettings({
   days,
@@ -70,3 +75,5 @@ export function RetentionSettings({
     </div>
   );
 }
+
+export default RetentionSettings;

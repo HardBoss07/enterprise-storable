@@ -1,124 +1,57 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { FileNode } from "@/types/api";
-import { getFileList, getFilePath, getHomeFolder } from "@/lib/api/file";
-import { apiRequest } from "@/lib/api/client";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Search, ChevronRight, X, Folder, Home } from "lucide-react";
 import { Spinner } from "@/components/ui/Spinner";
+import { useMoveModal } from "@/hooks/useMoveModal";
+import { cn } from "@/lib/utils";
 
 interface MoveModalProps {
+  /** Whether the modal is currently open. */
   isOpen: boolean;
+  /** Callback function when the modal is closed. */
   onClose: () => void;
+  /** Callback function when the move is confirmed. */
   onMove: (targetParentId: number | null) => void;
+  /** The node (file or folder) that is being moved. */
   nodeToMove: FileNode;
 }
 
 /**
- * Modal for selecting a destination folder to move a node to.
+ * Organism: Modal for selecting a destination folder to move a node to.
+ * Coordinates folder navigation, searching, and confirmation of move operations.
+ *
+ * @param {MoveModalProps} props - The component props.
+ * @returns {JSX.Element | null} The rendered MoveModal component or null if not open.
  */
-export default function MoveModal({
+export function MoveModal({
   isOpen,
   onClose,
   onMove,
   nodeToMove,
 }: MoveModalProps) {
-  const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
-  const [folders, setFolders] = useState<FileNode[]>([]);
-  const [path, setPath] = useState<FileNode[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<FileNode[]>([]);
-  const [searching, setSearching] = useState(false);
-
-  useEffect(() => {
-    if (isOpen) {
-      fetchHome();
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
-
-  const fetchHome = async () => {
-    setLoading(true);
-    try {
-      const home = await getHomeFolder();
-      setCurrentFolderId(home.id);
-      await fetchFolders(home.id);
-    } catch (err) {
-      console.error("Failed to fetch home folder:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchFolders = async (folderId: number | null) => {
-    setLoading(true);
-    try {
-      const children = await getFileList(folderId);
-      // Only keep folders, and exclude the node itself (if it's a folder)
-      setFolders(children.filter((f) => f.folder && f.id !== nodeToMove.id));
-
-      const pathArr = await getFilePath(folderId || 0);
-      setPath(pathArr);
-    } catch (err) {
-      console.error("Failed to fetch folders:", err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleFolderClick = (folderId: number) => {
-    setCurrentFolderId(folderId);
-    fetchFolders(folderId);
-    setSearchQuery("");
-  };
-
-  const handleSearch = async (query: string) => {
-    setSearchQuery(query);
-    if (query.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    setSearching(true);
-    try {
-      // We don't have a dedicated search endpoint for folders yet,
-      // but let's assume we can use a generic search or implement one.
-      // For now, let's mock it or if we have time, implement a search endpoint.
-      // Actually, let's just search within the current list or
-      // implement a simple search in FileController.
-
-      // I'll add a search endpoint to the backend later if needed.
-      // For now, let's just use what we have or mock.
-      const response = await apiRequest<FileNode[]>(
-        `/api/files/search?query=${query}&kind=folder`,
-      );
-      setSearchResults(response.filter((f) => f.id !== nodeToMove.id));
-    } catch (err) {
-      console.error("Search failed:", err);
-    } finally {
-      setSearching(false);
-    }
-  };
+  const {
+    currentFolderId,
+    folders,
+    path,
+    loading,
+    searchQuery,
+    searchResults,
+    searching,
+    handleFolderClick,
+    handleSearch,
+    fetchHome,
+  } = useMoveModal({ isOpen, nodeToMove, onClose });
 
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
-      <div className="bg-neutral-900 border border-neutral-800 rounded-xl w-full max-w-lg shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 shadow-2xl">
         {/* Header */}
-        <div className="p-4 border-b border-neutral-800 flex items-center justify-between">
+        <div className="flex items-center justify-between border-b border-neutral-800 p-4">
           <h3 className="text-lg font-semibold text-neutral-100">
             Move "{nodeToMove.name}" to...
           </h3>
@@ -126,7 +59,7 @@ export default function MoveModal({
         </div>
 
         {/* Search */}
-        <div className="p-4 bg-neutral-950/50">
+        <div className="bg-neutral-950/50 p-4">
           <div className="relative">
             <Search
               className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
@@ -144,22 +77,22 @@ export default function MoveModal({
 
         {/* Breadcrumbs */}
         {!searchQuery && (
-          <div className="px-4 py-2 bg-neutral-800/30 flex items-center space-x-1 overflow-x-auto text-sm no-scrollbar">
+          <div className="no-scrollbar flex items-center space-x-1 overflow-x-auto bg-neutral-800/30 px-4 py-2 text-sm">
             <button
               onClick={fetchHome}
-              className="p-1 hover:text-blue-400 text-neutral-400 transition-colors"
+              className="p-1 text-neutral-400 transition-colors hover:text-blue-400"
             >
               <Home size={14} />
             </button>
             {path.map((folder) => (
               <div
                 key={folder.id}
-                className="flex items-center space-x-1 shrink-0"
+                className="flex shrink-0 items-center space-x-1"
               >
                 <ChevronRight size={14} className="text-neutral-600" />
                 <button
                   onClick={() => handleFolderClick(folder.id)}
-                  className="hover:text-blue-400 text-neutral-400 transition-colors whitespace-nowrap"
+                  className="whitespace-nowrap text-neutral-400 transition-colors hover:text-blue-400"
                 >
                   {folder.name}
                 </button>
@@ -169,9 +102,9 @@ export default function MoveModal({
         )}
 
         {/* List */}
-        <div className="flex-1 overflow-y-auto p-2 min-h-[300px]">
+        <div className="min-h-[300px] flex-1 overflow-y-auto p-2">
           {loading || searching ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="flex h-full items-center justify-center">
               <Spinner size="md" />
             </div>
           ) : searchQuery ? (
@@ -181,14 +114,14 @@ export default function MoveModal({
                   <button
                     key={folder.id}
                     onClick={() => handleFolderClick(folder.id)}
-                    className="w-full flex items-center space-x-3 p-3 rounded-lg hover:bg-neutral-800 transition-colors text-left"
+                    className="flex w-full items-center space-x-3 rounded-lg p-3 text-left transition-colors hover:bg-neutral-800"
                   >
                     <Folder size={20} className="text-blue-500" />
                     <span className="text-neutral-200">{folder.name}</span>
                   </button>
                 ))
               ) : (
-                <div className="text-center py-10 text-neutral-500">
+                <div className="py-10 text-center text-neutral-500">
                   No folders found matching "{searchQuery}"
                 </div>
               )}
@@ -199,10 +132,10 @@ export default function MoveModal({
                 <button
                   key={folder.id}
                   onClick={() => handleFolderClick(folder.id)}
-                  className="w-full flex items-center justify-between p-3 rounded-lg hover:bg-neutral-800 transition-colors group"
+                  className="group flex w-full items-center justify-between rounded-lg p-3 transition-colors hover:bg-neutral-800"
                 >
                   <div className="flex items-center space-x-3">
-                    <Folder size={20} className="text-blue-500" />
+                    <Folder size={20} className="text-accent" />
                     <span className="text-neutral-200">{folder.name}</span>
                   </div>
                   <ChevronRight
@@ -212,7 +145,7 @@ export default function MoveModal({
                 </button>
               ))}
               {folders.length === 0 && (
-                <div className="text-center py-10 text-neutral-500 text-sm">
+                <div className="py-10 text-center text-sm text-neutral-500">
                   This folder has no subfolders
                 </div>
               )}
@@ -221,8 +154,8 @@ export default function MoveModal({
         </div>
 
         {/* Footer */}
-        <div className="p-4 border-t border-neutral-800 flex items-center justify-between bg-neutral-950/50">
-          <div className="text-sm text-neutral-400 truncate max-w-[200px]">
+        <div className="flex items-center justify-between border-t border-neutral-800 bg-neutral-950/50 p-4">
+          <div className="max-w-[200px] truncate text-sm text-neutral-400">
             Target:{" "}
             <span className="text-neutral-200">
               {path[path.length - 1]?.name || "Home"}
@@ -245,3 +178,5 @@ export default function MoveModal({
     </div>
   );
 }
+
+export default MoveModal;

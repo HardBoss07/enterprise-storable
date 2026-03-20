@@ -1,29 +1,33 @@
 "use client";
 
 import { useRef, useState } from "react";
-import Breadcrumbs from "./Breadcrumbs";
-import FileList from "./FileList";
+import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
+import { FileList } from "./FileList";
 import { Upload, FolderPlus, RefreshCw } from "lucide-react";
 import { useFileBrowser } from "@/hooks/useFileBrowser";
 import { Button } from "@/components/ui/Button";
 import { IconButton } from "@/components/ui/IconButton";
 import { Spinner } from "@/components/ui/Spinner";
 import { useToast } from "@/context/ToastContext";
-import MoveModal from "./MoveModal";
-import ShareModal from "./ShareModal";
+import { MoveModal } from "./MoveModal";
+import { ShareModal } from "./ShareModal";
 import { FileNode } from "@/types/api";
+import { cn } from "@/lib/utils";
 
 interface FileBrowserProps {
+  /** Optional ID of the initial folder to display. */
   initialFolderId?: number | null;
 }
 
 /**
- * The main file browser component.
+ * Organism: The main file browser component.
  * Handles navigation, file listing, folder creation, and file uploads.
+ * Coordinates multiple molecules and atoms to provide a full file management experience.
+ *
+ * @param {FileBrowserProps} props - The component props.
+ * @returns {JSX.Element} The rendered FileBrowser component.
  */
-export default function FileBrowser({
-  initialFolderId = null,
-}: FileBrowserProps) {
+export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
   const { showToast } = useToast();
   const {
     files,
@@ -49,16 +53,28 @@ export default function FileBrowser({
   const [sharingNode, setSharingNode] = useState<FileNode | null>(null);
   const [renamingNodeId, setRenamingNodeId] = useState<number | null>(null);
 
+  /**
+   * Triggers the folder creation UI.
+   */
   const handleCreateFolder = () => {
     triggerCreateFolder();
   };
 
+  /**
+   * Triggers the file upload dialog.
+   */
   const handleUploadClick = () => {
     fileInputRef.current?.click();
   };
 
-  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  /**
+   * Handles the file input change event for uploads.
+   * @param {React.ChangeEvent<HTMLInputElement>} event - The change event.
+   */
+  const handleFileChange = async (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = event.target.files?.[0];
     if (file) {
       try {
         await uploadFile(file);
@@ -69,6 +85,11 @@ export default function FileBrowser({
     }
   };
 
+  /**
+   * Handles the renaming of a file or folder.
+   * @param {number} nodeId - The ID of the node to rename.
+   * @param {string} newName - The new name for the node.
+   */
   const handleRename = async (nodeId: number, newName: string) => {
     try {
       await renameFile(nodeId, newName);
@@ -80,17 +101,25 @@ export default function FileBrowser({
     }
   };
 
+  /**
+   * Handles the duplication of a file or folder.
+   * @param {number} nodeId - The ID of the node to duplicate.
+   */
   const handleDuplicate = async (nodeId: number) => {
     try {
       const newNode = await duplicateFile(nodeId);
       showToast("Successfully duplicated", "success");
-      // Trigger rename for the new node
+      // Trigger rename for the new node to allow immediate customization
       setRenamingNodeId(newNode.id);
     } catch (err) {
       showToast("Failed to duplicate", "error");
     }
   };
 
+  /**
+   * Prepares a node for moving.
+   * @param {number} nodeId - The ID of the node to move.
+   */
   const handleMoveClick = (nodeId: number) => {
     const node = files.find((f) => f.id === nodeId);
     if (node) {
@@ -98,6 +127,10 @@ export default function FileBrowser({
     }
   };
 
+  /**
+   * Confirms and executes the move operation.
+   * @param {number | null} targetParentId - The ID of the target folder.
+   */
   const handleMoveConfirm = async (targetParentId: number | null) => {
     if (!movingNode) return;
     try {
@@ -112,7 +145,7 @@ export default function FileBrowser({
 
   return (
     <div className="card-surface relative">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-8">
+      <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center justify-between">
         <Breadcrumbs path={path} onBreadcrumbClick={navigateToFolder} />
 
         <div className="flex items-center space-x-3">
@@ -139,7 +172,7 @@ export default function FileBrowser({
             onClick={() => refresh()}
             variant="secondary"
             title="Refresh"
-            className={loading ? "animate-spin" : ""}
+            className={cn(loading && "animate-spin")}
             isLoading={loading}
           />
 
@@ -155,7 +188,7 @@ export default function FileBrowser({
       {loading && files.length === 0 ? (
         <Spinner size="lg" className="h-64" />
       ) : error ? (
-        <div className="bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-md">
+        <div className="rounded-md border border-red-500 bg-red-900/50 p-4 text-red-200">
           {error}
         </div>
       ) : (
@@ -190,3 +223,5 @@ export default function FileBrowser({
     </div>
   );
 }
+
+export default FileBrowser;

@@ -1,17 +1,7 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
 import { FileNode } from "@/types/api";
-import {
-  lookupUsers,
-  getNodePrivileges,
-  shareNode,
-  updatePrivilege,
-  removePrivilege,
-  UserLookup,
-  AccessPrivilege,
-  PrivilegeLevel,
-} from "@/lib/api/sharing";
+import { PrivilegeLevel } from "@/lib/api/sharing";
 import {
   X,
   Search,
@@ -23,125 +13,45 @@ import {
 } from "lucide-react";
 import { IconButton } from "@/components/ui/IconButton";
 import { Button } from "@/components/ui/Button";
-import { useToast } from "@/context/ToastContext";
+import { useShareModal } from "@/hooks/useShareModal";
+import { cn } from "@/lib/utils";
 
 interface ShareModalProps {
+  /** The node (file or folder) being shared. */
   node: FileNode;
+  /** Callback function when the modal is closed. */
   onClose: () => void;
 }
 
 /**
- * Modal for managing file/folder sharing and permissions.
+ * Organism: Modal for managing file/folder sharing and permissions.
+ * Coordinates user lookups, permission displays, and access management.
+ *
+ * @param {ShareModalProps} props - The component props.
+ * @returns {JSX.Element} The rendered ShareModal component.
  */
-export default function ShareModal({ node, onClose }: ShareModalProps) {
-  const { showToast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [searchResults, setSearchResults] = useState<UserLookup[]>([]);
-  const [privileges, setPrivileges] = useState<AccessPrivilege[]>([]);
-  const [loadingPrivileges, setLoadingPrivileges] = useState(true);
-  const [searching, setSearching] = useState(false);
-  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
-
-  useEffect(() => {
-    fetchPrivileges();
-  }, [node.id]);
-
-  useEffect(() => {
-    const handleEsc = (e: KeyboardEvent) => {
-      if (e.key === "Escape") {
-        onClose();
-      }
-    };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
-  }, [onClose]);
-
-  const fetchPrivileges = async () => {
-    try {
-      setLoadingPrivileges(true);
-      const data = await getNodePrivileges(node.id);
-      setPrivileges(data);
-    } catch (error) {
-      console.error("Failed to fetch privileges:", error);
-      showToast("Failed to load sharing permissions", "error");
-    } finally {
-      setLoadingPrivileges(false);
-    }
-  };
-
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-
-    if (searchTimeout.current) clearTimeout(searchTimeout.current);
-
-    if (value.length < 2) {
-      setSearchResults([]);
-      return;
-    }
-
-    setSearching(true);
-    searchTimeout.current = setTimeout(async () => {
-      try {
-        const results = await lookupUsers(value);
-        // Filter out users who already have access
-        const filtered = results.filter(
-          (u) =>
-            !privileges.some((p) => p.userId === u.id) && u.id !== node.ownerId,
-        );
-        setSearchResults(filtered);
-      } catch (error) {
-        console.error("Search failed:", error);
-      } finally {
-        setSearching(false);
-      }
-    }, 500);
-  };
-
-  const handleAddShare = async (user: UserLookup) => {
-    try {
-      await shareNode(node.id, user.id, "VIEW");
-      showToast(`Shared ${node.name} with ${user.username}`, "success");
-      setSearchQuery("");
-      setSearchResults([]);
-      fetchPrivileges();
-    } catch (error) {
-      console.error("Sharing failed:", error);
-      showToast("Failed to share file", "error");
-    }
-  };
-
-  const handleUpdateLevel = async (userId: string, level: PrivilegeLevel) => {
-    try {
-      await updatePrivilege(node.id, userId, level);
-      showToast("Permission updated", "success");
-      fetchPrivileges();
-    } catch (error) {
-      console.error("Update failed:", error);
-      showToast("Failed to update permission", "error");
-    }
-  };
-
-  const handleRemovePrivilege = async (userId: string) => {
-    try {
-      await removePrivilege(node.id, userId);
-      showToast("Access removed", "success");
-      fetchPrivileges();
-    } catch (error) {
-      console.error("Removal failed:", error);
-      showToast("Failed to remove access", "error");
-    }
-  };
+export function ShareModal({ node, onClose }: ShareModalProps) {
+  const {
+    searchQuery,
+    searchResults,
+    privileges,
+    loadingPrivileges,
+    searching,
+    handleSearchChange,
+    handleAddShare,
+    handleUpdateLevel,
+    handleRemovePrivilege,
+  } = useShareModal({ node, onClose });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
-      <div className="bg-surface-100 border border-surface-300 rounded-3xl w-full max-w-xl shadow-2xl overflow-hidden animate-in fade-in zoom-in duration-200">
-        <div className="flex items-center justify-between p-6 border-b border-surface-300">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm">
+      <div className="w-full max-w-xl animate-in fade-in zoom-in overflow-hidden rounded-3xl border border-surface-300 bg-surface-100 shadow-2xl duration-200">
+        <div className="flex items-center justify-between border-b border-surface-300 p-6">
           <div>
-            <h2 className="text-xl font-black text-text-primary tracking-tight">
+            <h2 className="text-xl font-black tracking-tight text-text-primary">
               Share "{node.name}"
             </h2>
-            <p className="text-sm text-text-muted mt-0.5">
+            <p className="mt-0.5 text-sm text-text-muted">
               Manage who can access this {node.folder ? "folder" : "file"}.
             </p>
           </div>
@@ -153,10 +63,10 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
           />
         </div>
 
-        <div className="p-6 space-y-6">
+        <div className="space-y-6 p-6">
           {/* Search Box */}
           <div className="relative">
-            <div className="absolute inset-y-0 left-4 flex items-center pointer-events-none text-text-muted">
+            <div className="pointer-events-none absolute inset-y-0 left-4 flex items-center text-text-muted">
               {searching ? (
                 <Loader2 size={18} className="animate-spin text-primary" />
               ) : (
@@ -167,20 +77,20 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
               type="text"
               placeholder="Search by username or email..."
               value={searchQuery}
-              onChange={handleSearchChange}
-              className="input-field w-full pl-12 h-12 bg-surface-200"
+              onChange={(e) => handleSearchChange(e.target.value)}
+              className="input-field h-12 w-full bg-surface-200 pl-12"
               autoFocus
             />
 
             {searchResults.length > 0 && (
-              <div className="absolute z-10 top-full left-0 right-0 mt-2 bg-surface-100 border border-surface-300 rounded-2xl shadow-xl max-h-60 overflow-y-auto">
+              <div className="absolute top-full left-0 right-0 z-10 mt-2 max-h-60 overflow-y-auto rounded-2xl border border-surface-300 bg-surface-100 shadow-xl">
                 {searchResults.map((user) => (
                   <button
                     key={user.id}
                     onClick={() => handleAddShare(user)}
-                    className="w-full flex items-center gap-3 p-3 hover:bg-surface-200 transition-colors text-left"
+                    className="flex w-full items-center gap-3 p-3 text-left transition-colors hover:bg-surface-200"
                   >
-                    <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-primary/10 text-primary">
                       <User size={16} />
                     </div>
                     <div>
@@ -208,11 +118,11 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                 <Loader2 size={24} className="animate-spin text-primary" />
               </div>
             ) : (
-              <div className="space-y-2 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
+              <div className="custom-scrollbar max-h-64 overflow-y-auto pr-2 space-y-2">
                 {/* Always show owner first */}
-                <div className="flex items-center justify-between p-3 bg-surface-200/50 rounded-2xl border border-surface-300/50">
+                <div className="flex items-center justify-between rounded-2xl border border-surface-300/50 bg-surface-200/50 p-3">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-accent/10 flex items-center justify-center text-accent">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-accent/10 text-accent">
                       <ShieldCheck size={20} />
                     </div>
                     <div>
@@ -222,7 +132,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                       </div>
                     </div>
                   </div>
-                  <div className="text-xs font-black text-accent bg-accent/10 px-3 py-1 rounded-full uppercase">
+                  <div className="rounded-full bg-accent/10 px-3 py-1 text-xs font-black uppercase text-accent">
                     Full Control
                   </div>
                 </div>
@@ -230,10 +140,10 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                 {privileges.map((p) => (
                   <div
                     key={p.id}
-                    className="flex items-center justify-between p-3 hover:bg-surface-200 rounded-2xl border border-transparent hover:border-surface-300 transition-all group"
+                    className="group flex items-center justify-between rounded-2xl border border-transparent p-3 transition-all hover:border-surface-300 hover:bg-surface-200"
                   >
                     <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-black transition-colors">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-black">
                         <User size={20} />
                       </div>
                       <div>
@@ -245,7 +155,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="relative inline-flex items-center group/select">
+                      <div className="group/select relative inline-flex items-center">
                         <select
                           value={p.level}
                           onChange={(e) =>
@@ -254,7 +164,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                               e.target.value as PrivilegeLevel,
                             )
                           }
-                          className="appearance-none bg-primary/10 text-primary border border-primary/20 hover:bg-primary/20 text-xs font-bold rounded-full pl-4 pr-8 py-1.5 transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary uppercase tracking-tighter"
+                          className="appearance-none rounded-full border border-primary/20 bg-primary/10 py-1.5 pl-4 pr-8 text-xs font-bold uppercase tracking-tighter text-primary transition-all cursor-pointer focus:outline-none focus:ring-1 focus:ring-primary hover:bg-primary/20"
                         >
                           <option
                             value="VIEW"
@@ -277,7 +187,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                         </select>
                         <ChevronDown
                           size={12}
-                          className="absolute right-2.5 pointer-events-none text-primary/50"
+                          className="pointer-events-none absolute right-2.5 text-primary/50"
                         />
                       </div>
 
@@ -294,7 +204,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
                 ))}
 
                 {privileges.length === 0 && !loadingPrivileges && (
-                  <div className="text-center py-6 text-text-muted text-sm">
+                  <div className="py-6 text-center text-sm text-text-muted">
                     Only you can access this item.
                   </div>
                 )}
@@ -303,7 +213,7 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
           </div>
         </div>
 
-        <div className="p-6 bg-surface-200/50 flex justify-end">
+        <div className="flex justify-end bg-surface-200/50 p-6">
           <Button
             onClick={onClose}
             variant="primary"
@@ -316,3 +226,5 @@ export default function ShareModal({ node, onClose }: ShareModalProps) {
     </div>
   );
 }
+
+export default ShareModal;

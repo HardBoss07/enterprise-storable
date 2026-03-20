@@ -1,7 +1,7 @@
 "use client";
 
 import { FileNode } from "@/types/api";
-import { FileIcon } from "@/components/icons/FileIcon";
+import { FileIcon } from "@/components/ui/FileIcon";
 import { format } from "date-fns";
 import {
   Download,
@@ -13,35 +13,45 @@ import {
   ExternalLink,
   Share2,
 } from "lucide-react";
-import { downloadFileAsBlob } from "@/lib/api/file";
 import { formatBytes } from "@/lib/utils";
 import { IconButton } from "@/components/ui/IconButton";
 import { StatusBadge } from "@/components/shared/StatusBadge";
-import { useToast } from "@/context/ToastContext";
-import { useConfirm } from "@/context/ConfirmContext";
-import { useAuth } from "@/context/AuthContext";
-import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { useFileListItem } from "@/hooks/useFileListItem";
 
 interface FileListItemProps {
+  /** The file or folder node data. */
   node: FileNode;
+  /** Callback function when a folder is clicked. */
   onFolderClick: (folderId: number) => void;
+  /** Callback function when a node is deleted. */
   onDelete: (nodeId: number) => void;
+  /** Callback function when a node is renamed. */
   onRename: (nodeId: number, newName: string) => void;
+  /** Callback function when a node is duplicated. */
   onDuplicate: (nodeId: number) => void;
+  /** Callback function when a node is moved. */
   onMove: (nodeId: number) => void;
+  /** Optional callback function when a node is shared. */
   onShare?: (node: FileNode) => void;
+  /** Optional callback function when a node is toggled as favorite. */
   onToggleFavorite?: (nodeId: number, isFavorite: boolean) => void;
+  /** Optional callback function to jump to the node's location. */
   onJumpToLocation?: (parentId: number | null) => void;
+  /** Whether the node should start in renaming mode. */
   isInitialRenaming?: boolean;
+  /** Optional callback when renaming is cancelled. */
   onCancelRename?: () => void;
 }
 
 /**
- * Renders a single row in the file list.
- * @param node The file or folder data.
+ * Molecule/Organism: Renders a single row in the file list.
+ * Combines FileIcon (Atom), Name (Text), StatusBadge (Molecule), and Action buttons (Atoms).
+ *
+ * @param {FileListItemProps} props - The component props.
+ * @returns {JSX.Element} The rendered FileListItem component.
  */
-export default function FileListItem({
+export function FileListItem({
   node,
   onFolderClick,
   onDelete,
@@ -54,43 +64,31 @@ export default function FileListItem({
   isInitialRenaming,
   onCancelRename,
 }: FileListItemProps) {
-  const { showToast } = useToast();
-  const { confirm } = useConfirm();
-  const { user } = useAuth();
-  const [isRenaming, setIsRenaming] = useState(isInitialRenaming || false);
-  const [newName, setNewName] = useState(node.name);
-  const inputRef = useRef<HTMLInputElement>(null);
+  const {
+    isRenaming,
+    setIsRenaming,
+    newName,
+    setNewName,
+    inputRef,
+    handleDownload,
+    handleDelete,
+    submitRename,
+    handleRenameKeyDown,
+  } = useFileListItem({
+    node,
+    onDelete,
+    onRename,
+    onCancelRename,
+    isInitialRenaming,
+  });
 
-  // Check if current user is owner
-  const isOwner = user?.id === node.ownerId;
-
-  useEffect(() => {
-    if (isInitialRenaming) {
-      setIsRenaming(true);
-    }
-  }, [isInitialRenaming]);
-
-  useEffect(() => {
-    if (isRenaming) {
-      // Strip extension for base name editing if it's a file
-      if (!node.folder) {
-        const lastDotIndex = node.name.lastIndexOf(".");
-        setNewName(
-          lastDotIndex !== -1
-            ? node.name.substring(0, lastDotIndex)
-            : node.name,
-        );
-      } else {
-        setNewName(node.name);
-      }
-      inputRef.current?.focus();
-      inputRef.current?.select();
-    }
-  }, [isRenaming, node.name, node.folder]);
-
-  const handleClick = (e: React.MouseEvent) => {
+  /**
+   * Handles the click event on the file list item.
+   * @param {React.MouseEvent} event - The click event.
+   */
+  const handleClick = (event: React.MouseEvent) => {
     // Prevent click if we're clicking any action button or renaming
-    if ((e.target as HTMLElement).closest(".action-btn") || isRenaming) {
+    if ((event.target as HTMLElement).closest(".action-btn") || isRenaming) {
       return;
     }
 
@@ -99,77 +97,33 @@ export default function FileListItem({
     }
   };
 
-  const handleDownload = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    try {
-      const blob = await downloadFileAsBlob(node.id);
-      const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = node.name;
-      document.body.appendChild(a);
-      a.click();
-      window.URL.revokeObjectURL(url);
-      document.body.removeChild(a);
-      showToast(`Started downloading ${node.name}`, "success");
-    } catch (error) {
-      console.error("Download failed:", error);
-      showToast("Failed to download file. Please try again.", "error");
-    }
-  };
-
-  const handleDelete = async (e: React.MouseEvent) => {
-    e.stopPropagation();
-    const confirmed = await confirm({
-      title: "Delete Item",
-      message: `Are you sure you want to delete ${node.name}? It will be moved to the trash.`,
-      confirmLabel: "Delete",
-      variant: "danger",
-    });
-
-    if (confirmed) {
-      onDelete(node.id);
-    }
-  };
-
-  const handleRenameClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    setIsRenaming(true);
-  };
-
-  const handleDuplicateClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onDuplicate(node.id);
-  };
-
-  const handleMoveClick = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onMove(node.id);
-  };
-
-  const handleToggleFavorite = (e: React.MouseEvent) => {
-    e.stopPropagation();
+  /**
+   * Wrapper for the toggle favorite action to prevent event propagation.
+   * @param {React.MouseEvent} event - The click event.
+   */
+  const handleToggleFavorite = (event: React.MouseEvent) => {
+    event.stopPropagation();
     if (onToggleFavorite) {
       onToggleFavorite(node.id, !node.isFavorite);
     }
   };
 
-  const submitRename = () => {
-    if (newName.trim() && newName.trim() !== node.name) {
-      onRename(node.id, newName.trim());
-    }
-    setIsRenaming(false);
-    onCancelRename?.();
+  /**
+   * Wrapper for download action to prevent event propagation.
+   * @param {React.MouseEvent} event - The click event.
+   */
+  const onDownloadClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    handleDownload();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (e.key === "Enter") {
-      submitRename();
-    } else if (e.key === "Escape") {
-      setIsRenaming(false);
-      setNewName(node.name);
-      onCancelRename?.();
-    }
+  /**
+   * Wrapper for delete action to prevent event propagation.
+   * @param {React.MouseEvent} event - The click event.
+   */
+  const onDeleteClick = (event: React.MouseEvent) => {
+    event.stopPropagation();
+    handleDelete();
   };
 
   // Permission checks
@@ -192,10 +146,10 @@ export default function FileListItem({
 
   return (
     <div
-      className="flex items-center space-x-4 p-2 interactive-surface group"
+      className="group flex items-center space-x-4 p-2 interactive-surface"
       onClick={handleClick}
     >
-      <div className="flex items-center justify-center w-10 h-10 flex-shrink-0">
+      <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
         <FileIcon
           extension={node.name.split(".").pop()}
           mime={node.mime}
@@ -203,26 +157,26 @@ export default function FileListItem({
           size={22}
         />
       </div>
-      <div className="flex-1 min-w-0 flex items-center h-10">
+      <div className="flex h-10 flex-1 items-center min-w-0">
         {isRenaming ? (
           <input
             ref={inputRef}
             type="text"
             value={newName}
             onChange={(e) => setNewName(e.target.value)}
-            onKeyDown={handleKeyDown}
+            onKeyDown={handleRenameKeyDown}
             onBlur={submitRename}
-            className="input-field w-full max-w-sm h-8 py-0 px-2 text-sm border-primary focus:ring-primary/30"
+            className="input-field h-8 w-full max-w-sm border-primary px-2 py-0 text-sm focus:ring-primary/30"
           />
         ) : (
           <div className="flex items-center space-x-2 truncate">
-            <p className="text-text-primary font-bold m-0 truncate leading-none group-hover:text-primary transition-colors">
+            <p className="m-0 truncate font-bold leading-none text-text-primary transition-colors group-hover:text-primary">
               {node.name}
             </p>
             {node.privilege && node.privilege !== "OWNER" && (
               <StatusBadge
                 variant={privilegeColors[node.privilege]}
-                className="text-[10px] py-0 px-1.5 h-4"
+                className="h-4 px-1.5 py-0 text-[10px]"
               >
                 {privilegeLabels[node.privilege]}
               </StatusBadge>
@@ -232,7 +186,7 @@ export default function FileListItem({
       </div>
 
       <div className="flex items-center space-x-2">
-        <div className="hidden group-hover:flex px-2 space-x-1">
+        <div className="hidden space-x-1 px-2 group-hover:flex">
           <IconButton
             icon={Star}
             onClick={handleToggleFavorite}
@@ -253,7 +207,7 @@ export default function FileListItem({
           {!node.folder && (
             <IconButton
               icon={Download}
-              onClick={handleDownload}
+              onClick={onDownloadClick}
               className="action-btn"
               variant="secondary"
               size="sm"
@@ -264,7 +218,10 @@ export default function FileListItem({
           {canEdit && !isRootLevel && (
             <IconButton
               icon={SquarePen}
-              onClick={handleRenameClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                setIsRenaming(true);
+              }}
               className="action-btn"
               variant="ghost"
               size="sm"
@@ -275,7 +232,10 @@ export default function FileListItem({
           {!node.folder && canEdit && (
             <IconButton
               icon={Copy}
-              onClick={handleDuplicateClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                onDuplicate(node.id);
+              }}
               className="action-btn"
               variant="ghost"
               size="sm"
@@ -286,7 +246,10 @@ export default function FileListItem({
           {canEdit && !isRootLevel && (
             <IconButton
               icon={ArrowRightLeft}
-              onClick={handleMoveClick}
+              onClick={(e) => {
+                e.stopPropagation();
+                onMove(node.id);
+              }}
               className="action-btn"
               variant="ghost"
               size="sm"
@@ -311,7 +274,7 @@ export default function FileListItem({
           {canManage && !isRootLevel && (
             <IconButton
               icon={Trash2}
-              onClick={handleDelete}
+              onClick={onDeleteClick}
               className="action-btn text-red-500 hover:text-red-400"
               variant="ghost"
               size="sm"
@@ -335,13 +298,15 @@ export default function FileListItem({
           )}
         </div>
 
-        <div className="w-40 text-text-muted text-sm hidden sm:block">
+        <div className="hidden w-40 text-sm text-text-muted sm:block">
           {format(new Date(node.modifiedAt), "MMM d, yyyy HH:mm")}
         </div>
-        <div className="w-24 text-text-muted text-sm text-right">
+        <div className="w-24 text-right text-sm text-text-muted">
           {!node.folder && node.size !== null ? formatBytes(node.size) : "--"}
         </div>
       </div>
     </div>
   );
 }
+
+export default FileListItem;
