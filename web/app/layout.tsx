@@ -3,7 +3,7 @@ import { Roboto } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Providers } from "./Providers";
-import AppLayout from "@/components/layout/AppLayout";
+import { AppLayout } from "@/components/features/layout/AppLayout";
 
 const robotoSans = Roboto({
   variable: "--font-roboto-sans",

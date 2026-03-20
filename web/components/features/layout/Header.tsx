@@ -3,14 +3,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
-import { User as UserIcon, LogOut, Settings } from "lucide-react";
-import SearchBar from "./SearchBar";
+import { SearchBar } from "@/components/shared/SearchBar";
+import { UserMenu } from "@/components/shared/UserMenu";
 import { usePathname } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 /**
- * Standardized application header with branding, search, and user controls.
+ * Organism: Application header for branding and user actions.
+ * Coordinates branding (Image), search (SearchBar molecule), and user menu (UserMenu molecule).
+ *
+ * @returns {JSX.Element} The rendered Header component.
  */
-export default function Header() {
+export function Header() {
   const { user, logout, isAuthenticated } = useAuth();
   const pathname = usePathname();
 
@@ -75,40 +79,4 @@ export default function Header() {
   );
 }
 
-function UserMenu({ user, onLogout }: { user: any; onLogout: () => void }) {
-  if (!user) {
-    return (
-      <Link
-        href="/login"
-        className="px-4 py-2 text-sm font-bold text-primary hover:bg-primary/10 rounded-lg transition-all border border-primary/20"
-      >
-        Login
-      </Link>
-    );
-  }
-
-  return (
-    <div className="flex items-center space-x-4">
-      <Link
-        href="/settings"
-        className="p-2 text-text-muted hover:text-primary hover:bg-primary/10 rounded-lg transition-all"
-        title="Settings"
-      >
-        <Settings size={20} />
-      </Link>
-      <div className="flex items-center gap-2 px-3 py-1.5 bg-surface-100 border border-surface-300 rounded-xl">
-        <UserIcon size={16} className="text-primary" />
-        <span className="text-sm font-bold text-text-primary">
-          {user.username}
-        </span>
-      </div>
-      <button
-        onClick={onLogout}
-        className="p-2 text-text-muted hover:text-red-500 hover:bg-red-500/10 rounded-lg transition-all"
-        title="Logout"
-      >
-        <LogOut size={20} />
-      </button>
-    </div>
-  );
-}
+export default Header;

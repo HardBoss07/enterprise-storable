@@ -16,12 +16,16 @@ import {
 } from "lucide-react";
 
 /**
- * Renders the sidebar with navigation links.
+ * Organism: Application sidebar for navigation.
+ * Coordinates navigation links and active state based on the current pathname.
+ *
+ * @returns {JSX.Element} The rendered Sidebar component.
  */
-export default function Sidebar() {
+export function Sidebar() {
   const { user } = useAuth();
   const pathname = usePathname();
 
+  // Define the base navigation links available to all users
   const navLinks = [
     { href: "/", label: "My Files", icon: Folder },
     { href: "/recent", label: "Recent", icon: Clock },
@@ -30,6 +34,7 @@ export default function Sidebar() {
     { href: "/trash", label: "Trash", icon: Trash2 },
   ];
 
+  // Add administrative links if the user has the ADMIN role
   if (user?.role === "ADMIN") {
     navLinks.push({ href: "/admin", label: "Admin Panel", icon: Shield });
     navLinks.push({
@@ -39,7 +44,7 @@ export default function Sidebar() {
     });
   }
 
-  // Account should always be the last item
+  // Account settings should always be the final item
   navLinks.push({ href: "/settings", label: "Account", icon: UserCircle });
 
   return (
@@ -77,3 +82,5 @@ export default function Sidebar() {
     </aside>
   );
 }
+
+export default Sidebar;
