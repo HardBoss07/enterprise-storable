@@ -3,14 +3,25 @@
 import React from "react";
 import { cn } from "@/lib/utils";
 
+/**
+ * Props for the Button component.
+ * Extends standard button HTML attributes.
+ */
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** The visual variant of the button. */
   variant?: "primary" | "secondary" | "outline" | "ghost" | "danger" | "accent";
+  /** The size of the button. */
   size?: "sm" | "md" | "lg" | "icon";
+  /** Whether the button is in a loading state. */
   isLoading?: boolean;
 }
 
 /**
- * A reusable button component with variant and size options.
+ * Atom: A reusable button component with various variants and sizes.
+ * Follows the Strict Atomic Design System as a stateless primitive.
+ *
+ * @param {ButtonProps} props - The component props.
+ * @returns {JSX.Element} The rendered Button component.
  */
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   (
@@ -56,3 +67,5 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 );
 
 Button.displayName = "Button";
+
+export default Button;

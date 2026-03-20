@@ -20,7 +20,8 @@ interface FileIconProps extends React.ComponentProps<"svg"> {
  * Standardized File Icon component that renders the correct Lucide icon
  * and color based on file extension, using a centralized configuration.
  *
- * @param props The icon properties including extension, mime, and folder status.
+ * @param {FileIconProps} props - The component props.
+ * @returns {JSX.Element} The rendered icon component.
  */
 export function FileIcon({
   extension,
@@ -60,6 +61,9 @@ export function FileIcon({
 
 /**
  * Simple folder icon component for standalone use.
+ *
+ * @param {React.ComponentProps<"svg">} props - The SVG properties.
+ * @returns {JSX.Element} The rendered folder icon.
  */
 export function FolderIcon(props: React.ComponentProps<"svg">) {
   return <Folder className="text-accent" {...props} />;

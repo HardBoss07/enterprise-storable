@@ -1,69 +1,28 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
-import { Search as SearchIcon, X, Folder as FolderIcon } from "lucide-react";
-import { FileNode } from "@/types/api";
-import { searchFiles } from "@/lib/api/file";
-import { useRouter } from "next/navigation";
+import { Search as SearchIcon, X } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { FileIcon } from "@/components/icons/FileIcon";
+import { FileIcon } from "@/components/ui/FileIcon";
+import { useSearch } from "@/hooks/useSearch";
 
 /**
- * Global search bar with debouncing and dropdown results.
+ * Global search bar molecule with debouncing and dropdown results.
+ * Combines an input, icons, and a results dropdown.
+ *
+ * @returns {JSX.Element} The rendered SearchBar component.
  */
-export default function SearchBar() {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState<FileNode[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
-  const router = useRouter();
-  const searchRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
-
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      setIsOpen(false);
-      return;
-    }
-
-    const timer = setTimeout(async () => {
-      setLoading(true);
-      try {
-        const data = await searchFiles(query);
-        setResults(data.slice(0, 8)); // Show top 8 results
-        setIsOpen(true);
-      } catch (error) {
-        console.error("Search failed:", error);
-      } finally {
-        setLoading(false);
-      }
-    }, 300);
-
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  const handleSelect = (node: FileNode) => {
-    if (node.folder) {
-      router.push(`/?folderId=${node.id}`);
-    } else {
-      router.push(`/?folderId=${node.parentId}`);
-    }
-    setIsOpen(false);
-    setQuery("");
-  };
+export function SearchBar() {
+  const {
+    query,
+    setQuery,
+    results,
+    loading,
+    isOpen,
+    setIsOpen,
+    searchRef,
+    handleSelect,
+    handleClear,
+  } = useSearch();
 
   return (
     <div className="relative group" ref={searchRef}>
@@ -84,7 +43,7 @@ export default function SearchBar() {
       />
       {query && (
         <button
-          onClick={() => setQuery("")}
+          onClick={handleClear}
           className="absolute right-3 top-1/2 -translate-y-1/2 text-text-muted hover:text-white"
         >
           <X size={16} />
@@ -135,3 +94,5 @@ export default function SearchBar() {
     </div>
   );
 }
+
+export default SearchBar;

@@ -4,17 +4,30 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { LucideIcon } from "lucide-react";
 
+/**
+ * Props for the IconButton component.
+ */
 interface IconButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  /** The Lucide icon component to display. */
   icon: LucideIcon;
+  /** The visual variant of the button. */
   variant?: "ghost" | "secondary" | "outline" | "danger";
+  /** The size of the button container. */
   size?: "sm" | "md" | "lg";
+  /** The size of the icon in pixels. */
   iconSize?: number;
+  /** Whether the button is in a loading state. */
   isLoading?: boolean;
+  /** Optional extra props for the Lucide icon. */
   iconProps?: React.SVGProps<SVGSVGElement>;
 }
 
 /**
- * A reusable icon-only button component.
+ * Atom: A reusable icon-only button component.
+ * Follows the Strict Atomic Design System as a stateless primitive.
+ *
+ * @param {IconButtonProps} props - The component props.
+ * @returns {JSX.Element} The rendered IconButton component.
  */
 export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
   (
@@ -61,7 +74,7 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
         <Icon
           size={iconSize}
           {...iconProps}
-          // Only the icon gets the spin
+          // Only the icon gets the spin if loading
           className={cn(isLoading && "animate-spin", iconProps?.className)}
         />
       </button>
@@ -70,3 +83,5 @@ export const IconButton = React.forwardRef<HTMLButtonElement, IconButtonProps>(
 );
 
 IconButton.displayName = "IconButton";
+
+export default IconButton;

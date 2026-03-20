@@ -12,6 +12,9 @@ import { ReactNode } from "react";
  */
 export type StatusBadgeVariant = "info" | "warning" | "success" | "neutral";
 
+/**
+ * Props for the StatusBadge component.
+ */
 export interface StatusBadgeProps {
   /** The content to display in the badge. */
   children: ReactNode;
@@ -23,6 +26,10 @@ export interface StatusBadgeProps {
 
 /**
  * Molecule: A small, styled status indicator used for counts, tags, or warnings.
+ * Combines a background surface (Atom) and text (Atom).
+ *
+ * @param {StatusBadgeProps} props - The component props.
+ * @returns {JSX.Element} The rendered StatusBadge component.
  */
 export function StatusBadge({
   children,
@@ -42,3 +49,5 @@ export function StatusBadge({
     </span>
   );
 }
+
+export default StatusBadge;
