@@ -1,7 +1,9 @@
 package dev.m4tt3o.storable.api.controller;
 
+import dev.m4tt3o.storable.api.mapper.FileApiMapper;
 import dev.m4tt3o.storable.api.request.ShareRequest;
 import dev.m4tt3o.storable.common.dto.AccessPrivilegeDto;
+import dev.m4tt3o.storable.common.dto.FileMetadataDto;
 import dev.m4tt3o.storable.common.dto.UserLookupDto;
 import dev.m4tt3o.storable.core.service.SharingService;
 import java.util.List;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 public class SharingController {
 
     private final SharingService sharingService;
+    private final FileApiMapper fileApiMapper;
 
     @GetMapping("/users")
     public ResponseEntity<List<UserLookupDto>> lookupUsers(
@@ -27,10 +30,15 @@ public class SharingController {
     }
 
     @GetMapping("/shared-with-me")
-    public ResponseEntity<
-        List<dev.m4tt3o.storable.common.dto.FileMetadataDto>
-    > getSharedWithMe(@AuthenticationPrincipal String userId) {
-        return ResponseEntity.ok(sharingService.getSharedWithMe(userId));
+    public ResponseEntity<List<FileMetadataDto>> getSharedWithMe(
+        @AuthenticationPrincipal String userId
+    ) {
+        return ResponseEntity.ok(
+            fileApiMapper.toDtoList(
+                sharingService.getSharedWithMe(userId),
+                userId
+            )
+        );
     }
 
     @GetMapping("/nodes/{nodeId}/privileges")

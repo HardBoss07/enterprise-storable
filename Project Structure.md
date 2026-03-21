@@ -26,6 +26,8 @@ enterprise-storable/
 │   │       │                   │   └── UserController.java
 │   │       │                   ├── exception/
 │   │       │                   │   └── GlobalExceptionHandler.java
+│   │       │                   ├── mapper/
+│   │       │                   │   └── FileApiMapper.java
 │   │       │                   ├── request/
 │   │       │                   │   ├── ChangeEmailRequest.java
 │   │       │                   │   ├── ChangePasswordRequest.java
@@ -57,14 +59,10 @@ enterprise-storable/
 │   │                           │   ├── UserDto.java
 │   │                           │   └── UserLookupDto.java
 │   │                           ├── entity/
-│   │                           │   ├── AccessPrivilege.java
-│   │                           │   ├── FileNode.java
+│   │                           │   ├── PrivilegeLevel.java
 │   │                           │   ├── SystemSetting.java
 │   │                           │   └── UserRole.java
 │   │                           └── repository/
-│   │                               ├── AccessPrivilegeRepository.java
-│   │                               ├── FileNodePersistence.java
-│   │                               ├── FileNodeRepository.java
 │   │                               └── SystemSettingRepository.java
 │   ├── target/
 │   └── pom.xml
@@ -80,12 +78,18 @@ enterprise-storable/
 │   │                           │   ├── CoreSecurityConfig.java
 │   │                           │   └── StorageProperties.java
 │   │                           ├── domain/
+│   │                           │   ├── File.java
+│   │                           │   ├── Folder.java
+│   │                           │   ├── Storable.java
+│   │                           │   ├── TrashItem.java
 │   │                           │   └── User.java
 │   │                           ├── dto/
 │   │                           │   ├── AuthRequest.java
 │   │                           │   ├── AuthResponse.java
 │   │                           │   └── RegisterRequest.java
 │   │                           ├── port/
+│   │                           │   ├── FilePersistencePort.java
+│   │                           │   ├── SharingPersistencePort.java
 │   │                           │   └── UserPersistencePort.java
 │   │                           ├── security/
 │   │                           │   ├── CustomUserDetails.java
@@ -115,15 +119,21 @@ enterprise-storable/
 │   │                   └── storable/
 │   │                       └── data/
 │   │                           ├── adapter/
+│   │                           │   ├── FilePersistenceAdapter.java
+│   │                           │   ├── SharingPersistenceAdapter.java
 │   │                           │   └── UserPersistenceAdapter.java
 │   │                           ├── entity/
+│   │                           │   ├── AccessPrivilegeEntity.java
+│   │                           │   ├── FileEntity.java
 │   │                           │   └── UserEntity.java
 │   │                           ├── mapper/
+│   │                           │   ├── FileMapper.java
 │   │                           │   └── UserMapper.java
 │   │                           ├── repository/
+│   │                           │   ├── AccessPrivilegeRepository.java
+│   │                           │   ├── FileRepository.java
 │   │                           │   └── UserRepository.java
 │   │                           └── service/
-│   │                               └── FileNodePersistenceImpl.java
 │   ├── target/
 │   └── pom.xml
 ├── storage/
