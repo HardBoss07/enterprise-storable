@@ -39,6 +39,7 @@ enterprise-storable/
 │   │       │                   └── StorableApiApplication.java
 │   │       └── resources/
 │   │           └── application.yml
+│   ├── target/
 │   └── pom.xml
 ├── storable-common/
 │   ├── src/
@@ -59,14 +60,13 @@ enterprise-storable/
 │   │                           │   ├── AccessPrivilege.java
 │   │                           │   ├── FileNode.java
 │   │                           │   ├── SystemSetting.java
-│   │                           │   ├── User.java
 │   │                           │   └── UserRole.java
 │   │                           └── repository/
 │   │                               ├── AccessPrivilegeRepository.java
 │   │                               ├── FileNodePersistence.java
 │   │                               ├── FileNodeRepository.java
-│   │                               ├── SystemSettingRepository.java
-│   │                               └── UserRepository.java
+│   │                               └── SystemSettingRepository.java
+│   ├── target/
 │   └── pom.xml
 ├── storable-core/
 │   ├── src/
@@ -79,10 +79,14 @@ enterprise-storable/
 │   │                           ├── config/
 │   │                           │   ├── CoreSecurityConfig.java
 │   │                           │   └── StorageProperties.java
+│   │                           ├── domain/
+│   │                           │   └── User.java
 │   │                           ├── dto/
 │   │                           │   ├── AuthRequest.java
 │   │                           │   ├── AuthResponse.java
 │   │                           │   └── RegisterRequest.java
+│   │                           ├── port/
+│   │                           │   └── UserPersistencePort.java
 │   │                           ├── security/
 │   │                           │   ├── CustomUserDetails.java
 │   │                           │   └── JwtService.java
@@ -100,6 +104,7 @@ enterprise-storable/
 │   │                               ├── StorageService.java
 │   │                               ├── TrashCleanupService.java
 │   │                               └── UserService.java
+│   ├── target/
 │   └── pom.xml
 ├── storable-data/
 │   ├── src/
@@ -109,8 +114,17 @@ enterprise-storable/
 │   │               └── m4tt3o/
 │   │                   └── storable/
 │   │                       └── data/
+│   │                           ├── adapter/
+│   │                           │   └── UserPersistenceAdapter.java
+│   │                           ├── entity/
+│   │                           │   └── UserEntity.java
+│   │                           ├── mapper/
+│   │                           │   └── UserMapper.java
+│   │                           ├── repository/
+│   │                           │   └── UserRepository.java
 │   │                           └── service/
 │   │                               └── FileNodePersistenceImpl.java
+│   ├── target/
 │   └── pom.xml
 ├── storage/
 │   ├── 0c739db5-8341-4e5f-b639-01af13e12dc8

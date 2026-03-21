@@ -8,9 +8,9 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @SpringBootApplication
-@EntityScan("dev.m4tt3o.storable.common.entity")
-@EnableJpaRepositories("dev.m4tt3o.storable.common.repository")
-@ComponentScan("dev.m4tt3o.storable") // Broaden component scan
+@EntityScan("dev.m4tt3o.storable")
+@EnableJpaRepositories("dev.m4tt3o.storable")
+@ComponentScan("dev.m4tt3o.storable")
 @EnableScheduling
 public class StorableApiApplication {
 
