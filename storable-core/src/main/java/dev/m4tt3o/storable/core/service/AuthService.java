@@ -1,13 +1,13 @@
 package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.entity.FileNode;
-import dev.m4tt3o.storable.common.entity.User;
 import dev.m4tt3o.storable.common.entity.UserRole;
 import dev.m4tt3o.storable.common.repository.FileNodeRepository;
-import dev.m4tt3o.storable.common.repository.UserRepository;
+import dev.m4tt3o.storable.core.domain.User;
 import dev.m4tt3o.storable.core.dto.AuthRequest;
 import dev.m4tt3o.storable.core.dto.AuthResponse;
 import dev.m4tt3o.storable.core.dto.RegisterRequest;
+import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import dev.m4tt3o.storable.core.security.JwtService;
 import java.util.Map;
 import java.util.UUID;
@@ -17,84 +17,101 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service for handling user authentication and registration.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
-    private final UserRepository userRepository;
+    private final UserPersistencePort userPersistencePort;
     private final FileNodeRepository fileNodeRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
+    /**
+     * Registers a new user and creates their home directory.
+     */
     @Transactional
     public AuthResponse register(RegisterRequest request) {
         log.info("Registering user: {}", request.username());
 
-        if (userRepository.existsByUsername(request.username())) {
+        validateUserRegistration(request);
+
+        User user = User.builder()
+            .username(request.username())
+            .email(request.email())
+            .password(passwordEncoder.encode(request.password()))
+            .role(UserRole.USER)
+            .build();
+
+        User savedUser = userPersistencePort.save(user);
+        createHomeDirectory(savedUser);
+
+        String token = generateAuthToken(savedUser);
+
+        return new AuthResponse(
+            token,
+            savedUser.username(),
+            savedUser.email(),
+            savedUser.id(),
+            savedUser.role().name()
+        );
+    }
+
+    /**
+     * Authenticates a user and returns an auth response with a JWT.
+     */
+    public AuthResponse login(AuthRequest request) {
+        log.info("Logging in user: {}", request.username());
+
+        User user = userPersistencePort
+            .findByUsername(request.username())
+            .orElseThrow(() ->
+                new RuntimeException("Invalid username or password")
+            );
+
+        if (!passwordEncoder.matches(request.password(), user.password())) {
+            throw new RuntimeException("Invalid username or password");
+        }
+
+        String token = generateAuthToken(user);
+
+        return new AuthResponse(
+            token,
+            user.username(),
+            user.email(),
+            user.id(),
+            user.role().name()
+        );
+    }
+
+    private void validateUserRegistration(RegisterRequest request) {
+        if (userPersistencePort.existsByUsername(request.username())) {
             throw new RuntimeException("Username already exists");
         }
-        if (userRepository.existsByEmail(request.email())) {
+        if (userPersistencePort.existsByEmail(request.email())) {
             throw new RuntimeException("Email already exists");
         }
+    }
 
-        User user = new User();
-        user.setUsername(request.username());
-        user.setEmail(request.email());
-        user.setPassword(passwordEncoder.encode(request.password()));
-        user.setRole(UserRole.USER); // Default role
-
-        User savedUser = userRepository.save(user);
-
-        // Create Home Directory
+    private void createHomeDirectory(User user) {
         FileNode homeDir = new FileNode();
-        homeDir.setName(savedUser.getUsername());
-        homeDir.setOwnerId(savedUser.getId());
+        homeDir.setName(user.username());
+        homeDir.setOwnerId(user.id());
         homeDir.setParentId(1L); // The Root folder
         homeDir.setKind(FileNode.NodeKind.folder);
         homeDir.setMime("directory");
         homeDir.setStorageKey(UUID.randomUUID().toString());
 
         fileNodeRepository.save(homeDir);
-
-        String token = jwtService.generateToken(
-            savedUser.getUsername(),
-            Map.of("role", savedUser.getRole().name(), "id", savedUser.getId())
-        );
-
-        return new AuthResponse(
-            token,
-            savedUser.getUsername(),
-            savedUser.getEmail(),
-            savedUser.getId(),
-            savedUser.getRole().name()
-        );
     }
 
-    public AuthResponse login(AuthRequest request) {
-        log.info("Logging in user: {}", request.username());
-
-        User user = userRepository
-            .findByUsername(request.username())
-            .orElseThrow(() ->
-                new RuntimeException("Invalid username or password")
-            );
-
-        if (!passwordEncoder.matches(request.password(), user.getPassword())) {
-            throw new RuntimeException("Invalid username or password");
-        }
-
-        String token = jwtService.generateToken(
-            user.getUsername(),
-            Map.of("role", user.getRole().name(), "id", user.getId())
-        );
-
-        return new AuthResponse(
-            token,
-            user.getUsername(),
-            user.getEmail(),
-            user.getId(),
-            user.getRole().name()
+    private String generateAuthToken(User user) {
+        return jwtService.generateToken(
+            user.username(),
+            Map.of("role", user.role().name(), "id", user.id())
         );
     }
 }

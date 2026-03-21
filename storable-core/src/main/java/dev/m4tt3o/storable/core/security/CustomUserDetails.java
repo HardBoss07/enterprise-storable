@@ -1,32 +1,38 @@
 package dev.m4tt3o.storable.core.security;
 
-import dev.m4tt3o.storable.common.entity.User;
 import dev.m4tt3o.storable.common.entity.UserRole;
+import dev.m4tt3o.storable.core.domain.User;
 import java.util.Collection;
 import java.util.Collections;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+/**
+ * Custom UserDetails implementation for Spring Security, using the User Domain Model.
+ */
 public record CustomUserDetails(
     String id,
     String username,
     String password,
     UserRole role
 ) implements UserDetails {
-    public static CustomUserDetails fromEntity(User user) {
+    /**
+     * Factory method to create CustomUserDetails from a User Domain Model.
+     */
+    public static CustomUserDetails fromDomain(User user) {
         return new CustomUserDetails(
-            user.getId(),
-            user.getUsername(),
-            user.getPassword(),
-            user.getRole()
+            user.id(),
+            user.username(),
+            user.password(),
+            user.role()
         );
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_" + role)
+            new SimpleGrantedAuthority("ROLE_" + role.name())
         );
     }
 

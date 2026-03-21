@@ -1,7 +1,7 @@
 package dev.m4tt3o.storable.core.service;
 
-import dev.m4tt3o.storable.common.entity.User;
-import dev.m4tt3o.storable.common.repository.UserRepository;
+import dev.m4tt3o.storable.core.domain.User;
+import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -16,15 +16,15 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
+    private final UserPersistencePort userPersistencePort;
     private final PasswordEncoder passwordEncoder;
     private final AdminService adminService;
 
+    private static final String ROOT_USER_ID =
+        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+
     /**
      * Changes a user's password after verifying the current one.
-     * @param userId The UUID of the user.
-     * @param currentPassword The current password to verify.
-     * @param newPassword The new password to set.
      */
     @Transactional
     public void changePassword(
@@ -34,71 +34,82 @@ public class UserService {
     ) {
         log.info("Changing password for user: {}", userId);
 
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        User user = findUserById(userId);
+        validateCurrentPassword(user, currentPassword);
 
-        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
-            throw new RuntimeException("Incorrect current password");
-        }
+        User updatedUser = User.builder()
+            .id(user.id())
+            .username(user.username())
+            .password(passwordEncoder.encode(newPassword))
+            .email(user.email())
+            .role(user.role())
+            .build();
 
-        user.setPassword(passwordEncoder.encode(newPassword));
-        userRepository.save(user);
+        userPersistencePort.save(updatedUser);
         log.info("Password changed successfully for user: {}", userId);
     }
 
     /**
      * Updates a user's email address.
-     * @param userId The UUID of the user.
-     * @param newEmail The new email to set.
      */
     @Transactional
     public void changeEmail(String userId, String newEmail) {
         log.info("Changing email for user: {} to {}", userId, newEmail);
 
-        if (userRepository.existsByEmail(newEmail)) {
-            throw new RuntimeException("Email already exists");
-        }
+        validateEmailAvailability(newEmail);
+        User user = findUserById(userId);
 
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+        User updatedUser = User.builder()
+            .id(user.id())
+            .username(user.username())
+            .password(user.password())
+            .email(newEmail)
+            .role(user.role())
+            .build();
 
-        user.setEmail(newEmail);
-        userRepository.save(user);
+        userPersistencePort.save(updatedUser);
         log.info("Email changed successfully for user: {}", userId);
     }
 
     /**
      * Deletes a user's account after confirming their password.
-     * @param userId The UUID of the user.
-     * @param passwordConfirmation The password to confirm.
      */
     @Transactional
     public void deleteAccount(String userId, String passwordConfirmation) {
         log.info("Processing account deletion request for user: {}", userId);
 
-        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) {
+        validateDeletionTarget(userId);
+        User user = findUserById(userId);
+        validateCurrentPassword(user, passwordConfirmation);
+
+        adminService.deleteUser(userId);
+        log.info("Account for user {} has been permanently deleted.", userId);
+    }
+
+    private User findUserById(String userId) {
+        return userPersistencePort
+            .findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+    }
+
+    private void validateCurrentPassword(User user, String password) {
+        if (!passwordEncoder.matches(password, user.password())) {
+            throw new RuntimeException("Incorrect current password");
+        }
+    }
+
+    private void validateEmailAvailability(String email) {
+        if (userPersistencePort.existsByEmail(email)) {
+            throw new RuntimeException("Email already exists");
+        }
+    }
+
+    private void validateDeletionTarget(String userId) {
+        if (ROOT_USER_ID.equals(userId)) {
             log.warn("Attempted to delete the root admin user!");
             throw new RuntimeException(
                 "The root admin user cannot be deleted."
             );
         }
-
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
-
-        if (
-            !passwordEncoder.matches(passwordConfirmation, user.getPassword())
-        ) {
-            throw new RuntimeException(
-                "Incorrect password for account deletion confirmation"
-            );
-        }
-
-        // Delegate deletion logic to AdminService (it already handles full cleanup)
-        adminService.deleteUser(userId);
-        log.info("Account for user {} has been permanently deleted.", userId);
     }
 }

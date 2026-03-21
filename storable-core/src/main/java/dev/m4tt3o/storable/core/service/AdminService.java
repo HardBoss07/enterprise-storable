@@ -2,92 +2,96 @@ package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.dto.UserDto;
 import dev.m4tt3o.storable.common.entity.FileNode;
-import dev.m4tt3o.storable.common.entity.User;
 import dev.m4tt3o.storable.common.entity.UserRole;
 import dev.m4tt3o.storable.common.repository.FileNodeRepository;
-import dev.m4tt3o.storable.common.repository.UserRepository;
+import dev.m4tt3o.storable.core.domain.User;
+import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Service for administrative tasks like user management.
+ */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class AdminService {
 
-    private final UserRepository userRepository;
+    private final UserPersistencePort userPersistencePort;
     private final FileNodeRepository fileNodeRepository;
     private final StorageService storageService;
 
+    private static final String ROOT_USER_ID =
+        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+
     /**
      * Retrieves all users in the system.
-     * @return List of UserDto.
      */
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         log.info("Fetching all users for administration.");
-        return userRepository
-            .findAll()
+        return userPersistencePort
+            .searchUsers("") // Assuming empty query returns all for now or add findAll to port
             .stream()
-            .map(u ->
-                new UserDto(
-                    u.getId(),
-                    u.getUsername(),
-                    u.getEmail(),
-                    u.getRole()
-                )
-            )
-            .collect(Collectors.toList());
+            .map(this::toUserDto)
+            .toList();
     }
 
     /**
      * Updates the role of a user.
-     * @param userId The UUID of the user.
-     * @param newRole The new role to assign.
      */
     @Transactional
     public void updateUserRole(String userId, UserRole newRole) {
         log.info("Updating role for user {} to {}", userId, newRole);
 
-        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) {
-            log.warn("Attempted to change the role of the root admin user!");
-            throw new RuntimeException(
-                "The root admin user's role cannot be changed."
-            );
-        }
+        validateRoleUpdateTarget(userId);
+        User user = findUserById(userId);
 
-        User user = userRepository
-            .findById(userId)
-            .orElseThrow(() ->
-                new RuntimeException("User not found: " + userId)
-            );
+        User updatedUser = User.builder()
+            .id(user.id())
+            .username(user.username())
+            .password(user.password())
+            .email(user.email())
+            .role(newRole)
+            .build();
 
-        user.setRole(newRole);
-        userRepository.save(user);
+        userPersistencePort.save(updatedUser);
     }
 
     /**
-     * Deletes a user and all their associated data (files, folders, DB records).
-     * @param userId The UUID of the user to delete.
+     * Deletes a user and all their associated data.
      */
     @Transactional
     public void deleteUser(String userId) {
         log.info("Commencing deletion for user: {}", userId);
 
-        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(userId)) {
-            log.warn("Attempted to delete the root admin user!");
-            throw new RuntimeException(
-                "The root admin user cannot be deleted."
+        validateDeletionTarget(userId);
+
+        // 1. Fetch and clean physical files
+        cleanUserPhysicalFiles(userId);
+
+        // 2. Delete user entry (CASCADE handles FileNodes in DB)
+        userPersistencePort.deleteById(userId);
+
+        log.info(
+            "User {} and all associated data deleted successfully.",
+            userId
+        );
+    }
+
+    private User findUserById(String userId) {
+        return userPersistencePort
+            .findById(userId)
+            .orElseThrow(() ->
+                new RuntimeException("User not found: " + userId)
             );
-        }
+    }
 
-        // 1. Fetch all nodes owned by the user (needed for file cleanup)
+    private void cleanUserPhysicalFiles(String userId) {
         List<FileNode> userNodes = fileNodeRepository.findByOwnerId(userId);
-
-        // 2. Delete physical files from disk for all 'file' kind nodes
         userNodes
             .stream()
             .filter(
@@ -95,26 +99,45 @@ public class AdminService {
                     node.getKind() == FileNode.NodeKind.file &&
                     node.getStorageKey() != null
             )
-            .forEach(node -> {
-                try {
-                    storageService.delete(node.getStorageKey());
-                } catch (Exception e) {
-                    log.error(
-                        "Failed to delete physical file for storageKey {}: {}",
-                        node.getStorageKey(),
-                        e.getMessage()
-                    );
-                }
-            });
+            .forEach(this::deletePhysicalFile);
+    }
 
-        // 3. Delete user entry from DB
-        // NOTE: The database schema has ON DELETE CASCADE for owner_id and parent_id,
-        // so deleting the user will automatically remove all their nodes in the correct order.
-        userRepository.deleteById(userId);
+    private void deletePhysicalFile(FileNode node) {
+        try {
+            storageService.delete(node.getStorageKey());
+        } catch (Exception e) {
+            log.error(
+                "Failed to delete physical file for storageKey {}: {}",
+                node.getStorageKey(),
+                e.getMessage()
+            );
+        }
+    }
 
-        log.info(
-            "User {} and all associated data deleted successfully.",
-            userId
+    private void validateRoleUpdateTarget(String userId) {
+        if (ROOT_USER_ID.equals(userId)) {
+            log.warn("Attempted to change the role of the root admin user!");
+            throw new RuntimeException(
+                "The root admin user's role cannot be changed."
+            );
+        }
+    }
+
+    private void validateDeletionTarget(String userId) {
+        if (ROOT_USER_ID.equals(userId)) {
+            log.warn("Attempted to delete the root admin user!");
+            throw new RuntimeException(
+                "The root admin user cannot be deleted."
+            );
+        }
+    }
+
+    private UserDto toUserDto(User user) {
+        return new UserDto(
+            user.id(),
+            user.username(),
+            user.email(),
+            user.role()
         );
     }
 }
