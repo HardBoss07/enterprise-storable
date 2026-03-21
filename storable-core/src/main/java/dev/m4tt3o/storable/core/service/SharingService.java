@@ -2,7 +2,7 @@ package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.dto.AccessPrivilegeDto;
 import dev.m4tt3o.storable.common.dto.UserLookupDto;
-import dev.m4tt3o.storable.common.entity.AccessPrivilege.PrivilegeLevel;
+import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
 import java.util.List;
 
 /**
@@ -35,7 +35,7 @@ public interface SharingService {
     List<AccessPrivilegeDto> getPrivileges(Long nodeId, String requesterId);
 
     /** Get all nodes shared with a specific user. */
-    List<dev.m4tt3o.storable.common.dto.FileMetadataDto> getSharedWithMe(
+    List<dev.m4tt3o.storable.core.domain.Storable> getSharedWithMe(
         String userId
     );
 

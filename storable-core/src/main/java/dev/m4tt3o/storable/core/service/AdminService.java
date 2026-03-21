@@ -1,10 +1,11 @@
 package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.common.dto.UserDto;
-import dev.m4tt3o.storable.common.entity.FileNode;
 import dev.m4tt3o.storable.common.entity.UserRole;
-import dev.m4tt3o.storable.common.repository.FileNodeRepository;
+import dev.m4tt3o.storable.core.domain.File;
+import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.User;
+import dev.m4tt3o.storable.core.port.FilePersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
 
     private final UserPersistencePort userPersistencePort;
-    private final FileNodeRepository fileNodeRepository;
+    private final FilePersistencePort filePersistencePort;
     private final StorageService storageService;
 
     private static final String ROOT_USER_ID =
@@ -34,7 +35,7 @@ public class AdminService {
     public List<UserDto> getAllUsers() {
         log.info("Fetching all users for administration.");
         return userPersistencePort
-            .searchUsers("") // Assuming empty query returns all for now or add findAll to port
+            .searchUsers("")
             .stream()
             .map(this::toUserDto)
             .toList();
@@ -73,7 +74,7 @@ public class AdminService {
         // 1. Fetch and clean physical files
         cleanUserPhysicalFiles(userId);
 
-        // 2. Delete user entry (CASCADE handles FileNodes in DB)
+        // 2. Delete user entry
         userPersistencePort.deleteById(userId);
 
         log.info(
@@ -91,24 +92,21 @@ public class AdminService {
     }
 
     private void cleanUserPhysicalFiles(String userId) {
-        List<FileNode> userNodes = fileNodeRepository.findByOwnerId(userId);
+        List<Storable> userNodes = filePersistencePort.findByOwnerId(userId);
         userNodes
             .stream()
-            .filter(
-                node ->
-                    node.getKind() == FileNode.NodeKind.file &&
-                    node.getStorageKey() != null
-            )
+            .filter(node -> node instanceof File f && f.storageKey() != null)
+            .map(node -> (File) node)
             .forEach(this::deletePhysicalFile);
     }
 
-    private void deletePhysicalFile(FileNode node) {
+    private void deletePhysicalFile(File file) {
         try {
-            storageService.delete(node.getStorageKey());
+            storageService.delete(file.storageKey());
         } catch (Exception e) {
             log.error(
                 "Failed to delete physical file for storageKey {}: {}",
-                node.getStorageKey(),
+                file.storageKey(),
                 e.getMessage()
             );
         }

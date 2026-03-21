@@ -1,10 +1,12 @@
 package dev.m4tt3o.storable.core.service;
 
-import dev.m4tt3o.storable.common.dto.FileMetadataDto;
-import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
-import dev.m4tt3o.storable.common.entity.AccessPrivilege.PrivilegeLevel;
-import dev.m4tt3o.storable.common.repository.FileNodePersistence;
+import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
+import dev.m4tt3o.storable.core.domain.File;
+import dev.m4tt3o.storable.core.domain.Folder;
+import dev.m4tt3o.storable.core.domain.Storable;
+import dev.m4tt3o.storable.core.domain.TrashItem;
 import dev.m4tt3o.storable.core.domain.User;
+import dev.m4tt3o.storable.core.port.FilePersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -14,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -29,128 +30,100 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class FileServiceImpl implements FileService {
 
-    private final FileNodePersistence persistence;
+    private final FilePersistencePort filePersistencePort;
     private final StorageService storageService;
     private final ConfigService configService;
     private final SharingService sharingService;
     private final UserPersistencePort userPersistencePort;
 
+    private static final String ADMIN_ID =
+        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+    private static final Long ROOT_ID = 1L;
+
     @Override
-    public List<FileMetadataDto> getChildren(Long nodeId, String ownerId) {
+    public List<Storable> getChildren(Long nodeId, String ownerId) {
         log.info(
             "Retrieving children for node ID: {} and owner: {}",
             nodeId,
             ownerId
         );
-        Long targetId = (nodeId == null || nodeId == 0) ? 1L : nodeId;
+        Long targetId = resolveTargetId(nodeId);
 
-        if (
-            !sharingService.hasPermission(
-                targetId,
-                ownerId,
-                PrivilegeLevel.VIEW
-            )
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to view this folder."
-            );
-        }
+        validatePermission(
+            targetId,
+            ownerId,
+            PrivilegeLevel.VIEW,
+            "Access denied: You don't have permission to view this folder."
+        );
 
-        return enrichDtos(persistence.findChildrenGlobal(targetId), ownerId);
+        return filePersistencePort.findChildrenGlobal(targetId);
     }
 
     @Override
-    public FileMetadataDto getMetadata(Long nodeId, String ownerId) {
+    public Storable getMetadata(Long nodeId, String ownerId) {
         log.info(
             "Retrieving metadata for node ID: {} and owner: {}",
             nodeId,
             ownerId
         );
-
         if (
             !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.VIEW)
         ) {
             return null;
         }
-
-        FileMetadataDto dto = persistence
-            .findByIds(List.of(nodeId))
-            .stream()
-            .findFirst()
-            .orElse(null);
-        return enrichDto(dto, ownerId);
+        return filePersistencePort.findById(nodeId).orElse(null);
     }
 
     @Override
     public long getTotalSize(String ownerId) {
         log.info("Calculating total size for owner: {}", ownerId);
-        return persistence.sumSizeByOwnerId(ownerId);
+        return filePersistencePort.sumSizeByOwnerId(ownerId);
     }
 
     @Override
     @Transactional
-    public FileMetadataDto createFolder(
-        String name,
-        Long parentId,
-        String ownerId
-    ) {
+    public Folder createFolder(String name, Long parentId, String ownerId) {
         log.info("Creating folder: {} in parent ID: {}", name, parentId);
-        String storageKey = UUID.randomUUID().toString();
-        Long targetParentId = (parentId == null || parentId == 0)
-            ? 1L
-            : parentId;
+        Long targetParentId = resolveTargetId(parentId);
 
-        if (
-            !sharingService.hasPermission(
-                targetParentId,
-                ownerId,
-                PrivilegeLevel.EDIT
-            )
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to create folders here."
-            );
-        }
-
-        if (persistence.existsByNameAndParentGlobal(name, targetParentId)) {
-            throw new RuntimeException(
-                "A file or folder with this name already exists."
-            );
-        }
-
-        return persistence.saveFolder(
-            name,
+        validatePermission(
             targetParentId,
             ownerId,
-            storageKey
+            PrivilegeLevel.EDIT,
+            "Access denied: You don't have permission to create folders here."
         );
+        validateNameAvailability(name, targetParentId);
+
+        Folder folder = Folder.builder()
+            .name(name)
+            .parentId(targetParentId)
+            .ownerId(ownerId)
+            .build();
+
+        return filePersistencePort.saveFolder(folder);
     }
 
     @Override
     @Transactional
-    public FileMetadataDto createFolderRecursive(String path, String ownerId) {
+    public Folder createFolderRecursive(String path, String ownerId) {
         log.info(
             "Creating recursive folders for path: {} and owner: {}",
             path,
             ownerId
         );
-        if (path == null || path.isBlank()) {
-            return null;
-        }
+        if (path == null || path.isBlank()) return null;
 
         String[] parts = path.split("/");
         Long currentParentId = null;
-        FileMetadataDto lastFolder = null;
+        Folder lastFolder = null;
 
         for (String part : parts) {
             if (part.isBlank()) continue;
-
-            Optional<FileMetadataDto> existing = persistence.findFolder(
-                ownerId,
+            Optional<Folder> existing = filePersistencePort.findFolder(
+                part,
                 currentParentId,
-                part
+                ownerId
             );
-
             if (existing.isPresent()) {
                 lastFolder = existing.get();
                 currentParentId = lastFolder.id();
@@ -159,13 +132,12 @@ public class FileServiceImpl implements FileService {
                 currentParentId = lastFolder.id();
             }
         }
-
         return lastFolder;
     }
 
     @Override
     @Transactional
-    public FileMetadataDto uploadFile(
+    public File uploadFile(
         InputStream inputStream,
         String name,
         String mime,
@@ -174,39 +146,29 @@ public class FileServiceImpl implements FileService {
         String ownerId
     ) {
         log.info("Uploading file: {} for owner: {}", name, ownerId);
-        Long targetParentId = (parentId == null || parentId == 0)
-            ? 1L
-            : parentId;
+        Long targetParentId = resolveTargetId(parentId);
 
-        if (
-            !sharingService.hasPermission(
-                targetParentId,
-                ownerId,
-                PrivilegeLevel.EDIT
-            )
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to upload files here."
-            );
-        }
-
-        if (persistence.existsByNameAndParentGlobal(name, targetParentId)) {
-            throw new RuntimeException(
-                "A file or folder with this name already exists."
-            );
-        }
+        validatePermission(
+            targetParentId,
+            ownerId,
+            PrivilegeLevel.EDIT,
+            "Access denied: You don't have permission to upload files here."
+        );
+        validateNameAvailability(name, targetParentId);
 
         String storageKey = UUID.randomUUID().toString();
         storageService.store(inputStream, storageKey);
 
-        return persistence.saveFile(
-            name,
-            targetParentId,
-            ownerId,
-            storageKey,
-            mime,
-            size
-        );
+        File file = File.builder()
+            .name(name)
+            .parentId(targetParentId)
+            .ownerId(ownerId)
+            .storageKey(storageKey)
+            .mime(mime)
+            .size(size)
+            .build();
+
+        return filePersistencePort.saveFile(file);
     }
 
     @Override
@@ -216,97 +178,72 @@ public class FileServiceImpl implements FileService {
             nodeId,
             ownerId
         );
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.VIEW,
+            "Access denied: You don't have permission to download this file."
+        );
 
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.VIEW)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to download this file."
-            );
-        }
-
-        FileMetadataDto metadata = persistence
-            .findByIds(List.of(nodeId))
-            .stream()
-            .findFirst()
+        Storable storable = filePersistencePort
+            .findById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("File not found: " + nodeId)
             );
 
-        if (!metadata.folder()) {
-            return storageService.load(metadata.storageKey());
-        } else {
-            throw new RuntimeException("Cannot download a folder: " + nodeId);
+        if (storable instanceof File file) {
+            return storageService.load(file.storageKey());
         }
+        throw new RuntimeException("Cannot download a folder: " + nodeId);
     }
 
     @Override
-    public FileMetadataDto getHomeNode(String ownerId, String username) {
+    public Folder getHomeNode(String ownerId, String username) {
         log.info(
             "Retrieving home node for owner: {} and username: {}",
             ownerId,
             username
         );
-        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)) {
-            FileMetadataDto root = persistence
-                .findByIdAndOwner(1L, ownerId)
-                .orElseThrow();
-            return enrichDto(root, ownerId);
+        if (ADMIN_ID.equals(ownerId)) {
+            return (Folder) filePersistencePort.findById(ROOT_ID).orElseThrow();
         }
 
-        String effectiveUsername = (username != null)
-            ? username
-            : userPersistencePort
-                  .findById(ownerId)
-                  .map(User::username)
-                  .orElseThrow(() ->
-                      new RuntimeException("User not found: " + ownerId)
-                  );
-
-        FileMetadataDto home = persistence
-            .findByNameParentAndOwner(effectiveUsername, 1L, ownerId)
+        String effectiveUsername = resolveUsername(ownerId, username);
+        return filePersistencePort
+            .findFolder(effectiveUsername, ROOT_ID, ownerId)
             .orElseThrow(() ->
                 new RuntimeException(
                     "Home folder not found for user: " + effectiveUsername
                 )
             );
-
-        return enrichDto(home, ownerId);
     }
 
     @Override
-    public List<FileMetadataDto> getPath(
+    public List<Storable> getPath(
         Long nodeId,
         String ownerId,
         String username
     ) {
         log.info("Retrieving path for node: {} and user: {}", nodeId, username);
-        List<FileMetadataDto> pathArr = new ArrayList<>();
-        Long tempId = (nodeId == null || nodeId == 0) ? 1L : nodeId;
+        List<Storable> pathArr = new ArrayList<>();
+        Long tempId = resolveTargetId(nodeId);
 
         while (tempId != null) {
-            final Long currentId = tempId;
             if (
                 !sharingService.hasPermission(
-                    currentId,
+                    tempId,
                     ownerId,
                     PrivilegeLevel.VIEW
                 )
-            ) {
-                break;
-            }
+            ) break;
 
-            FileMetadataDto node = persistence
-                .findByIds(List.of(currentId))
-                .stream()
-                .findFirst()
+            final Long currentId = tempId;
+            Storable node = filePersistencePort
+                .findById(currentId)
                 .orElseGet(() ->
-                    currentId == 1L
-                        ? persistence
-                              .findByIdAndOwner(
-                                  1L,
-                                  "f43c0bcf-11e4-4629-b072-321ccd04e72a"
-                              )
+                    currentId.equals(ROOT_ID)
+                        ? filePersistencePort
+                              .findByIdAndOwner(ROOT_ID, ADMIN_ID)
                               .orElse(null)
                         : null
                 );
@@ -319,99 +256,63 @@ public class FileServiceImpl implements FileService {
         return truncatePathForUser(pathArr, ownerId, username);
     }
 
-    private List<FileMetadataDto> truncatePathForUser(
-        List<FileMetadataDto> pathArr,
-        String ownerId,
-        String username
-    ) {
-        if ("f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)) {
-            return enrichDtos(pathArr, ownerId);
-        }
-
-        String effectiveUsername = (username != null)
-            ? username
-            : userPersistencePort
-                  .findById(ownerId)
-                  .map(User::username)
-                  .orElse(null);
-
-        if (effectiveUsername == null) {
-            return enrichDtos(pathArr, ownerId);
-        }
-
-        int homeIndex = -1;
-        for (int i = 0; i < pathArr.size(); i++) {
-            FileMetadataDto node = pathArr.get(i);
-            if (
-                effectiveUsername.equals(node.name()) &&
-                node.parentId() != null &&
-                node.parentId() == 1L
-            ) {
-                homeIndex = i;
-                break;
-            }
-        }
-
-        List<FileMetadataDto> finalPath = (homeIndex != -1)
-            ? pathArr.subList(homeIndex + 1, pathArr.size())
-            : pathArr;
-        return enrichDtos(finalPath, ownerId);
-    }
-
     @Override
     @Transactional
     public void softDelete(Long nodeId, String ownerId) {
         log.info("Soft deleting node: {} for owner: {}", nodeId, ownerId);
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.OWNER)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to delete this node."
-            );
-        }
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.OWNER,
+            "Access denied: You don't have permission to delete this node."
+        );
 
-        FileMetadataDto node = persistence
-            .findByIds(List.of(nodeId))
-            .stream()
-            .findFirst()
+        Storable node = filePersistencePort
+            .findById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
 
-        if (node.parentId() != null && node.parentId() == 1L) {
+        if (ROOT_ID.equals(node.parentId())) {
             throw new RuntimeException(
                 "Access denied: Cannot delete a root-level directory."
             );
         }
 
-        persistence.softDelete(nodeId, ownerId);
+        filePersistencePort.softDelete(nodeId, ownerId);
     }
 
     @Override
     @Transactional
     public void restore(Long nodeId, String ownerId) {
         log.info("Restoring node: {} for owner: {}", nodeId, ownerId);
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.OWNER)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to restore this node."
-            );
-        }
-        persistence.restore(nodeId, ownerId);
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.OWNER,
+            "Access denied: You don't have permission to restore this node."
+        );
+        filePersistencePort.restore(nodeId, ownerId);
     }
 
     @Override
-    public List<TrashMetadataDto> getTrash(String ownerId) {
+    public List<TrashItem> getTrash(String ownerId) {
         log.info("Retrieving trash for owner: {}", ownerId);
-        return enrichTrashDtos(persistence.findTrash(ownerId), ownerId);
+        return filePersistencePort
+            .findTrash(ownerId)
+            .stream()
+            .map(this::toTrashItem)
+            .toList();
     }
 
     @Override
-    public List<TrashMetadataDto> getAllTrash() {
+    public List<TrashItem> getAllTrash() {
         log.info("Retrieving all trash for ADMIN");
-        String adminId = "f43c0bcf-11e4-4629-b072-321ccd04e72a";
-        return enrichTrashDtos(persistence.findAllTrash(), adminId);
+        return filePersistencePort
+            .findAllTrash()
+            .stream()
+            .map(this::toTrashItem)
+            .toList();
     }
 
     @Override
@@ -422,21 +323,20 @@ public class FileServiceImpl implements FileService {
             nodeId,
             ownerId
         );
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.OWNER)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to permanently delete this node."
-            );
-        }
-        persistence.permanentlyDelete(nodeId, ownerId);
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.OWNER,
+            "Access denied: You don't have permission to permanently delete this node."
+        );
+        filePersistencePort.deleteById(nodeId, ownerId);
     }
 
     @Override
     @Transactional
     public void emptyTrash(String ownerId) {
         log.info("Emptying trash for owner: {}", ownerId);
-        persistence.emptyTrash(ownerId);
+        filePersistencePort.emptyTrash(ownerId);
     }
 
     @Override
@@ -446,64 +346,235 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public FileMetadataDto rename(Long nodeId, String newName, String ownerId) {
+    public Storable rename(Long nodeId, String newName, String ownerId) {
         log.info(
             "Renaming node: {} to: {} for owner: {}",
             nodeId,
             newName,
             ownerId
         );
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.EDIT,
+            "Access denied: You don't have permission to rename this node."
+        );
 
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.EDIT)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to rename this node."
-            );
-        }
-
-        FileMetadataDto node = persistence
-            .findByIds(List.of(nodeId))
-            .stream()
-            .findFirst()
+        Storable node = filePersistencePort
+            .findById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
 
-        if (node.parentId() != null && node.parentId() == 1L) {
+        if (ROOT_ID.equals(node.parentId())) {
             throw new RuntimeException(
                 "Access denied: Cannot rename root-level directories."
             );
         }
 
         String finalName = validateAndResolveNewName(node, newName);
+        validateNameAvailability(finalName, node.parentId());
 
-        if (
-            persistence.existsByNameAndParentGlobal(finalName, node.parentId())
-        ) {
+        Storable renamed = switch (node) {
+            case File f -> filePersistencePort.saveFile(f.withName(finalName));
+            case Folder fol -> filePersistencePort.saveFolder(
+                fol.withName(finalName)
+            );
+        };
+        return renamed;
+    }
+
+    @Override
+    @Transactional
+    public File duplicate(Long nodeId, String newName, String ownerId) {
+        log.info(
+            "Duplicating node: {} with new name: {} for owner: {}",
+            nodeId,
+            newName,
+            ownerId
+        );
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.VIEW,
+            "Access denied: You don't have permission to duplicate this node."
+        );
+
+        Storable original = filePersistencePort
+            .findById(nodeId)
+            .orElseThrow(() ->
+                new RuntimeException("Node not found: " + nodeId)
+            );
+
+        if (original instanceof Folder) {
             throw new RuntimeException(
-                "A file or folder with this name already exists in the destination."
+                "Duplicating folders is not supported yet."
             );
         }
 
-        FileMetadataDto renamed = persistence.rename(
-            nodeId,
-            finalName,
-            node.ownerId()
-        );
-        return enrichDto(renamed, ownerId);
+        File originalFile = (File) original;
+        String finalName = resolveDuplicateName(originalFile, newName);
+        String newStorageKey = UUID.randomUUID().toString();
+        storageService.copy(originalFile.storageKey(), newStorageKey);
+
+        File newFile = File.builder()
+            .name(finalName)
+            .parentId(originalFile.parentId())
+            .ownerId(ownerId)
+            .storageKey(newStorageKey)
+            .mime(originalFile.mime())
+            .size(originalFile.size())
+            .build();
+
+        return filePersistencePort.saveFile(newFile);
     }
 
-    private String validateAndResolveNewName(
-        FileMetadataDto node,
-        String newName
+    @Override
+    @Transactional
+    public Storable move(Long nodeId, Long targetParentId, String ownerId) {
+        log.info(
+            "Moving node: {} to: {} for owner: {}",
+            nodeId,
+            targetParentId,
+            ownerId
+        );
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.EDIT,
+            "Access denied: You don't have permission to move this node."
+        );
+        validatePermission(
+            targetParentId,
+            ownerId,
+            PrivilegeLevel.EDIT,
+            "Access denied: You don't have permission to move items into the target folder."
+        );
+
+        Storable node = filePersistencePort
+            .findById(nodeId)
+            .orElseThrow(() ->
+                new RuntimeException("Node not found: " + nodeId)
+            );
+
+        if (ROOT_ID.equals(node.parentId())) {
+            throw new RuntimeException(
+                "Access denied: Cannot move root-level directories."
+            );
+        }
+
+        if (node instanceof Folder && isSubfolder(nodeId, targetParentId)) {
+            throw new RuntimeException(
+                "Cannot move a folder into its own subfolder."
+            );
+        }
+
+        if (nodeId.equals(targetParentId)) {
+            throw new RuntimeException("Cannot move a node to itself.");
+        }
+
+        Storable moved = switch (node) {
+            case File f -> filePersistencePort.saveFile(
+                f.withParentId(targetParentId)
+            );
+            case Folder fol -> filePersistencePort.saveFolder(
+                fol.withParentId(targetParentId)
+            );
+        };
+        return moved;
+    }
+
+    @Override
+    public List<Storable> search(String query, String kind, String ownerId) {
+        log.info(
+            "Searching for nodes with query: {} and kind: {} for owner: {}",
+            query,
+            kind,
+            ownerId
+        );
+        return ADMIN_ID.equals(ownerId)
+            ? filePersistencePort.searchGlobal(query, kind)
+            : filePersistencePort.search(query, kind, ownerId);
+    }
+
+    @Override
+    public List<File> getRecentFiles(String ownerId) {
+        log.info("Retrieving recent files for owner: {}", ownerId);
+        return filePersistencePort.findRecentFiles(ownerId);
+    }
+
+    @Override
+    public List<Storable> getFavorites(String ownerId) {
+        log.info("Retrieving favorites for owner: {}", ownerId);
+        // Assuming findFavorites exists in port
+        return List.of(); // TODO: Implement in Port
+    }
+
+    @Override
+    @Transactional
+    public Storable toggleFavorite(
+        Long nodeId,
+        boolean isFavorite,
+        String ownerId
     ) {
+        log.info(
+            "Toggling favorite for node: {} to: {} for owner: {}",
+            nodeId,
+            isFavorite,
+            ownerId
+        );
+        validatePermission(
+            nodeId,
+            ownerId,
+            PrivilegeLevel.VIEW,
+            "Access denied: You don't have permission to favorite this node."
+        );
+
+        return filePersistencePort.toggleFavorite(nodeId, isFavorite, ownerId);
+    }
+
+    // Helper Methods (Atomic & Small)
+
+    private Long resolveTargetId(Long nodeId) {
+        return (nodeId == null || nodeId == 0) ? ROOT_ID : nodeId;
+    }
+
+    private void validatePermission(
+        Long nodeId,
+        String userId,
+        PrivilegeLevel level,
+        String errorMessage
+    ) {
+        if (!sharingService.hasPermission(nodeId, userId, level)) {
+            throw new RuntimeException(errorMessage);
+        }
+    }
+
+    private void validateNameAvailability(String name, Long parentId) {
+        if (filePersistencePort.existsByNameAndParentGlobal(name, parentId)) {
+            throw new RuntimeException(
+                "A file or folder with this name already exists."
+            );
+        }
+    }
+
+    private String resolveUsername(String ownerId, String username) {
+        if (username != null) return username;
+        return userPersistencePort
+            .findById(ownerId)
+            .map(User::username)
+            .orElseThrow(() ->
+                new RuntimeException("User not found: " + ownerId)
+            );
+    }
+
+    private String validateAndResolveNewName(Storable node, String newName) {
         if (newName.matches(".*[\\\\/:*?\"<>|].*")) {
             throw new RuntimeException("Filename contains invalid characters.");
         }
 
-        if (!node.folder()) {
-            String originalName = node.name();
+        if (node instanceof File file) {
+            String originalName = file.name();
             int lastDotIndex = originalName.lastIndexOf('.');
             if (lastDotIndex != -1) {
                 String extension = originalName.substring(lastDotIndex);
@@ -517,73 +588,10 @@ public class FileServiceImpl implements FileService {
         return newName;
     }
 
-    @Override
-    @Transactional
-    public FileMetadataDto duplicate(
-        Long nodeId,
-        String newName,
-        String ownerId
-    ) {
-        log.info(
-            "Duplicating node: {} with new name: {} for owner: {}",
-            nodeId,
-            newName,
-            ownerId
-        );
-
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.VIEW)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to duplicate this node."
-            );
-        }
-
-        FileMetadataDto original = persistence
-            .findByIds(List.of(nodeId))
-            .stream()
-            .findFirst()
-            .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
-            );
-
-        if (original.folder()) {
-            throw new RuntimeException(
-                "Duplicating folders is not supported yet."
-            );
-        }
-
-        String finalName = resolveDuplicateName(original, newName);
-        String newStorageKey = UUID.randomUUID().toString();
-        storageService.copy(original.storageKey(), newStorageKey);
-
-        FileMetadataDto saved = persistence.saveFile(
-            finalName,
-            original.parentId(),
-            ownerId,
-            newStorageKey,
-            original.mime(),
-            original.size()
-        );
-        return enrichDto(saved, ownerId);
-    }
-
-    private String resolveDuplicateName(
-        FileMetadataDto original,
-        String newName
-    ) {
+    private String resolveDuplicateName(File original, String newName) {
         if (newName != null && !newName.isBlank()) {
             String resolved = validateAndResolveNewName(original, newName);
-            if (
-                persistence.existsByNameAndParentGlobal(
-                    resolved,
-                    original.parentId()
-                )
-            ) {
-                throw new RuntimeException(
-                    "A file or folder with this name already exists."
-                );
-            }
+            validateNameAvailability(resolved, original.parentId());
             return resolved;
         }
 
@@ -599,7 +607,7 @@ public class FileServiceImpl implements FileService {
         String finalName = originalName;
         int counter = 1;
         while (
-            persistence.existsByNameAndParentGlobal(
+            filePersistencePort.existsByNameAndParentGlobal(
                 finalName,
                 original.parentId()
             )
@@ -610,195 +618,17 @@ public class FileServiceImpl implements FileService {
         return finalName;
     }
 
-    @Override
-    @Transactional
-    public FileMetadataDto move(
-        Long nodeId,
-        Long targetParentId,
-        String ownerId
-    ) {
-        log.info(
-            "Moving node: {} to: {} for owner: {}",
-            nodeId,
-            targetParentId,
-            ownerId
-        );
-
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.EDIT)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to move this node."
-            );
-        }
-
-        if (
-            !sharingService.hasPermission(
-                targetParentId,
-                ownerId,
-                PrivilegeLevel.EDIT
-            )
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to move items into the target folder."
-            );
-        }
-
-        FileMetadataDto node = persistence
-            .findByIds(List.of(nodeId))
-            .stream()
-            .findFirst()
-            .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
-            );
-
-        if (node.parentId() != null && node.parentId() == 1L) {
-            throw new RuntimeException(
-                "Access denied: Cannot move root-level directories."
-            );
-        }
-
-        if (node.folder() && isSubfolder(nodeId, targetParentId)) {
-            throw new RuntimeException(
-                "Cannot move a folder into its own subfolder."
-            );
-        }
-
-        if (nodeId.equals(targetParentId)) {
-            throw new RuntimeException("Cannot move a node to itself.");
-        }
-
-        FileMetadataDto moved = persistence.move(
-            nodeId,
-            targetParentId,
-            node.ownerId()
-        );
-        return enrichDto(moved, ownerId);
-    }
-
-    @Override
-    public List<FileMetadataDto> search(
-        String query,
-        String kind,
-        String ownerId
-    ) {
-        log.info(
-            "Searching for nodes with query: {} and kind: {} for owner: {}",
-            query,
-            kind,
-            ownerId
-        );
-        List<FileMetadataDto> results =
-            "f43c0bcf-11e4-4629-b072-321ccd04e72a".equals(ownerId)
-                ? persistence.searchGlobal(query, kind)
-                : persistence.search(query, kind, ownerId);
-        return enrichDtos(results, ownerId);
-    }
-
-    @Override
-    public List<FileMetadataDto> getRecentFiles(String ownerId) {
-        log.info("Retrieving recent files for owner: {}", ownerId);
-        return enrichDtos(persistence.findRecentFiles(ownerId), ownerId);
-    }
-
-    @Override
-    public List<FileMetadataDto> getFavorites(String ownerId) {
-        log.info("Retrieving favorites for owner: {}", ownerId);
-        return enrichDtos(persistence.findFavorites(ownerId), ownerId);
-    }
-
-    @Override
-    @Transactional
-    public FileMetadataDto toggleFavorite(
-        Long nodeId,
-        boolean isFavorite,
-        String ownerId
-    ) {
-        log.info(
-            "Toggling favorite for node: {} to: {} for owner: {}",
-            nodeId,
-            isFavorite,
-            ownerId
-        );
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.VIEW)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to favorite this node."
-            );
-        }
-
-        FileMetadataDto node = persistence
-            .findByIds(List.of(nodeId))
-            .stream()
-            .findFirst()
-            .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
-            );
-
-        FileMetadataDto toggled = persistence.toggleFavorite(
-            nodeId,
-            isFavorite,
-            node.ownerId()
-        );
-        return enrichDto(toggled, ownerId);
-    }
-
-    private FileMetadataDto enrichDto(FileMetadataDto dto, String userId) {
-        if (dto == null) return null;
-        return new FileMetadataDto(
-            dto.id(),
-            dto.name(),
-            dto.size(),
-            dto.mime(),
-            dto.storageKey(),
-            dto.createdAt(),
-            dto.modifiedAt(),
-            dto.isDeleted(),
-            dto.deletedAt(),
-            dto.originalPath(),
-            dto.isFavorite(),
-            dto.ownerId(),
-            dto.parentId(),
-            dto.folder(),
-            sharingService.getHighestPrivilege(dto.id(), userId)
-        );
-    }
-
-    private List<FileMetadataDto> enrichDtos(
-        List<FileMetadataDto> dtos,
-        String userId
-    ) {
-        return dtos
-            .stream()
-            .map(d -> enrichDto(d, userId))
-            .collect(Collectors.toList());
-    }
-
-    private List<TrashMetadataDto> enrichTrashDtos(
-        List<FileMetadataDto> dtos,
-        String userId
-    ) {
-        return dtos
-            .stream()
-            .map(d -> toTrashDto(enrichDto(d, userId)))
-            .collect(Collectors.toList());
-    }
-
     private boolean isSubfolder(Long folderId, Long targetParentId) {
         if (
             targetParentId == null ||
             targetParentId == 0 ||
-            targetParentId == 1L
+            ROOT_ID.equals(targetParentId)
         ) return false;
         if (folderId.equals(targetParentId)) return true;
 
         Long currentId = targetParentId;
-        while (currentId != null && currentId != 1L) {
-            Optional<FileMetadataDto> parent = persistence
-                .findByIds(List.of(currentId))
-                .stream()
-                .findFirst();
+        while (currentId != null && !ROOT_ID.equals(currentId)) {
+            Optional<Storable> parent = filePersistencePort.findById(currentId);
             if (parent.isEmpty()) break;
             currentId = parent.get().parentId();
             if (folderId.equals(currentId)) return true;
@@ -806,10 +636,10 @@ public class FileServiceImpl implements FileService {
         return false;
     }
 
-    private TrashMetadataDto toTrashDto(FileMetadataDto metadata) {
+    private TrashItem toTrashItem(Storable storable) {
         long daysRemaining = 0;
-        if (metadata.deletedAt() != null) {
-            LocalDateTime expiryDate = metadata
+        if (storable.deletedAt() != null) {
+            LocalDateTime expiryDate = storable
                 .deletedAt()
                 .plusDays(configService.getTrashRetentionDays());
             daysRemaining = ChronoUnit.DAYS.between(
@@ -818,6 +648,31 @@ public class FileServiceImpl implements FileService {
             );
             if (daysRemaining < 0) daysRemaining = 0;
         }
-        return new TrashMetadataDto(metadata, daysRemaining);
+        return new TrashItem(storable, daysRemaining);
+    }
+
+    private List<Storable> truncatePathForUser(
+        List<Storable> pathArr,
+        String ownerId,
+        String username
+    ) {
+        if (ADMIN_ID.equals(ownerId)) return pathArr;
+
+        String effectiveUsername = resolveUsername(ownerId, username);
+        int homeIndex = -1;
+        for (int i = 0; i < pathArr.size(); i++) {
+            Storable node = pathArr.get(i);
+            if (
+                effectiveUsername.equals(node.name()) &&
+                ROOT_ID.equals(node.parentId())
+            ) {
+                homeIndex = i;
+                break;
+            }
+        }
+
+        return (homeIndex != -1)
+            ? pathArr.subList(homeIndex + 1, pathArr.size())
+            : pathArr;
     }
 }

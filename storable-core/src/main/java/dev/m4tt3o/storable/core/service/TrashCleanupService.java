@@ -1,8 +1,9 @@
 package dev.m4tt3o.storable.core.service;
 
-import dev.m4tt3o.storable.common.entity.FileNode;
-import dev.m4tt3o.storable.common.repository.FileNodeRepository;
+import dev.m4tt3o.storable.core.domain.Storable;
+import dev.m4tt3o.storable.core.port.FilePersistencePort;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class TrashCleanupService {
 
-    private final FileNodeRepository repository;
+    private final FilePersistencePort filePersistencePort;
     private final ConfigService configService;
 
     /**
@@ -29,19 +30,17 @@ public class TrashCleanupService {
     @Transactional
     public void cleanupExpiredTrash() {
         log.info("Starting scheduled trash cleanup...");
-        LocalDateTime cutoff = LocalDateTime.now(
-            java.time.ZoneOffset.UTC
-        ).minusDays(configService.getTrashRetentionDays());
+        LocalDateTime cutoff = LocalDateTime.now(ZoneOffset.UTC).minusDays(
+            configService.getTrashRetentionDays()
+        );
 
-        // This is a simplified version. In a real system, you'd want to handle
-        // physical file deletion too via StorageService.
-        List<FileNode> expiredNodes = repository
-            .findAllDeleted()
+        List<Storable> expiredNodes = filePersistencePort
+            .findAllTrash()
             .stream()
             .filter(
                 node ->
-                    node.getDeletedAt() != null &&
-                    node.getDeletedAt().isBefore(cutoff)
+                    node.deletedAt() != null &&
+                    node.deletedAt().isBefore(cutoff)
             )
             .toList();
 
@@ -50,12 +49,8 @@ public class TrashCleanupService {
             expiredNodes.size()
         );
 
-        for (FileNode node : expiredNodes) {
-            // repository.delete(node);
-            // Note: We might need recursive deletion here if it's a folder,
-            // but findAllDeleted() should ideally return all nodes.
-            // However, softDeleteChildren already marks all descendants as deleted.
-            repository.delete(node);
+        for (Storable node : expiredNodes) {
+            filePersistencePort.deleteById(node.id(), node.ownerId());
         }
 
         log.info("Trash cleanup completed.");
