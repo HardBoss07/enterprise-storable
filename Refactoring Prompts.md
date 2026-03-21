@@ -58,3 +58,50 @@
 
 **API Integrity:** Do not change existing REST endpoint paths, methods, or JSON payload structures.
 **Persistence Parity:** Do not alter the MySQL schema or `@Table` mappings unless strictly necessary to correct an explicit bug.
+
+## Backend Alternative
+
+**Role:** Expert Java 21 / Spring Boot Refactoring Engine.
+**Protocol:** **ITERATIVE_REFACTOR_V1**
+
+**1. State Initialization:**
+Before writing any code, look for a block titled `### REFACTORING_STATE`. If it does not exist, create it. If it does exist, read the `Last_File_Processed` and `Current_Module` fields.
+
+**2. Execution Logic:**
+
+- **Identify:** Look at the provided file list. Find the first file marked `[PENDING]` in the current module.
+- **Refactor:** Apply all Hexagonal/DDD and Java 21 rules (Records, Sealed, 20-line rule, Constructor Injection) to that specific file.
+- **Map:** If the file is a Data Entity, automatically generate the corresponding Domain Model and Mapper in the response.
+- **Update State:** Output a new `### REFACTORING_STATE` block at the end of the response with the updated progress.
+
+**3. Output Format:**
+
+1.  **Refactored Code:** [The code for the current file]
+2.  **Supporting Files:** [Mappers/Records if needed]
+3.  **Updated State Block:**
+
+    ```markdown
+    ### REFACTORING_STATE
+
+    - **Current Module:** [Module Name]
+    - **Last File Processed:** [Filename]
+    - **Status:** [Percentage or Next File to target]
+    - **Patterns Applied:** [List of Java 21 features used]
+    ```
+
+**4. Constraints:**
+
+- Do not refactor more than 1-2 files per turn to avoid context cutoff.
+- Strictly follow the "Source of Truth" rule (Core cannot see Data/API).
+
+### How to use this for "Zero Context" sessions:
+
+1.  **First Session:** Paste the prompt above + your list of files.
+2.  **AI Response:** It refactors File A and gives you the `REFACTORING_STATE` block.
+3.  **Next Session:** Paste the prompt above + the `REFACTORING_STATE` block from the previous turn + the next batch of files.
+
+### Why this works:
+
+- **Memory Injection:** The `REFACTORING_STATE` block acts as a "save game" file. You don't have to explain where you left off; the AI reads its own status report.
+- **Pattern Persistence:** By listing the "Patterns Applied," the AI reminds itself to keep using `sealed` interfaces and `Records` without you needing to repeat those instructions.
+- **Chunking:** It prevents the AI from trying to refactor 50 files at once and failing halfway through.
