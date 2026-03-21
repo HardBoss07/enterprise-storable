@@ -1,6 +1,6 @@
 package dev.m4tt3o.storable.common.dto;
 
-import dev.m4tt3o.storable.common.entity.AccessPrivilege.PrivilegeLevel;
+import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
 
 /**
  * Data Transfer Object for access privilege info.
