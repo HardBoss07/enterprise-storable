@@ -1,15 +1,17 @@
 package dev.m4tt3o.storable.api.mapper;
 
+import dev.m4tt3o.storable.common.dto.AccessPrivilegeDto;
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
 import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
 import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
+import dev.m4tt3o.storable.core.domain.AccessPrivilege;
 import dev.m4tt3o.storable.core.domain.File;
 import dev.m4tt3o.storable.core.domain.Folder;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.TrashItem;
 import dev.m4tt3o.storable.core.service.SharingService;
-import java.util.List;
 import java.util.SequencedCollection;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -100,6 +102,24 @@ public class FileApiMapper {
         return trashItems
             .stream()
             .map(ti -> toTrashDto(ti, userId))
+            .toList();
+    }
+
+    public AccessPrivilegeDto toAccessPrivilegeDto(AccessPrivilege privilege) {
+        if (privilege == null) return null;
+        return new AccessPrivilegeDto(
+            privilege.id(),
+            privilege.nodeId(),
+            privilege.userId(),
+            privilege.username(),
+            privilege.email(),
+            privilege.level()
+        );
+    }
+
+    public List<AccessPrivilegeDto> toAccessPrivilegeDtoList(List<AccessPrivilege> privileges) {
+        return privileges.stream()
+            .map(this::toAccessPrivilegeDto)
             .toList();
     }
 }

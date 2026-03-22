@@ -10,6 +10,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+/**
+ * Adapter for sharing and privilege persistence operations.
+ * Maps between AccessPrivilegeEntity and Core Domain Records.
+ */
 @Component
 @RequiredArgsConstructor
 public class SharingPersistenceAdapter implements SharingPersistencePort {
@@ -17,30 +21,19 @@ public class SharingPersistenceAdapter implements SharingPersistencePort {
     private final AccessPrivilegeRepository privilegeRepository;
 
     @Override
-    public Optional<PrivilegeLevel> findHighestPrivilege(
-        Long nodeId,
-        String userId
-    ) {
-        return privilegeRepository
-            .findByNodeIdAndUserId(nodeId, userId)
+    public Optional<PrivilegeLevel> findHighestPrivilege(Long nodeId, String userId) {
+        return privilegeRepository.findByNodeIdAndUserId(nodeId, userId)
             .map(AccessPrivilegeEntity::getLevel);
     }
 
     @Override
     @Transactional
-    public void grantPrivilege(
-        Long nodeId,
-        String userId,
-        PrivilegeLevel level
-    ) {
-        AccessPrivilegeEntity entity = privilegeRepository
-            .findByNodeIdAndUserId(nodeId, userId)
-            .orElseGet(() ->
-                AccessPrivilegeEntity.builder()
-                    .nodeId(nodeId)
-                    .userId(userId)
-                    .build()
-            );
+    public void grantPrivilege(Long nodeId, String userId, PrivilegeLevel level) {
+        AccessPrivilegeEntity entity = privilegeRepository.findByNodeIdAndUserId(nodeId, userId)
+            .orElseGet(() -> AccessPrivilegeEntity.builder()
+                .nodeId(nodeId)
+                .userId(userId)
+                .build());
         entity.setLevel(level);
         privilegeRepository.save(entity);
     }
@@ -59,23 +52,18 @@ public class SharingPersistenceAdapter implements SharingPersistencePort {
 
     @Override
     public List<AccessPrivilegeInfo> findPrivilegesForNode(Long nodeId) {
-        return privilegeRepository
-            .findByNodeId(nodeId)
+        return privilegeRepository.findByNodeId(nodeId)
             .stream()
-            .map(entity ->
-                new AccessPrivilegeInfo(
-                    entity.getNodeId(),
-                    entity.getUserId(),
-                    entity.getLevel()
-                )
-            )
+            .map(entity -> new AccessPrivilegeInfo(
+                entity.getNodeId(),
+                entity.getUserId(),
+                entity.getLevel()))
             .toList();
     }
 
     @Override
     public List<Long> findSharedNodeIds(String userId) {
-        return privilegeRepository
-            .findByUserId(userId)
+        return privilegeRepository.findByUserId(userId)
             .stream()
             .map(AccessPrivilegeEntity::getNodeId)
             .toList();
