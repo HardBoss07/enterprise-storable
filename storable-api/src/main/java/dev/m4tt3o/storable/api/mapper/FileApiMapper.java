@@ -10,8 +10,8 @@ import dev.m4tt3o.storable.core.domain.Folder;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.TrashItem;
 import dev.m4tt3o.storable.core.service.SharingService;
-import java.util.SequencedCollection;
 import java.util.List;
+import java.util.SequencedCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
@@ -117,9 +117,9 @@ public class FileApiMapper {
         );
     }
 
-    public List<AccessPrivilegeDto> toAccessPrivilegeDtoList(List<AccessPrivilege> privileges) {
-        return privileges.stream()
-            .map(this::toAccessPrivilegeDto)
-            .toList();
+    public List<AccessPrivilegeDto> toAccessPrivilegeDtoList(
+        List<AccessPrivilege> privileges
+    ) {
+        return privileges.stream().map(this::toAccessPrivilegeDto).toList();
     }
 }

@@ -5,6 +5,9 @@ import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
 import dev.m4tt3o.storable.core.domain.AccessPrivilege;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.User;
+import dev.m4tt3o.storable.core.exception.DuplicateResourceException;
+import dev.m4tt3o.storable.core.exception.ResourceNotFoundException;
+import dev.m4tt3o.storable.core.exception.UnauthorizedAccessException;
 import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import dev.m4tt3o.storable.core.port.SharingPersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
@@ -124,35 +127,35 @@ public class SharingServiceImpl implements SharingService {
 
     private Storable findNode(Long nodeId) {
         return folderPersistencePort.findStorableById(nodeId)
-            .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
+            .orElseThrow(() -> new ResourceNotFoundException("Node not found: " + nodeId));
     }
 
     private User findTargetUser(String userId) {
         return userPersistencePort.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Target user not found: " + userId));
+            .orElseThrow(() -> new ResourceNotFoundException("Target user not found: " + userId));
     }
 
     private void verifySharePermission(Storable node, String requesterId) {
         if (!node.ownerId().equals(requesterId) && !hasPermission(node.id(), requesterId, PrivilegeLevel.OWNER)) {
-            throw new RuntimeException("Access denied: You don't have permission to share this node.");
+            throw new UnauthorizedAccessException("Access denied: You don't have permission to share this node.");
         }
     }
 
     private void verifyManageSharePermission(Storable node, String requesterId) {
         if (!node.ownerId().equals(requesterId) && !hasPermission(node.id(), requesterId, PrivilegeLevel.OWNER)) {
-            throw new RuntimeException("Access denied: You don't have permission to manage shares for this node.");
+            throw new UnauthorizedAccessException("Access denied: You don't have permission to manage shares for this node.");
         }
     }
 
     private void verifyViewSharePermission(Storable node, String requesterId) {
         if (!node.ownerId().equals(requesterId) && !hasPermission(node.id(), requesterId, PrivilegeLevel.VIEW)) {
-            throw new RuntimeException("Access denied: You don't have permission to view shares for this node.");
+            throw new UnauthorizedAccessException("Access denied: You don't have permission to view shares for this node.");
         }
     }
 
     private void verifyTargetUserNotOwner(Storable node, String targetUserId) {
         if (node.ownerId().equals(targetUserId)) {
-            throw new RuntimeException("Target user is already the owner.");
+            throw new DuplicateResourceException("Target user is already the owner.");
         }
     }
 

@@ -62,6 +62,9 @@ enterprise-storable/
 │   │                           │   ├── PrivilegeLevel.java
 │   │                           │   ├── SystemSetting.java
 │   │                           │   └── UserRole.java
+│   │                           ├── exception/
+│   │                           │   ├── ErrorCode.java
+│   │                           │   └── ErrorResponse.java
 │   │                           └── repository/
 │   │                               └── SystemSettingRepository.java
 │   ├── target/
@@ -78,6 +81,7 @@ enterprise-storable/
 │   │                           │   ├── CoreSecurityConfig.java
 │   │                           │   └── StorageProperties.java
 │   │                           ├── domain/
+│   │                           │   ├── AccessPrivilege.java
 │   │                           │   ├── File.java
 │   │                           │   ├── Folder.java
 │   │                           │   ├── Storable.java
@@ -87,6 +91,13 @@ enterprise-storable/
 │   │                           │   ├── AuthRequest.java
 │   │                           │   ├── AuthResponse.java
 │   │                           │   └── RegisterRequest.java
+│   │                           ├── exception/
+│   │                           │   ├── DuplicateResourceException.java
+│   │                           │   ├── InternalStorableException.java
+│   │                           │   ├── ResourceNotFoundException.java
+│   │                           │   ├── StorableException.java
+│   │                           │   ├── StorageFullException.java
+│   │                           │   └── UnauthorizedAccessException.java
 │   │                           ├── port/
 │   │                           │   ├── FilePersistencePort.java
 │   │                           │   ├── FolderPersistencePort.java
