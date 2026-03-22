@@ -261,6 +261,7 @@ enterprise-storable/
 │   ├── package.json
 │   ├── postcss.config.mjs
 │   └── tsconfig.json
+├── CONTRIBUTING.md
 ├── Dockerfile.backend
 ├── File Colors.md
 ├── GEMINI.md

@@ -69,7 +69,7 @@ graph TD
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/yourusername/enterprise-storable.git
+   git clone https://github.com/HardBoss07/enterprise-storable.git
    cd enterprise-storable
    ```
 2. Start the services:
