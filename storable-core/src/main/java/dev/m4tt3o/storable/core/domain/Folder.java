@@ -1,6 +1,7 @@
 package dev.m4tt3o.storable.core.domain;
 
 import java.time.LocalDateTime;
+import java.util.SequencedCollection;
 import lombok.Builder;
 
 /**
@@ -16,33 +17,8 @@ public record Folder(
     LocalDateTime deletedAt,
     boolean isFavorite,
     String ownerId,
-    Long parentId
+    Long parentId,
+    SequencedCollection<Storable> children
 ) implements Storable {
-    public Folder withName(String newName) {
-        return new Folder(
-            id,
-            newName,
-            createdAt,
-            modifiedAt,
-            isDeleted,
-            deletedAt,
-            isFavorite,
-            ownerId,
-            parentId
-        );
-    }
-
-    public Folder withParentId(Long newParentId) {
-        return new Folder(
-            id,
-            name,
-            createdAt,
-            modifiedAt,
-            isDeleted,
-            deletedAt,
-            isFavorite,
-            ownerId,
-            newParentId
-        );
-    }
+    // Note: Record getters are automatically name() and id() etc.
 }

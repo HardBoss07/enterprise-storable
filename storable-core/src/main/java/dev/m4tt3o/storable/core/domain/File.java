@@ -22,39 +22,5 @@ public record File(
     String ownerId,
     Long parentId
 ) implements Storable {
-    public File withName(String newName) {
-        return new File(
-            id,
-            newName,
-            size,
-            mime,
-            storageKey,
-            createdAt,
-            modifiedAt,
-            isDeleted,
-            deletedAt,
-            originalPath,
-            isFavorite,
-            ownerId,
-            parentId
-        );
-    }
-
-    public File withParentId(Long newParentId) {
-        return new File(
-            id,
-            name,
-            size,
-            mime,
-            storageKey,
-            createdAt,
-            modifiedAt,
-            isDeleted,
-            deletedAt,
-            originalPath,
-            isFavorite,
-            ownerId,
-            newParentId
-        );
-    }
+    // Note: Record getters are automatically name() and id() etc.
 }
