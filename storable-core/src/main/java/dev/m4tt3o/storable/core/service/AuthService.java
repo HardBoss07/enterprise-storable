@@ -6,9 +6,10 @@ import dev.m4tt3o.storable.core.domain.User;
 import dev.m4tt3o.storable.core.dto.AuthRequest;
 import dev.m4tt3o.storable.core.dto.AuthResponse;
 import dev.m4tt3o.storable.core.dto.RegisterRequest;
-import dev.m4tt3o.storable.core.port.FilePersistencePort;
+import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import dev.m4tt3o.storable.core.security.JwtService;
+import java.util.ArrayList;
 import java.util.Map;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,7 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AuthService {
 
     private final UserPersistencePort userPersistencePort;
-    private final FilePersistencePort filePersistencePort;
+    private final FolderPersistencePort folderPersistencePort;
     private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
 
@@ -100,9 +101,10 @@ public class AuthService {
             .name(user.username())
             .ownerId(user.id())
             .parentId(1L) // The Root folder
+            .children(new ArrayList<>())
             .build();
 
-        filePersistencePort.saveFolder(homeDir);
+        folderPersistencePort.save(homeDir);
     }
 
     private String generateAuthToken(User user) {

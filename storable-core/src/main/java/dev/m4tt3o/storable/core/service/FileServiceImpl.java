@@ -7,6 +7,7 @@ import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.TrashItem;
 import dev.m4tt3o.storable.core.domain.User;
 import dev.m4tt3o.storable.core.port.FilePersistencePort;
+import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import java.io.InputStream;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.SequencedCollection;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of the FileService business logic.
- * Respects Hexagonal Architecture by using ports for persistence.
+ * Uses split persistence ports (File and Folder) to maintain domain boundaries.
  */
 @Slf4j
 @Service
@@ -31,6 +33,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FileServiceImpl implements FileService {
 
     private final FilePersistencePort filePersistencePort;
+    private final FolderPersistencePort folderPersistencePort;
     private final StorageService storageService;
     private final ConfigService configService;
     private final SharingService sharingService;
@@ -41,7 +44,10 @@ public class FileServiceImpl implements FileService {
     private static final Long ROOT_ID = 1L;
 
     @Override
-    public List<Storable> getChildren(Long nodeId, String ownerId) {
+    public SequencedCollection<Storable> getChildren(
+        Long nodeId,
+        String ownerId
+    ) {
         log.info(
             "Retrieving children for node ID: {} and owner: {}",
             nodeId,
@@ -56,7 +62,7 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to view this folder."
         );
 
-        return filePersistencePort.findChildrenGlobal(targetId);
+        return folderPersistencePort.findChildren(targetId);
     }
 
     @Override
@@ -71,13 +77,13 @@ public class FileServiceImpl implements FileService {
         ) {
             return null;
         }
-        return filePersistencePort.findById(nodeId).orElse(null);
+        return folderPersistencePort.findStorableById(nodeId).orElse(null);
     }
 
     @Override
     public long getTotalSize(String ownerId) {
         log.info("Calculating total size for owner: {}", ownerId);
-        return filePersistencePort.sumSizeByOwnerId(ownerId);
+        return filePersistencePort.sumSizeByOwner(ownerId);
     }
 
     @Override
@@ -98,9 +104,10 @@ public class FileServiceImpl implements FileService {
             .name(name)
             .parentId(targetParentId)
             .ownerId(ownerId)
+            .children(new ArrayList<>())
             .build();
 
-        return filePersistencePort.saveFolder(folder);
+        return folderPersistencePort.save(folder);
     }
 
     @Override
@@ -119,7 +126,7 @@ public class FileServiceImpl implements FileService {
 
         for (String part : parts) {
             if (part.isBlank()) continue;
-            Optional<Folder> existing = filePersistencePort.findFolder(
+            Optional<Folder> existing = folderPersistencePort.findFolder(
                 part,
                 currentParentId,
                 ownerId
@@ -168,7 +175,7 @@ public class FileServiceImpl implements FileService {
             .size(size)
             .build();
 
-        return filePersistencePort.saveFile(file);
+        return filePersistencePort.save(file);
     }
 
     @Override
@@ -185,8 +192,8 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to download this file."
         );
 
-        Storable storable = filePersistencePort
-            .findById(nodeId)
+        Storable storable = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("File not found: " + nodeId)
             );
@@ -205,11 +212,13 @@ public class FileServiceImpl implements FileService {
             username
         );
         if (ADMIN_ID.equals(ownerId)) {
-            return (Folder) filePersistencePort.findById(ROOT_ID).orElseThrow();
+            return (Folder) folderPersistencePort
+                .findStorableById(ROOT_ID)
+                .orElseThrow();
         }
 
         String effectiveUsername = resolveUsername(ownerId, username);
-        return filePersistencePort
+        return folderPersistencePort
             .findFolder(effectiveUsername, ROOT_ID, ownerId)
             .orElseThrow(() ->
                 new RuntimeException(
@@ -238,12 +247,12 @@ public class FileServiceImpl implements FileService {
             ) break;
 
             final Long currentId = tempId;
-            Storable node = filePersistencePort
-                .findById(currentId)
+            Storable node = folderPersistencePort
+                .findStorableById(currentId)
                 .orElseGet(() ->
                     currentId.equals(ROOT_ID)
-                        ? filePersistencePort
-                              .findByIdAndOwner(ROOT_ID, ADMIN_ID)
+                        ? folderPersistencePort
+                              .findStorableByIdAndOwner(ROOT_ID, ADMIN_ID)
                               .orElse(null)
                         : null
                 );
@@ -267,8 +276,8 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to delete this node."
         );
 
-        Storable node = filePersistencePort
-            .findById(nodeId)
+        Storable node = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
@@ -279,7 +288,7 @@ public class FileServiceImpl implements FileService {
             );
         }
 
-        filePersistencePort.softDelete(nodeId, ownerId);
+        folderPersistencePort.softDelete(nodeId, ownerId);
     }
 
     @Override
@@ -292,13 +301,13 @@ public class FileServiceImpl implements FileService {
             PrivilegeLevel.OWNER,
             "Access denied: You don't have permission to restore this node."
         );
-        filePersistencePort.restore(nodeId, ownerId);
+        folderPersistencePort.restore(nodeId, ownerId);
     }
 
     @Override
     public List<TrashItem> getTrash(String ownerId) {
         log.info("Retrieving trash for owner: {}", ownerId);
-        return filePersistencePort
+        return folderPersistencePort
             .findTrash(ownerId)
             .stream()
             .map(this::toTrashItem)
@@ -308,7 +317,7 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<TrashItem> getAllTrash() {
         log.info("Retrieving all trash for ADMIN");
-        return filePersistencePort
+        return folderPersistencePort
             .findAllTrash()
             .stream()
             .map(this::toTrashItem)
@@ -329,14 +338,14 @@ public class FileServiceImpl implements FileService {
             PrivilegeLevel.OWNER,
             "Access denied: You don't have permission to permanently delete this node."
         );
-        filePersistencePort.deleteById(nodeId, ownerId);
+        folderPersistencePort.deleteById(nodeId, ownerId);
     }
 
     @Override
     @Transactional
     public void emptyTrash(String ownerId) {
         log.info("Emptying trash for owner: {}", ownerId);
-        filePersistencePort.emptyTrash(ownerId);
+        folderPersistencePort.emptyTrash(ownerId);
     }
 
     @Override
@@ -360,8 +369,8 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to rename this node."
         );
 
-        Storable node = filePersistencePort
-            .findById(nodeId)
+        Storable node = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
@@ -375,13 +384,39 @@ public class FileServiceImpl implements FileService {
         String finalName = validateAndResolveNewName(node, newName);
         validateNameAvailability(finalName, node.parentId());
 
-        Storable renamed = switch (node) {
-            case File f -> filePersistencePort.saveFile(f.withName(finalName));
-            case Folder fol -> filePersistencePort.saveFolder(
-                fol.withName(finalName)
+        return switch (node) {
+            case File f -> filePersistencePort.save(
+                new File(
+                    f.id(),
+                    finalName,
+                    f.size(),
+                    f.mime(),
+                    f.storageKey(),
+                    f.createdAt(),
+                    f.modifiedAt(),
+                    f.isDeleted(),
+                    f.deletedAt(),
+                    f.originalPath(),
+                    f.isFavorite(),
+                    f.ownerId(),
+                    f.parentId()
+                )
+            );
+            case Folder fol -> folderPersistencePort.save(
+                new Folder(
+                    fol.id(),
+                    finalName,
+                    fol.createdAt(),
+                    fol.modifiedAt(),
+                    fol.isDeleted(),
+                    fol.deletedAt(),
+                    fol.isFavorite(),
+                    fol.ownerId(),
+                    fol.parentId(),
+                    fol.children()
+                )
             );
         };
-        return renamed;
     }
 
     @Override
@@ -400,8 +435,8 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to duplicate this node."
         );
 
-        Storable original = filePersistencePort
-            .findById(nodeId)
+        Storable original = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
@@ -426,7 +461,7 @@ public class FileServiceImpl implements FileService {
             .size(originalFile.size())
             .build();
 
-        return filePersistencePort.saveFile(newFile);
+        return filePersistencePort.save(newFile);
     }
 
     @Override
@@ -451,8 +486,8 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to move items into the target folder."
         );
 
-        Storable node = filePersistencePort
-            .findById(nodeId)
+        Storable node = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
@@ -473,15 +508,39 @@ public class FileServiceImpl implements FileService {
             throw new RuntimeException("Cannot move a node to itself.");
         }
 
-        Storable moved = switch (node) {
-            case File f -> filePersistencePort.saveFile(
-                f.withParentId(targetParentId)
+        return switch (node) {
+            case File f -> filePersistencePort.save(
+                new File(
+                    f.id(),
+                    f.name(),
+                    f.size(),
+                    f.mime(),
+                    f.storageKey(),
+                    f.createdAt(),
+                    f.modifiedAt(),
+                    f.isDeleted(),
+                    f.deletedAt(),
+                    f.originalPath(),
+                    f.isFavorite(),
+                    f.ownerId(),
+                    targetParentId
+                )
             );
-            case Folder fol -> filePersistencePort.saveFolder(
-                fol.withParentId(targetParentId)
+            case Folder fol -> folderPersistencePort.save(
+                new Folder(
+                    fol.id(),
+                    fol.name(),
+                    fol.createdAt(),
+                    fol.modifiedAt(),
+                    fol.isDeleted(),
+                    fol.deletedAt(),
+                    fol.isFavorite(),
+                    fol.ownerId(),
+                    targetParentId,
+                    fol.children()
+                )
             );
         };
-        return moved;
     }
 
     @Override
@@ -493,21 +552,20 @@ public class FileServiceImpl implements FileService {
             ownerId
         );
         return ADMIN_ID.equals(ownerId)
-            ? filePersistencePort.searchGlobal(query, kind)
-            : filePersistencePort.search(query, kind, ownerId);
+            ? folderPersistencePort.searchGlobal(query, kind)
+            : folderPersistencePort.search(query, kind, ownerId);
     }
 
     @Override
     public List<File> getRecentFiles(String ownerId) {
         log.info("Retrieving recent files for owner: {}", ownerId);
-        return filePersistencePort.findRecentFiles(ownerId);
+        return filePersistencePort.findRecent(ownerId);
     }
 
     @Override
     public List<Storable> getFavorites(String ownerId) {
         log.info("Retrieving favorites for owner: {}", ownerId);
-        // Assuming findFavorites exists in port
-        return List.of(); // TODO: Implement in Port
+        return folderPersistencePort.findFavorites(ownerId);
     }
 
     @Override
@@ -530,7 +588,11 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to favorite this node."
         );
 
-        return filePersistencePort.toggleFavorite(nodeId, isFavorite, ownerId);
+        return folderPersistencePort.toggleFavorite(
+            nodeId,
+            isFavorite,
+            ownerId
+        );
     }
 
     // Helper Methods (Atomic & Small)
@@ -551,7 +613,7 @@ public class FileServiceImpl implements FileService {
     }
 
     private void validateNameAvailability(String name, Long parentId) {
-        if (filePersistencePort.existsByNameAndParentGlobal(name, parentId)) {
+        if (folderPersistencePort.existsByNameAndParent(name, parentId)) {
             throw new RuntimeException(
                 "A file or folder with this name already exists."
             );
@@ -607,7 +669,7 @@ public class FileServiceImpl implements FileService {
         String finalName = originalName;
         int counter = 1;
         while (
-            filePersistencePort.existsByNameAndParentGlobal(
+            folderPersistencePort.existsByNameAndParent(
                 finalName,
                 original.parentId()
             )
@@ -628,7 +690,9 @@ public class FileServiceImpl implements FileService {
 
         Long currentId = targetParentId;
         while (currentId != null && !ROOT_ID.equals(currentId)) {
-            Optional<Storable> parent = filePersistencePort.findById(currentId);
+            Optional<Storable> parent = folderPersistencePort.findStorableById(
+                currentId
+            );
             if (parent.isEmpty()) break;
             currentId = parent.get().parentId();
             if (folderId.equals(currentId)) return true;

@@ -5,7 +5,7 @@ import dev.m4tt3o.storable.common.entity.UserRole;
 import dev.m4tt3o.storable.core.domain.File;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.User;
-import dev.m4tt3o.storable.core.port.FilePersistencePort;
+import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class AdminService {
 
     private final UserPersistencePort userPersistencePort;
-    private final FilePersistencePort filePersistencePort;
+    private final FolderPersistencePort folderPersistencePort;
     private final StorageService storageService;
 
     private static final String ROOT_USER_ID =
@@ -92,7 +92,9 @@ public class AdminService {
     }
 
     private void cleanUserPhysicalFiles(String userId) {
-        List<Storable> userNodes = filePersistencePort.findByOwnerId(userId);
+        List<Storable> userNodes = folderPersistencePort.findStorableByOwnerId(
+            userId
+        );
         userNodes
             .stream()
             .filter(node -> node instanceof File f && f.storageKey() != null)

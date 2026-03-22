@@ -6,6 +6,7 @@ import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.TrashItem;
 import java.io.InputStream;
 import java.util.List;
+import java.util.SequencedCollection;
 
 /**
  * Interface for business logic operations related to files and folders.
@@ -13,7 +14,7 @@ import java.util.List;
  */
 public interface FileService {
     /** Retrieves children of a given node for a specific owner. */
-    List<Storable> getChildren(Long nodeId, String ownerId);
+    SequencedCollection<Storable> getChildren(Long nodeId, String ownerId);
 
     /** Retrieves metadata for a specific node for a specific owner. */
     Storable getMetadata(Long nodeId, String ownerId);

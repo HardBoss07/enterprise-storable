@@ -1,7 +1,7 @@
 package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.core.domain.Storable;
-import dev.m4tt3o.storable.core.port.FilePersistencePort;
+import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
@@ -13,13 +13,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Background task for cleaning up expired items in the trash.
+ * Uses FolderPersistencePort for general Storable node operations.
  */
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class TrashCleanupService {
 
-    private final FilePersistencePort filePersistencePort;
+    private final FolderPersistencePort folderPersistencePort;
     private final ConfigService configService;
 
     /**
@@ -34,7 +35,7 @@ public class TrashCleanupService {
             configService.getTrashRetentionDays()
         );
 
-        List<Storable> expiredNodes = filePersistencePort
+        List<Storable> expiredNodes = folderPersistencePort
             .findAllTrash()
             .stream()
             .filter(
@@ -50,7 +51,7 @@ public class TrashCleanupService {
         );
 
         for (Storable node : expiredNodes) {
-            filePersistencePort.deleteById(node.id(), node.ownerId());
+            folderPersistencePort.deleteById(node.id(), node.ownerId());
         }
 
         log.info("Trash cleanup completed.");

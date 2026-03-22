@@ -5,7 +5,7 @@ import dev.m4tt3o.storable.common.dto.UserLookupDto;
 import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.User;
-import dev.m4tt3o.storable.core.port.FilePersistencePort;
+import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import dev.m4tt3o.storable.core.port.SharingPersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import java.util.List;
@@ -24,7 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SharingServiceImpl implements SharingService {
 
     private final SharingPersistencePort sharingPersistencePort;
-    private final FilePersistencePort filePersistencePort;
+    private final FolderPersistencePort folderPersistencePort;
     private final UserPersistencePort userPersistencePort;
 
     private static final String ADMIN_ID =
@@ -58,8 +58,8 @@ public class SharingServiceImpl implements SharingService {
             level
         );
 
-        Storable node = filePersistencePort
-            .findById(nodeId)
+        Storable node = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
@@ -109,8 +109,8 @@ public class SharingServiceImpl implements SharingService {
             targetUserId
         );
 
-        Storable node = filePersistencePort
-            .findById(nodeId)
+        Storable node = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
@@ -134,8 +134,8 @@ public class SharingServiceImpl implements SharingService {
     ) {
         log.info("Fetching privileges for node {}", nodeId);
 
-        Storable node = filePersistencePort
-            .findById(nodeId)
+        Storable node = folderPersistencePort
+            .findStorableById(nodeId)
             .orElseThrow(() ->
                 new RuntimeException("Node not found: " + nodeId)
             );
@@ -174,7 +174,7 @@ public class SharingServiceImpl implements SharingService {
         List<Long> sharedNodeIds = sharingPersistencePort.findSharedNodeIds(
             userId
         );
-        return filePersistencePort.findByIds(sharedNodeIds);
+        return folderPersistencePort.findStorableByIds(sharedNodeIds);
     }
 
     @Override
@@ -194,7 +194,9 @@ public class SharingServiceImpl implements SharingService {
     public PrivilegeLevel getHighestPrivilege(Long nodeId, String userId) {
         if (ADMIN_ID.equals(userId)) return PrivilegeLevel.OWNER;
 
-        Optional<Storable> nodeOpt = filePersistencePort.findById(nodeId);
+        Optional<Storable> nodeOpt = folderPersistencePort.findStorableById(
+            nodeId
+        );
         if (nodeOpt.isEmpty()) return null;
         Storable node = nodeOpt.get();
 
