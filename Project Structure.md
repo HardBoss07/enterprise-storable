@@ -89,6 +89,7 @@ enterprise-storable/
 │   │                           │   └── RegisterRequest.java
 │   │                           ├── port/
 │   │                           │   ├── FilePersistencePort.java
+│   │                           │   ├── FolderPersistencePort.java
 │   │                           │   ├── SharingPersistencePort.java
 │   │                           │   └── UserPersistencePort.java
 │   │                           ├── security/
@@ -120,18 +121,23 @@ enterprise-storable/
 │   │                       └── data/
 │   │                           ├── adapter/
 │   │                           │   ├── FilePersistenceAdapter.java
+│   │                           │   ├── FolderPersistenceAdapter.java
 │   │                           │   ├── SharingPersistenceAdapter.java
 │   │                           │   └── UserPersistenceAdapter.java
 │   │                           ├── entity/
 │   │                           │   ├── AccessPrivilegeEntity.java
 │   │                           │   ├── FileEntity.java
+│   │                           │   ├── FolderEntity.java
+│   │                           │   ├── NodeEntity.java
 │   │                           │   └── UserEntity.java
 │   │                           ├── mapper/
-│   │                           │   ├── FileMapper.java
+│   │                           │   ├── NodeMapper.java
 │   │                           │   └── UserMapper.java
 │   │                           ├── repository/
 │   │                           │   ├── AccessPrivilegeRepository.java
 │   │                           │   ├── FileRepository.java
+│   │                           │   ├── FolderRepository.java
+│   │                           │   ├── NodeRepository.java
 │   │                           │   └── UserRepository.java
 │   │                           └── service/
 │   ├── target/

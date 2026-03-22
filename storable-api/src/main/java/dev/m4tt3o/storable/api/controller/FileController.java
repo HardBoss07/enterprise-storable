@@ -5,12 +5,14 @@ import dev.m4tt3o.storable.api.request.CreateFolderRequest;
 import dev.m4tt3o.storable.api.request.RecursiveFolderRequest;
 import dev.m4tt3o.storable.common.dto.FileMetadataDto;
 import dev.m4tt3o.storable.common.dto.TrashMetadataDto;
+import dev.m4tt3o.storable.core.domain.File;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.service.FileService;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.Map;
+import java.util.SequencedCollection;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.InputStreamResource;
@@ -25,6 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 /**
  * Controller for file and folder management.
+ * Uses Java 21 features and handles both File and Folder operations.
  */
 @Slf4j
 @RestController
@@ -66,10 +69,11 @@ public class FileController {
             nodeId,
             userId
         );
-        return fileApiMapper.toDtoList(
-            fileService.getChildren(nodeId, userId),
+        SequencedCollection<Storable> children = fileService.getChildren(
+            nodeId,
             userId
         );
+        return fileApiMapper.toDtoList(children, userId);
     }
 
     @GetMapping("/home")
@@ -91,10 +95,8 @@ public class FileController {
             nodeId,
             userId
         );
-        return fileApiMapper.toDtoList(
-            fileService.getPath(nodeId, userId, null),
-            userId
-        );
+        List<Storable> path = fileService.getPath(nodeId, userId, null);
+        return fileApiMapper.toDtoList(new java.util.ArrayList<>(path), userId);
     }
 
     @PostMapping("/folders")
@@ -169,26 +171,20 @@ public class FileController {
         InputStream inputStream = fileService.downloadFile(nodeId, userId);
         Resource resource = new InputStreamResource(inputStream);
 
+        String mimeType = (metadata instanceof File f && f.mime() != null)
+            ? f.mime()
+            : "application/octet-stream";
+        long contentLength = (metadata instanceof File f && f.size() != null)
+            ? f.size()
+            : 0;
+
         return ResponseEntity.ok()
-            .contentType(
-                MediaType.parseMediaType(
-                    metadata instanceof
-                            dev.m4tt3o.storable.core.domain.File f &&
-                        f.mime() != null
-                        ? f.mime()
-                        : "application/octet-stream"
-                )
-            )
+            .contentType(MediaType.parseMediaType(mimeType))
             .header(
                 HttpHeaders.CONTENT_DISPOSITION,
                 "attachment; filename=\"" + metadata.name() + "\""
             )
-            .contentLength(
-                metadata instanceof dev.m4tt3o.storable.core.domain.File f &&
-                    f.size() != null
-                    ? f.size()
-                    : 0
-            )
+            .contentLength(contentLength)
             .body(resource);
     }
 
@@ -222,7 +218,7 @@ public class FileController {
     ) {
         log.info("Request to get trash for user ID: {}", userId);
         return fileApiMapper.toTrashDtoList(
-            fileService.getTrash(userId),
+            new java.util.ArrayList<>(fileService.getTrash(userId)),
             userId
         );
     }
@@ -233,7 +229,10 @@ public class FileController {
         @AuthenticationPrincipal String userId
     ) {
         log.info("Admin request to get all trash by user ID: {}", userId);
-        return fileApiMapper.toTrashDtoList(fileService.getAllTrash(), userId);
+        return fileApiMapper.toTrashDtoList(
+            new java.util.ArrayList<>(fileService.getAllTrash()),
+            userId
+        );
     }
 
     @DeleteMapping("/{nodeId}/permanent")
@@ -291,7 +290,7 @@ public class FileController {
         @RequestBody(required = false) Map<String, String> body,
         @AuthenticationPrincipal String userId
     ) {
-        String newName = body != null ? body.get("name") : null;
+        String newName = (body != null) ? body.get("name") : null;
         log.info(
             "Request to duplicate node: {} with name: {} by user ID: {}",
             nodeId,
@@ -336,7 +335,7 @@ public class FileController {
             userId
         );
         return fileApiMapper.toDtoList(
-            fileService.search(query, kind, userId),
+            new java.util.ArrayList<>(fileService.search(query, kind, userId)),
             userId
         );
     }
@@ -346,14 +345,16 @@ public class FileController {
         @AuthenticationPrincipal String userId
     ) {
         log.info("Request to get recent files for user ID: {}", userId);
-        return fileApiMapper.toDtoList(
-            fileService
-                .getRecentFiles(userId)
-                .stream()
-                .map(f -> (Storable) f)
-                .toList(),
-            userId
-        );
+        List<File> recent = fileService.getRecentFiles(userId);
+        SequencedCollection<Storable> storables = recent
+            .stream()
+            .map(f -> (Storable) f)
+            .collect(
+                java.util.stream.Collectors.toCollection(
+                    java.util.ArrayList::new
+                )
+            );
+        return fileApiMapper.toDtoList(storables, userId);
     }
 
     @GetMapping("/favorites")
@@ -362,7 +363,7 @@ public class FileController {
     ) {
         log.info("Request to get favorites for user ID: {}", userId);
         return fileApiMapper.toDtoList(
-            fileService.getFavorites(userId),
+            new java.util.ArrayList<>(fileService.getFavorites(userId)),
             userId
         );
     }

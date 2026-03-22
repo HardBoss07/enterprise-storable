@@ -9,9 +9,13 @@ import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.TrashItem;
 import dev.m4tt3o.storable.core.service.SharingService;
 import java.util.List;
+import java.util.SequencedCollection;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
+/**
+ * Mapper for converting Domain Records to API DTOs.
+ */
 @Component
 @RequiredArgsConstructor
 public class FileApiMapper {
@@ -73,7 +77,7 @@ public class FileApiMapper {
     }
 
     public List<FileMetadataDto> toDtoList(
-        List<Storable> storables,
+        SequencedCollection<Storable> storables,
         String userId
     ) {
         return storables
@@ -90,7 +94,7 @@ public class FileApiMapper {
     }
 
     public List<TrashMetadataDto> toTrashDtoList(
-        List<TrashItem> trashItems,
+        SequencedCollection<TrashItem> trashItems,
         String userId
     ) {
         return trashItems
