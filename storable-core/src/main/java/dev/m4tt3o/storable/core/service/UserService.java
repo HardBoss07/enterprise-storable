@@ -1,6 +1,9 @@
 package dev.m4tt3o.storable.core.service;
 
 import dev.m4tt3o.storable.core.domain.User;
+import dev.m4tt3o.storable.core.exception.DuplicateResourceException;
+import dev.m4tt3o.storable.core.exception.ResourceNotFoundException;
+import dev.m4tt3o.storable.core.exception.UnauthorizedAccessException;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for managing user profile and account lifecycle.
+ * Throws specific domain exceptions for proper API error reporting.
  */
 @Slf4j
 @Service
@@ -89,25 +93,31 @@ public class UserService {
     private User findUserById(String userId) {
         return userPersistencePort
             .findById(userId)
-            .orElseThrow(() -> new RuntimeException("User not found"));
+            .orElseThrow(() ->
+                new ResourceNotFoundException("User not found: " + userId)
+            );
     }
 
     private void validateCurrentPassword(User user, String password) {
         if (!passwordEncoder.matches(password, user.password())) {
-            throw new RuntimeException("Incorrect current password");
+            throw new UnauthorizedAccessException(
+                "Incorrect current password."
+            );
         }
     }
 
     private void validateEmailAvailability(String email) {
         if (userPersistencePort.existsByEmail(email)) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException(
+                "Email already exists: " + email
+            );
         }
     }
 
     private void validateDeletionTarget(String userId) {
         if (ROOT_USER_ID.equals(userId)) {
             log.warn("Attempted to delete the root admin user!");
-            throw new RuntimeException(
+            throw new UnauthorizedAccessException(
                 "The root admin user cannot be deleted."
             );
         }

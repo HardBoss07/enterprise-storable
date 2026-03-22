@@ -1,6 +1,8 @@
 package dev.m4tt3o.storable.core.service;
 
+import dev.m4tt3o.storable.common.exception.ErrorCode;
 import dev.m4tt3o.storable.core.config.StorageProperties;
+import dev.m4tt3o.storable.core.exception.InternalStorableException;
 import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.io.InputStream;
@@ -11,6 +13,10 @@ import java.nio.file.StandardCopyOption;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+/**
+ * Implementation of StorageService for local file system storage.
+ * Throws InternalStorableException with STORAGE_FAILURE for all I/O errors.
+ */
 @Service
 @RequiredArgsConstructor
 public class LocalStorageService implements StorageService {
@@ -24,7 +30,10 @@ public class LocalStorageService implements StorageService {
         try {
             Files.createDirectories(rootLocation);
         } catch (IOException e) {
-            throw new RuntimeException("Could not initialize storage", e);
+            throw new InternalStorableException(
+                ErrorCode.STORAGE_FAILURE,
+                "Could not initialize storage."
+            );
         }
     }
 
@@ -36,15 +45,18 @@ public class LocalStorageService implements StorageService {
                 )
                 .normalize()
                 .toAbsolutePath();
+
             if (
                 !destinationFile
                     .getParent()
                     .startsWith(this.rootLocation.toAbsolutePath())
             ) {
-                throw new RuntimeException(
-                    "Cannot store file outside current directory."
+                throw new InternalStorableException(
+                    ErrorCode.STORAGE_FAILURE,
+                    "Cannot store file outside root directory."
                 );
             }
+
             Files.createDirectories(destinationFile.getParent());
             Files.copy(
                 inputStream,
@@ -52,7 +64,10 @@ public class LocalStorageService implements StorageService {
                 StandardCopyOption.REPLACE_EXISTING
             );
         } catch (IOException e) {
-            throw new RuntimeException("Failed to store file.", e);
+            throw new InternalStorableException(
+                ErrorCode.STORAGE_FAILURE,
+                "Failed to store file: " + storageKey
+            );
         }
     }
 
@@ -62,7 +77,10 @@ public class LocalStorageService implements StorageService {
             Path file = rootLocation.resolve(storageKey);
             return Files.newInputStream(file);
         } catch (IOException e) {
-            throw new RuntimeException("Could not read file.", e);
+            throw new InternalStorableException(
+                ErrorCode.STORAGE_FAILURE,
+                "Could not read file: " + storageKey
+            );
         }
     }
 
@@ -72,7 +90,10 @@ public class LocalStorageService implements StorageService {
             Path file = rootLocation.resolve(storageKey);
             Files.deleteIfExists(file);
         } catch (IOException e) {
-            throw new RuntimeException("Could not delete file.", e);
+            throw new InternalStorableException(
+                ErrorCode.STORAGE_FAILURE,
+                "Could not delete file: " + storageKey
+            );
         }
     }
 
@@ -93,8 +114,9 @@ public class LocalStorageService implements StorageService {
                     .getParent()
                     .startsWith(this.rootLocation.toAbsolutePath())
             ) {
-                throw new RuntimeException(
-                    "Cannot copy file outside current directory."
+                throw new InternalStorableException(
+                    ErrorCode.STORAGE_FAILURE,
+                    "Cannot copy file outside root directory."
                 );
             }
 
@@ -105,7 +127,13 @@ public class LocalStorageService implements StorageService {
                 StandardCopyOption.REPLACE_EXISTING
             );
         } catch (IOException e) {
-            throw new RuntimeException("Failed to copy file.", e);
+            throw new InternalStorableException(
+                ErrorCode.STORAGE_FAILURE,
+                "Failed to copy file from " +
+                    sourceKey +
+                    " to " +
+                    destinationKey
+            );
         }
     }
 

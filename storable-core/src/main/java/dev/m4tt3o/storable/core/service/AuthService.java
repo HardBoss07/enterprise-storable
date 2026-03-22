@@ -6,6 +6,8 @@ import dev.m4tt3o.storable.core.domain.User;
 import dev.m4tt3o.storable.core.dto.AuthRequest;
 import dev.m4tt3o.storable.core.dto.AuthResponse;
 import dev.m4tt3o.storable.core.dto.RegisterRequest;
+import dev.m4tt3o.storable.core.exception.DuplicateResourceException;
+import dev.m4tt3o.storable.core.exception.UnauthorizedAccessException;
 import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
 import dev.m4tt3o.storable.core.security.JwtService;
@@ -19,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Service for handling user authentication and registration.
+ * Throws specific domain exceptions for proper API error reporting.
  */
 @Slf4j
 @Service
@@ -69,11 +72,13 @@ public class AuthService {
         User user = userPersistencePort
             .findByUsername(request.username())
             .orElseThrow(() ->
-                new RuntimeException("Invalid username or password")
+                new UnauthorizedAccessException("Invalid username or password.")
             );
 
         if (!passwordEncoder.matches(request.password(), user.password())) {
-            throw new RuntimeException("Invalid username or password");
+            throw new UnauthorizedAccessException(
+                "Invalid username or password."
+            );
         }
 
         String token = generateAuthToken(user);
@@ -89,10 +94,14 @@ public class AuthService {
 
     private void validateUserRegistration(RegisterRequest request) {
         if (userPersistencePort.existsByUsername(request.username())) {
-            throw new RuntimeException("Username already exists");
+            throw new DuplicateResourceException(
+                "Username already exists: " + request.username()
+            );
         }
         if (userPersistencePort.existsByEmail(request.email())) {
-            throw new RuntimeException("Email already exists");
+            throw new DuplicateResourceException(
+                "Email already exists: " + request.email()
+            );
         }
     }
 

@@ -6,6 +6,7 @@ import dev.m4tt3o.storable.core.domain.Folder;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.TrashItem;
 import dev.m4tt3o.storable.core.domain.User;
+import dev.m4tt3o.storable.core.exception.*;
 import dev.m4tt3o.storable.core.port.FilePersistencePort;
 import dev.m4tt3o.storable.core.port.FolderPersistencePort;
 import dev.m4tt3o.storable.core.port.UserPersistencePort;
@@ -26,6 +27,7 @@ import org.springframework.transaction.annotation.Transactional;
 /**
  * Implementation of the FileService business logic.
  * Uses split persistence ports (File and Folder) to maintain domain boundaries.
+ * Throws specific domain exceptions for standard error handling.
  */
 @Slf4j
 @Service
@@ -195,13 +197,15 @@ public class FileServiceImpl implements FileService {
         Storable storable = folderPersistencePort
             .findStorableById(nodeId)
             .orElseThrow(() ->
-                new RuntimeException("File not found: " + nodeId)
+                new ResourceNotFoundException("File not found: " + nodeId)
             );
 
         if (storable instanceof File file) {
             return storageService.load(file.storageKey());
         }
-        throw new RuntimeException("Cannot download a folder: " + nodeId);
+        throw new InternalStorableException(
+            "Cannot download a folder: " + nodeId
+        );
     }
 
     @Override
@@ -214,14 +218,16 @@ public class FileServiceImpl implements FileService {
         if (ADMIN_ID.equals(ownerId)) {
             return (Folder) folderPersistencePort
                 .findStorableById(ROOT_ID)
-                .orElseThrow();
+                .orElseThrow(() ->
+                    new InternalStorableException("System root folder missing.")
+                );
         }
 
         String effectiveUsername = resolveUsername(ownerId, username);
         return folderPersistencePort
             .findFolder(effectiveUsername, ROOT_ID, ownerId)
             .orElseThrow(() ->
-                new RuntimeException(
+                new ResourceNotFoundException(
                     "Home folder not found for user: " + effectiveUsername
                 )
             );
@@ -279,11 +285,11 @@ public class FileServiceImpl implements FileService {
         Storable node = folderPersistencePort
             .findStorableById(nodeId)
             .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
+                new ResourceNotFoundException("Node not found: " + nodeId)
             );
 
         if (ROOT_ID.equals(node.parentId())) {
-            throw new RuntimeException(
+            throw new UnauthorizedAccessException(
                 "Access denied: Cannot delete a root-level directory."
             );
         }
@@ -372,11 +378,11 @@ public class FileServiceImpl implements FileService {
         Storable node = folderPersistencePort
             .findStorableById(nodeId)
             .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
+                new ResourceNotFoundException("Node not found: " + nodeId)
             );
 
         if (ROOT_ID.equals(node.parentId())) {
-            throw new RuntimeException(
+            throw new UnauthorizedAccessException(
                 "Access denied: Cannot rename root-level directories."
             );
         }
@@ -438,11 +444,11 @@ public class FileServiceImpl implements FileService {
         Storable original = folderPersistencePort
             .findStorableById(nodeId)
             .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
+                new ResourceNotFoundException("Node not found: " + nodeId)
             );
 
         if (original instanceof Folder) {
-            throw new RuntimeException(
+            throw new InternalStorableException(
                 "Duplicating folders is not supported yet."
             );
         }
@@ -489,23 +495,25 @@ public class FileServiceImpl implements FileService {
         Storable node = folderPersistencePort
             .findStorableById(nodeId)
             .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
+                new ResourceNotFoundException("Node not found: " + nodeId)
             );
 
         if (ROOT_ID.equals(node.parentId())) {
-            throw new RuntimeException(
+            throw new UnauthorizedAccessException(
                 "Access denied: Cannot move root-level directories."
             );
         }
 
         if (node instanceof Folder && isSubfolder(nodeId, targetParentId)) {
-            throw new RuntimeException(
+            throw new DuplicateResourceException(
                 "Cannot move a folder into its own subfolder."
             );
         }
 
         if (nodeId.equals(targetParentId)) {
-            throw new RuntimeException("Cannot move a node to itself.");
+            throw new InternalStorableException(
+                "Cannot move a node to itself."
+            );
         }
 
         return switch (node) {
@@ -608,13 +616,13 @@ public class FileServiceImpl implements FileService {
         String errorMessage
     ) {
         if (!sharingService.hasPermission(nodeId, userId, level)) {
-            throw new RuntimeException(errorMessage);
+            throw new UnauthorizedAccessException(errorMessage);
         }
     }
 
     private void validateNameAvailability(String name, Long parentId) {
         if (folderPersistencePort.existsByNameAndParent(name, parentId)) {
-            throw new RuntimeException(
+            throw new DuplicateResourceException(
                 "A file or folder with this name already exists."
             );
         }
@@ -626,13 +634,15 @@ public class FileServiceImpl implements FileService {
             .findById(ownerId)
             .map(User::username)
             .orElseThrow(() ->
-                new RuntimeException("User not found: " + ownerId)
+                new ResourceNotFoundException("User not found: " + ownerId)
             );
     }
 
     private String validateAndResolveNewName(Storable node, String newName) {
         if (newName.matches(".*[\\\\/:*?\"<>|].*")) {
-            throw new RuntimeException("Filename contains invalid characters.");
+            throw new InternalStorableException(
+                "Filename contains invalid characters."
+            );
         }
 
         if (node instanceof File file) {
