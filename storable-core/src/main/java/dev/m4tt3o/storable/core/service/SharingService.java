@@ -1,19 +1,21 @@
 package dev.m4tt3o.storable.core.service;
 
-import dev.m4tt3o.storable.common.dto.AccessPrivilegeDto;
 import dev.m4tt3o.storable.common.dto.UserLookupDto;
 import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
+import dev.m4tt3o.storable.core.domain.AccessPrivilege;
+import dev.m4tt3o.storable.core.domain.Storable;
 import java.util.List;
 
 /**
  * Service for managing file/folder sharing and access privileges.
+ * Returns pure domain records (AccessPrivilege, Storable).
  */
 public interface SharingService {
     /** Lookup users by email or username. */
     List<UserLookupDto> lookupUsers(String query);
 
     /** Share a node with another user. */
-    AccessPrivilegeDto shareNode(
+    AccessPrivilege shareNode(
         Long nodeId,
         String targetUserId,
         PrivilegeLevel level,
@@ -21,7 +23,7 @@ public interface SharingService {
     );
 
     /** Update an existing privilege. */
-    AccessPrivilegeDto updatePrivilege(
+    AccessPrivilege updatePrivilege(
         Long nodeId,
         String targetUserId,
         PrivilegeLevel level,
@@ -32,12 +34,10 @@ public interface SharingService {
     void removePrivilege(Long nodeId, String targetUserId, String requesterId);
 
     /** Get all privileges for a node. */
-    List<AccessPrivilegeDto> getPrivileges(Long nodeId, String requesterId);
+    List<AccessPrivilege> getPrivileges(Long nodeId, String requesterId);
 
     /** Get all nodes shared with a specific user. */
-    List<dev.m4tt3o.storable.core.domain.Storable> getSharedWithMe(
-        String userId
-    );
+    List<Storable> getSharedWithMe(String userId);
 
     /** Check if a user has a specific permission level on a node. */
     boolean hasPermission(

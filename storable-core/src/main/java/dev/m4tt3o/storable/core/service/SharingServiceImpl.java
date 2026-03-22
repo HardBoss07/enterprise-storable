@@ -1,8 +1,8 @@
 package dev.m4tt3o.storable.core.service;
 
-import dev.m4tt3o.storable.common.dto.AccessPrivilegeDto;
 import dev.m4tt3o.storable.common.dto.UserLookupDto;
 import dev.m4tt3o.storable.common.entity.PrivilegeLevel;
+import dev.m4tt3o.storable.core.domain.AccessPrivilege;
 import dev.m4tt3o.storable.core.domain.Storable;
 import dev.m4tt3o.storable.core.domain.User;
 import dev.m4tt3o.storable.core.port.FolderPersistencePort;
@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Implementation of SharingService for managing node permissions.
+ * Complies with the 20-line rule and follows Hexagonal Architecture.
  */
 @Slf4j
 @Service
@@ -27,8 +28,7 @@ public class SharingServiceImpl implements SharingService {
     private final FolderPersistencePort folderPersistencePort;
     private final UserPersistencePort userPersistencePort;
 
-    private static final String ADMIN_ID =
-        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+    private static final String ADMIN_ID = "f43c0bcf-11e4-4629-b072-321ccd04e72a";
     private static final Long ROOT_ID = 1L;
 
     @Override
@@ -36,8 +36,7 @@ public class SharingServiceImpl implements SharingService {
         log.info("Looking up users with query: {}", query);
         if (query == null || query.isBlank()) return List.of();
 
-        return userPersistencePort
-            .searchUsers(query)
+        return userPersistencePort.searchUsers(query)
             .stream()
             .map(u -> new UserLookupDto(u.id(), u.username(), u.email()))
             .toList();
@@ -45,165 +44,73 @@ public class SharingServiceImpl implements SharingService {
 
     @Override
     @Transactional
-    public AccessPrivilegeDto shareNode(
-        Long nodeId,
-        String targetUserId,
-        PrivilegeLevel level,
-        String requesterId
-    ) {
-        log.info(
-            "Sharing node {} with user {} at level {}",
-            nodeId,
-            targetUserId,
-            level
-        );
+    public AccessPrivilege shareNode(Long nodeId, String targetUserId, PrivilegeLevel level, String requesterId) {
+        log.info("Sharing node {} with user {} at level {}", nodeId, targetUserId, level);
 
-        Storable node = folderPersistencePort
-            .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
-            );
+        Storable node = findNode(nodeId);
+        verifySharePermission(node, requesterId);
+        verifyTargetUserNotOwner(node, targetUserId);
 
-        validateSharePermission(node, requesterId);
-        validateTargetUserNotOwner(node, targetUserId);
-
-        User targetUser = userPersistencePort
-            .findById(targetUserId)
-            .orElseThrow(() ->
-                new RuntimeException("Target user not found: " + targetUserId)
-            );
-
+        User targetUser = findTargetUser(targetUserId);
         sharingPersistencePort.grantPrivilege(nodeId, targetUserId, level);
 
-        return new AccessPrivilegeDto(
-            null,
-            nodeId,
-            targetUserId,
-            targetUser.username(),
-            targetUser.email(),
-            level
-        );
+        return buildAccessPrivilege(nodeId, targetUser, level);
     }
 
     @Override
     @Transactional
-    public AccessPrivilegeDto updatePrivilege(
-        Long nodeId,
-        String targetUserId,
-        PrivilegeLevel level,
-        String requesterId
-    ) {
+    public AccessPrivilege updatePrivilege(Long nodeId, String targetUserId, PrivilegeLevel level, String requesterId) {
         return shareNode(nodeId, targetUserId, level, requesterId);
     }
 
     @Override
     @Transactional
-    public void removePrivilege(
-        Long nodeId,
-        String targetUserId,
-        String requesterId
-    ) {
-        log.info(
-            "Removing privilege for node {} and user {}",
-            nodeId,
-            targetUserId
-        );
+    public void removePrivilege(Long nodeId, String targetUserId, String requesterId) {
+        log.info("Removing privilege for node {} and user {}", nodeId, targetUserId);
 
-        Storable node = folderPersistencePort
-            .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
-            );
-
-        if (
-            !node.ownerId().equals(requesterId) &&
-            !hasPermission(nodeId, requesterId, PrivilegeLevel.OWNER)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to manage shares for this node."
-            );
-        }
+        Storable node = findNode(nodeId);
+        verifyManageSharePermission(node, requesterId);
 
         sharingPersistencePort.revokePrivileges(nodeId, targetUserId);
     }
 
     @Override
-    public List<AccessPrivilegeDto> getPrivileges(
-        Long nodeId,
-        String requesterId
-    ) {
+    public List<AccessPrivilege> getPrivileges(Long nodeId, String requesterId) {
         log.info("Fetching privileges for node {}", nodeId);
 
-        Storable node = folderPersistencePort
-            .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new RuntimeException("Node not found: " + nodeId)
-            );
+        Storable node = findNode(nodeId);
+        verifyViewSharePermission(node, requesterId);
 
-        if (
-            !node.ownerId().equals(requesterId) &&
-            !hasPermission(nodeId, requesterId, PrivilegeLevel.VIEW)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to view shares for this node."
-            );
-        }
-
-        return sharingPersistencePort
-            .findPrivilegesForNode(nodeId)
+        return sharingPersistencePort.findPrivilegesForNode(nodeId)
             .stream()
-            .map(info -> {
-                User user = userPersistencePort
-                    .findById(info.userId())
-                    .orElse(null);
-                return new AccessPrivilegeDto(
-                    null,
-                    info.nodeId(),
-                    info.userId(),
-                    user != null ? user.username() : "Unknown",
-                    user != null ? user.email() : "Unknown",
-                    info.level()
-                );
-            })
+            .map(this::mapToAccessPrivilege)
             .toList();
     }
 
     @Override
     public List<Storable> getSharedWithMe(String userId) {
         log.info("Fetching nodes shared with user {}", userId);
-        List<Long> sharedNodeIds = sharingPersistencePort.findSharedNodeIds(
-            userId
-        );
+        List<Long> sharedNodeIds = sharingPersistencePort.findSharedNodeIds(userId);
         return folderPersistencePort.findStorableByIds(sharedNodeIds);
     }
 
     @Override
-    public boolean hasPermission(
-        Long nodeId,
-        String userId,
-        PrivilegeLevel requiredLevel
-    ) {
+    public boolean hasPermission(Long nodeId, String userId, PrivilegeLevel requiredLevel) {
         PrivilegeLevel actualLevel = getHighestPrivilege(nodeId, userId);
-        return (
-            actualLevel != null &&
-            actualLevel.ordinal() >= requiredLevel.ordinal()
-        );
+        return actualLevel != null && actualLevel.ordinal() >= requiredLevel.ordinal();
     }
 
     @Override
     public PrivilegeLevel getHighestPrivilege(Long nodeId, String userId) {
         if (ADMIN_ID.equals(userId)) return PrivilegeLevel.OWNER;
 
-        Optional<Storable> nodeOpt = folderPersistencePort.findStorableById(
-            nodeId
-        );
+        Optional<Storable> nodeOpt = folderPersistencePort.findStorableById(nodeId);
         if (nodeOpt.isEmpty()) return null;
         Storable node = nodeOpt.get();
 
         if (node.ownerId().equals(userId)) return PrivilegeLevel.OWNER;
 
-        Optional<PrivilegeLevel> explicitPrivilege =
-            sharingPersistencePort.findHighestPrivilege(nodeId, userId);
+        Optional<PrivilegeLevel> explicitPrivilege = sharingPersistencePort.findHighestPrivilege(nodeId, userId);
         if (explicitPrivilege.isPresent()) return explicitPrivilege.get();
 
         if (node.parentId() != null && !ROOT_ID.equals(node.parentId())) {
@@ -213,23 +120,60 @@ public class SharingServiceImpl implements SharingService {
         return null;
     }
 
-    private void validateSharePermission(Storable node, String requesterId) {
-        if (
-            !node.ownerId().equals(requesterId) &&
-            !hasPermission(node.id(), requesterId, PrivilegeLevel.OWNER)
-        ) {
-            throw new RuntimeException(
-                "Access denied: You don't have permission to share this node."
-            );
+    // --- Private Atomic Helper Methods ---
+
+    private Storable findNode(Long nodeId) {
+        return folderPersistencePort.findStorableById(nodeId)
+            .orElseThrow(() -> new RuntimeException("Node not found: " + nodeId));
+    }
+
+    private User findTargetUser(String userId) {
+        return userPersistencePort.findById(userId)
+            .orElseThrow(() -> new RuntimeException("Target user not found: " + userId));
+    }
+
+    private void verifySharePermission(Storable node, String requesterId) {
+        if (!node.ownerId().equals(requesterId) && !hasPermission(node.id(), requesterId, PrivilegeLevel.OWNER)) {
+            throw new RuntimeException("Access denied: You don't have permission to share this node.");
         }
     }
 
-    private void validateTargetUserNotOwner(
-        Storable node,
-        String targetUserId
-    ) {
+    private void verifyManageSharePermission(Storable node, String requesterId) {
+        if (!node.ownerId().equals(requesterId) && !hasPermission(node.id(), requesterId, PrivilegeLevel.OWNER)) {
+            throw new RuntimeException("Access denied: You don't have permission to manage shares for this node.");
+        }
+    }
+
+    private void verifyViewSharePermission(Storable node, String requesterId) {
+        if (!node.ownerId().equals(requesterId) && !hasPermission(node.id(), requesterId, PrivilegeLevel.VIEW)) {
+            throw new RuntimeException("Access denied: You don't have permission to view shares for this node.");
+        }
+    }
+
+    private void verifyTargetUserNotOwner(Storable node, String targetUserId) {
         if (node.ownerId().equals(targetUserId)) {
             throw new RuntimeException("Target user is already the owner.");
         }
+    }
+
+    private AccessPrivilege buildAccessPrivilege(Long nodeId, User targetUser, PrivilegeLevel level) {
+        return AccessPrivilege.builder()
+            .nodeId(nodeId)
+            .userId(targetUser.id())
+            .username(targetUser.username())
+            .email(targetUser.email())
+            .level(level)
+            .build();
+    }
+
+    private AccessPrivilege mapToAccessPrivilege(SharingPersistencePort.AccessPrivilegeInfo info) {
+        User user = userPersistencePort.findById(info.userId()).orElse(null);
+        return AccessPrivilege.builder()
+            .nodeId(info.nodeId())
+            .userId(info.userId())
+            .username(user != null ? user.username() : "Unknown")
+            .email(user != null ? user.email() : "Unknown")
+            .level(info.level())
+            .build();
     }
 }
