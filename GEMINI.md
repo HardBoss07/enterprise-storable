@@ -161,11 +161,11 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **Logic:** Implement "First Login" interceptor. If `user.password == 'root'`, redirect to a mandatory `/setup/change-password` flow.
 - [x] **Footer:** Standardize global footer with Creator links and GitHub repository integration.
 
-### [ ] Phase 11: Admin Control & Session Management
+### [x] Phase 11: Admin Control & Session Management
 
-- [ ] **Logic:** Implement a Session Registry in `storable-core`.
-- [ ] **API:** `POST /api/admin/sessions/revoke-all` (Logic: Invalidate all JWTs/Sessions except for UID `root`).
-- [ ] **UI:** Add "Nuclear Session Reset" button to the Admin Panel.
+- [x] **Logic:** Implement a Session Registry in `storable-core`.
+- [x] **API:** `POST /api/admin/sessions/revoke-all` (Logic: Invalidate all JWTs/Sessions except for UID `root`).
+- [x] **UI:** Add "Nuclear Session Reset" button to the Admin Panel.
 
 ### [ ] Phase 12: Self-Hosting & Portability (The "Final Wrap")
 
