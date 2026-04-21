@@ -80,7 +80,7 @@ This file is the **Source of Truth** for the project. Every session should begin
 
 ## Interactive Roadmap
 
-> **Status:** Phase 10: User Onboarding & Branding (In Progress) | **Last Updated:** 2026-03-21
+> **Status:** Phase 12: Self-Hosting & Portability (Completed) | **Last Updated:** 2026-04-21
 
 ### [x] Phase 1: Infrastructure & Skeleton
 
@@ -167,11 +167,11 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **API:** `POST /api/admin/sessions/revoke-all` (Logic: Invalidate all JWTs/Sessions except for UID `root`).
 - [x] **UI:** Add "Nuclear Session Reset" button to the Admin Panel.
 
-### [ ] Phase 12: Self-Hosting & Portability (The "Final Wrap")
+### [x] Phase 12: Self-Hosting & Portability (The "Final Wrap")
 
-- [ ] **Config:** Refactor Spring Boot to use `${ENV_VAR}` mapping for all `application.yaml` properties, ensuring 100% `.env` driven configuration.
-- [ ] **Docker:** Multi-stage `Dockerfile` to compile Java and Next.js into a single, optimized production image.
-- [ ] **Documentation:** Create a `docker-compose.yml` template and "One-Click" setup guide for Portainer/Nginx Proxy Manager users.
+- [x] **Config:** Refactor Spring Boot to use `${ENV_VAR}` mapping for all `application.yaml` properties, ensuring 100% `.env` driven configuration.
+- [x] **Docker:** Multi-stage `Dockerfile` to compile Java and Next.js into a single, optimized production image.
+- [x] **Documentation:** Create a `docker-compose.yml` template and "One-Click" setup guide for Portainer/Nginx Proxy Manager users.
 
 ---
 

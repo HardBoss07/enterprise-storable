@@ -292,14 +292,18 @@ enterprise-storable/
 │   ├── postcss.config.mjs
 │   └── tsconfig.json
 ├── CONTRIBUTING.md
+├── DEPLOYMENT.md
 ├── Dockerfile.backend
+├── Dockerfile.production
 ├── File Colors.md
 ├── GEMINI.md
 ├── LICENSE
 ├── Project Structure.md
 ├── README.md
 ├── Refactoring Prompts.md
+├── docker-compose.production.yml
 ├── docker-compose.yml
+├── entrypoint.sh
 ├── package-lock.json
 ├── package.json
 ├── pom.xml
