@@ -18,8 +18,17 @@ export default function LoginPage() {
     setError("");
     try {
       const res = await loginApi({ username, password });
-      login(res.token, res.username, res.email, res.userId, res.role);
-      // login function handles redirect usually, but duplicate just in case
+      // Phase 10: Implement "First Login" interceptor.
+      // If user.password == 'root', redirect to a mandatory /setup/change-password flow.
+      const isFirstLogin = password === "root";
+      login(
+        res.token,
+        res.username,
+        res.email,
+        res.userId,
+        res.role,
+        isFirstLogin,
+      );
     } catch (err: any) {
       setError(err.message || "Login failed");
     }

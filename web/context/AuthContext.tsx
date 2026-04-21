@@ -25,6 +25,7 @@ interface AuthContextType {
     email: string,
     userId: string,
     role: string,
+    isFirstLogin?: boolean,
   ) => void;
   logout: () => void;
   isAuthenticated: boolean;
@@ -55,6 +56,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     email: string,
     userId: string,
     role: string,
+    isFirstLogin: boolean = false,
   ) => {
     localStorage.setItem("token", token);
     localStorage.setItem("username", username);
@@ -62,7 +64,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("userId", userId);
     localStorage.setItem("role", role);
     setUser({ token, username, email, id: userId, role });
-    router.push("/");
+
+    if (isFirstLogin) {
+      router.push("/setup/change-password");
+    } else {
+      router.push("/home");
+    }
   };
 
   const logout = () => {
