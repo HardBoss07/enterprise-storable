@@ -20,15 +20,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtService jwtService;
-    private final UserDetailsService userDetailsService;
+    private final dev.m4tt3o.storable.core.security.JwtService jwtService;
+    private final org.springframework.security.core.userdetails.UserDetailsService userDetailsService;
+    private final dev.m4tt3o.storable.core.service.SessionService sessionService;
 
     @Override
     protected void doFilterInternal(
-        @NonNull HttpServletRequest request,
-        @NonNull HttpServletResponse response,
-        @NonNull FilterChain filterChain
-    ) throws ServletException, IOException {
+        @NonNull jakarta.servlet.http.HttpServletRequest request,
+        @NonNull jakarta.servlet.http.HttpServletResponse response,
+        @NonNull jakarta.servlet.FilterChain filterChain
+    ) throws jakarta.servlet.ServletException, IOException {
         final String authHeader = request.getHeader("Authorization");
         final String jwt;
         final String username;
@@ -39,43 +40,50 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         jwt = authHeader.substring(7);
-        // If parsing fails (e.g. expired), exceptions will bubble up.
-        // GlobalExceptionHandler might catch them if configured for filters,
-        // but typically filters are outside ControllerAdvice.
-        // For simplicity, we let Spring Security handle unauthorized exceptions.
 
         try {
             username = jwtService.extractUsername(jwt);
             if (
                 username != null &&
-                SecurityContextHolder.getContext().getAuthentication() == null
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() ==
+                null
             ) {
-                UserDetails userDetails =
+                org.springframework.security.core.userdetails.UserDetails userDetails =
                     this.userDetailsService.loadUserByUsername(username);
+
                 if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
-                    // Extract ID if it's our CustomUserDetails
-                    Object principal = userDetails.getUsername(); // fallback
+                    String userId = null;
                     if (
                         userDetails instanceof
                             dev.m4tt3o.storable.core.security.CustomUserDetails custom
                     ) {
-                        principal = custom.id();
+                        userId = custom.id();
                     }
 
-                    UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                            principal,
-                            null,
-                            userDetails.getAuthorities()
-                        );
-                    authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(
-                            request
+                    java.util.Date issuedAt = jwtService.extractIssuedAt(jwt);
+
+                    if (
+                        userId != null &&
+                        sessionService.isSessionValid(
+                            userId,
+                            issuedAt.toInstant()
                         )
-                    );
-                    SecurityContextHolder.getContext().setAuthentication(
-                        authToken
-                    );
+                    ) {
+                        org.springframework.security.authentication.UsernamePasswordAuthenticationToken authToken =
+                            new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
+                                userId,
+                                null,
+                                userDetails.getAuthorities()
+                            );
+                        authToken.setDetails(
+                            new org.springframework.security.web.authentication.WebAuthenticationDetailsSource().buildDetails(
+                                request
+                            )
+                        );
+                        org.springframework.security.core.context.SecurityContextHolder.getContext().setAuthentication(
+                            authToken
+                        );
+                    }
                 }
             }
         } catch (Exception e) {
