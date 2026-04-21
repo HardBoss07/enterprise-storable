@@ -16,42 +16,34 @@ RUN mvn clean install -DskipTests
 # --- Stage 2: Build Frontend ---
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app
+# Copy the package files from the web subdirectory to the container root
 COPY web/package.json web/package-lock.json* ./
 RUN npm install
+# Copy everything else from the web subdirectory to the container root
 COPY web/ .
-# Set environment variables for build if needed
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+# Set output to standalone in your next.config.js if not already done
 RUN npm run build
 
 # --- Stage 3: Final Production Image ---
 FROM eclipse-temurin:21-jre-alpine AS runner
-
-# Install Node.js and Tini
 RUN apk add --no-cache nodejs npm tini
-
 WORKDIR /app
 
 # Copy Backend
 COPY --from=backend-builder /app/storable-api/target/storable-api-*.jar ./backend.jar
 
-# Copy Frontend (Standalone)
-COPY --from=frontend-builder /app/.next/standalone ./frontend
-COPY --from=frontend-builder /app/.next/static ./frontend/.next/static
-COPY --from=frontend-builder /app/public ./frontend/public
+# Copy Frontend (Note the path change to match Next.js standalone output)
+COPY --from=frontend-builder /app/.next/standalone ./
+COPY --from=frontend-builder /app/.next/static ./.next/static
+COPY --from=frontend-builder /app/public ./public
 
-# Create storage directory
 RUN mkdir -p /app/storage && chmod 777 /app/storage
-
-# Entrypoint script
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
-# Environment variables
 ENV NODE_ENV=production
 ENV PORT=3000
-
-# Expose ports
 EXPOSE 8080 3000
-
 ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]

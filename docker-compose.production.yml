@@ -2,14 +2,12 @@ version: "3.8"
 
 services:
   storable:
-    image: storable:latest
-    build:
-      context: .
-      dockerfile: Dockerfile.production
-      args:
-        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    # 1. Update this to your Docker Hub image name
+    image: m4tt3o/storable:latest
     container_name: storable_app
     restart: unless-stopped
+    # 2. Portainer handles these via its "Environment Variables" UI
+    # but keeping this here for local reference is fine
     env_file: .env
     depends_on:
       db:
@@ -18,7 +16,8 @@ services:
       - "${HOST_PORT_BACKEND:-8080}:8080"
       - "${HOST_PORT_FRONTEND:-3000}:3000"
     volumes:
-      - ./storage:/app/storage
+      # 3. Change relative path to an absolute path for your homelab
+      - /home/youruser/storable/storage:/app/storage
     networks:
       - storable-net
 
@@ -34,9 +33,11 @@ services:
       - "${HOST_PORT_DB:-3306}:3306"
     volumes:
       - db-data:/var/lib/mysql
-      - ./db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
-      - ./db/indexes.sql:/docker-entrypoint-initdb.d/002_indexes.sql
-      - ./db/base-data.sql:/docker-entrypoint-initdb.d/003_base-data.sql
+      # 4. Note: These SQL files must exist on the homelab server
+      # at these exact paths for the DB to initialize!
+      - /home/youruser/storable/db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
+      - /home/youruser/storable/db/indexes.sql:/docker-entrypoint-initdb.d/002_indexes.sql
+      - /home/youruser/storable/db/base-data.sql:/docker-entrypoint-initdb.d/003_base-data.sql
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       timeout: 20s
