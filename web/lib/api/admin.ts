@@ -60,3 +60,12 @@ export async function updateRetentionDays(days: number): Promise<void> {
   const current = await getSettings();
   await updateSettings({ ...current, trashRetentionDays: days });
 }
+
+/**
+ * Nuclear Session Reset: Revokes all active user sessions globally (ADMIN only).
+ */
+export async function revokeAllSessions(): Promise<{ message: string }> {
+  return apiRequest<{ message: string }>("/api/admin/sessions/revoke-all", {
+    method: "POST",
+  });
+}

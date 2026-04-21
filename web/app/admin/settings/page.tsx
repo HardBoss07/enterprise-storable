@@ -2,10 +2,23 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { GlobalSettingsDto } from "@/types/api";
-import { getSettings, updateSettings } from "@/lib/api/admin";
+import {
+  getSettings,
+  updateSettings,
+  revokeAllSessions,
+} from "@/lib/api/admin";
 import { Button } from "@/components/ui/Button";
-import { Save, Clock, Trash2, Search, Check } from "lucide-react";
+import {
+  Save,
+  Clock,
+  Trash2,
+  Search,
+  Check,
+  ShieldAlert,
+  LogOut,
+} from "lucide-react";
 import { useToast } from "@/context/ToastContext";
+import { useConfirm } from "@/context/ConfirmContext";
 import { Spinner } from "@/components/ui/Spinner";
 import { cn } from "@/lib/utils";
 
@@ -13,9 +26,11 @@ export default function GlobalSettingsPage() {
   const [settings, setSettings] = useState<GlobalSettingsDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isRevoking, setIsRevoking] = useState(false);
   const [tzSearch, setTzSearch] = useState("");
   const [isTzOpen, setIsTzOpen] = useState(false);
   const { showToast } = useToast();
+  const { confirm } = useConfirm();
 
   const allTimezones = useMemo(() => {
     return (Intl as any).supportedValuesOf("timeZone") as string[];
@@ -40,7 +55,7 @@ export default function GlobalSettingsPage() {
       }
     };
     fetchSettings();
-  }, []);
+  }, [showToast]);
 
   const handleSave = async () => {
     if (!settings) return;
@@ -52,6 +67,28 @@ export default function GlobalSettingsPage() {
       showToast("Failed to update settings", "error");
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleNuclearReset = async () => {
+    const isConfirmed = await confirm({
+      title: "Nuclear Session Reset",
+      message:
+        "This will immediately invalidate ALL active user sessions across the entire system. Every user (except the root admin) will be forcibly logged out and required to sign in again. Use this only in emergencies or security breaches.",
+      confirmLabel: "Invalidate All Sessions",
+      variant: "danger",
+    });
+
+    if (isConfirmed) {
+      try {
+        setIsRevoking(true);
+        const response = await revokeAllSessions();
+        showToast(response.message, "success");
+      } catch (error) {
+        showToast("Failed to revoke sessions", "error");
+      } finally {
+        setIsRevoking(false);
+      }
     }
   };
 
@@ -168,7 +205,51 @@ export default function GlobalSettingsPage() {
         </div>
       </section>
 
-      <div className="flex justify-end pt-4">
+      {/* Security Section */}
+      <section className="bg-bg-sidebar rounded-2xl border border-red-500/20 p-6 shadow-2xl space-y-6">
+        <div className="flex items-center gap-3 text-red-500">
+          <div className="p-2 rounded-lg bg-red-500/10">
+            <ShieldAlert size={20} />
+          </div>
+          <h2 className="text-lg font-bold tracking-tight">
+            Security & Sessions
+          </h2>
+        </div>
+
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <h3 className="text-sm font-bold text-text-primary uppercase tracking-tighter">
+              Nuclear Session Reset
+            </h3>
+            <p className="text-sm text-text-muted leading-relaxed">
+              In case of a security breach or system-wide maintenance, you can
+              instantly log out all active users. This will invalidate all
+              existing authentication tokens globally.
+            </p>
+          </div>
+
+          <Button
+            variant="ghost"
+            onClick={handleNuclearReset}
+            disabled={isRevoking}
+            className="w-full bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all duration-300 font-bold py-6 group"
+          >
+            {isRevoking ? (
+              <Spinner size="sm" />
+            ) : (
+              <div className="flex items-center gap-3">
+                <LogOut
+                  size={20}
+                  className="group-hover:translate-x-1 transition-transform"
+                />
+                <span>Invalidate All User Sessions</span>
+              </div>
+            )}
+          </Button>
+        </div>
+      </section>
+
+      <div className="flex justify-end pt-4 pb-12">
         <Button
           onClick={handleSave}
           disabled={isSaving}

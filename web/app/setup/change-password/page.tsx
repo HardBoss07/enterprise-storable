@@ -28,6 +28,12 @@ export default function ChangePasswordSetup() {
       return;
     }
 
+    if (newPassword.length < 8) {
+      setStatus("error");
+      setErrorMessage("New password must be at least 8 characters long");
+      return;
+    }
+
     if (newPassword === "root") {
       setStatus("error");
       setErrorMessage("New password cannot be 'root'");
