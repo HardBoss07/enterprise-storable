@@ -12,6 +12,7 @@ export default function RegisterPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [error, setError] = useState("");
   const { login } = useAuth();
   const router = useRouter();
@@ -22,6 +23,11 @@ export default function RegisterPage() {
 
     if (password !== confirmPassword) {
       setError("Passwords do not match");
+      return;
+    }
+
+    if (!acceptedTerms) {
+      setError("You must accept the Terms of Service and Privacy Policy");
       return;
     }
 
@@ -109,9 +115,43 @@ export default function RegisterPage() {
               required
             />
           </div>
+
+          <div className="flex items-start gap-3 pt-2">
+            <input
+              id="terms"
+              type="checkbox"
+              className="mt-1 h-4 w-4 rounded border-neutral-700 bg-neutral-900 text-primary focus:ring-primary accent-primary cursor-pointer"
+              checked={acceptedTerms}
+              onChange={(e) => setAcceptedTerms(e.target.checked)}
+              required
+            />
+            <label
+              htmlFor="terms"
+              className="text-xs text-neutral-400 leading-tight cursor-pointer select-none"
+            >
+              I agree to the{" "}
+              <Link
+                href="/terms"
+                target="_blank"
+                className="text-accent hover:underline font-bold"
+              >
+                Terms of Service
+              </Link>{" "}
+              and I have read the{" "}
+              <Link
+                href="/privacy"
+                target="_blank"
+                className="text-accent hover:underline font-bold"
+              >
+                Privacy Policy
+              </Link>
+              .
+            </label>
+          </div>
+
           <button
             type="submit"
-            className="w-full bg-primary hover:bg-primary-dark text-black font-black py-3 px-4 rounded-xl transition-all uppercase tracking-tight shadow-lg shadow-primary/20 active:scale-95"
+            className="w-full bg-primary hover:bg-primary-dark text-black font-black py-3 px-4 rounded-xl transition-all uppercase tracking-tight shadow-lg shadow-primary/20 active:scale-95 mt-2"
           >
             Register
           </button>

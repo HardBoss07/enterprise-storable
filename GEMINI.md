@@ -154,12 +154,12 @@ This file is the **Source of Truth** for the project. Every session should begin
 - [x] **Feature:** Implementation of "Change Password" (with current password verification) and "Change Email" flows.
 - [x] **Security:** Implement the "Nuclear Option" - a "Delete Account" flow that recursively wipes the user's database entries and physical `/storage` directory after a "Confirm Password" warning.
 
-### [ ] Phase 10: User Onboarding & Branding
+### [x] Phase 10: User Onboarding & Branding
 
-- [ ] **UI:** Create a high-conversion Landing Page at `/` featuring project info, feature showcases (dummy components), and a prominent Login CTA.
-- [ ] **Navigation:** Move the existing File Explorer/Dashboard to `/home`.
-- [ ] **Logic:** Implement "First Login" interceptor. If `user.password == 'root'`, redirect to a mandatory `/setup/change-password` flow.
-- [ ] **Footer:** Standardize global footer with Creator links and GitHub repository integration.
+- [x] **UI:** Create a high-conversion Landing Page at `/` featuring project info, feature showcases (dummy components), and a prominent Login CTA.
+- [x] **Navigation:** Move the existing File Explorer/Dashboard to `/home`.
+- [x] **Logic:** Implement "First Login" interceptor. If `user.password == 'root'`, redirect to a mandatory `/setup/change-password` flow.
+- [x] **Footer:** Standardize global footer with Creator links and GitHub repository integration.
 
 ### [ ] Phase 11: Admin Control & Session Management
 
