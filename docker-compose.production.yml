@@ -1,0 +1,52 @@
+version: "3.8"
+
+services:
+  storable:
+    image: storable:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.production
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8080}
+    container_name: storable_app
+    restart: unless-stopped
+    env_file: .env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "${HOST_PORT_BACKEND:-8080}:8080"
+      - "${HOST_PORT_FRONTEND:-3000}:3000"
+    volumes:
+      - ./storage:/app/storage
+    networks:
+      - storable-net
+
+  db:
+    image: mysql:8.0
+    container_name: storable_db
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-storable}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+    ports:
+      - "${HOST_PORT_DB:-3306}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/001_schema.sql
+      - ./db/indexes.sql:/docker-entrypoint-initdb.d/002_indexes.sql
+      - ./db/base-data.sql:/docker-entrypoint-initdb.d/003_base-data.sql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+    networks:
+      - storable-net
+
+networks:
+  storable-net:
+    driver: bridge
+
+volumes:
+  db-data:
