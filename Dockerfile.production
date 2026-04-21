@@ -1,0 +1,57 @@
+# --- Stage 1: Build Backend ---
+FROM maven:3.9-eclipse-temurin-21 AS backend-builder
+WORKDIR /app
+COPY pom.xml .
+COPY storable-common/pom.xml ./storable-common/
+COPY storable-data/pom.xml ./storable-data/
+COPY storable-core/pom.xml ./storable-core/
+COPY storable-api/pom.xml ./storable-api/
+RUN mvn dependency:go-offline -B
+COPY storable-common/src ./storable-common/src
+COPY storable-data/src ./storable-data/src
+COPY storable-core/src ./storable-core/src
+COPY storable-api/src ./storable-api/src
+RUN mvn clean install -DskipTests
+
+# --- Stage 2: Build Frontend ---
+FROM node:20-alpine AS frontend-builder
+WORKDIR /app
+COPY web/package.json web/package-lock.json* ./
+RUN npm install
+COPY web/ .
+# Set environment variables for build if needed
+ARG NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
+RUN npm run build
+
+# --- Stage 3: Final Production Image ---
+FROM eclipse-temurin:21-jre-alpine AS runner
+
+# Install Node.js and Tini
+RUN apk add --no-cache nodejs npm tini
+
+WORKDIR /app
+
+# Copy Backend
+COPY --from=backend-builder /app/storable-api/target/storable-api-*.jar ./backend.jar
+
+# Copy Frontend (Standalone)
+COPY --from=frontend-builder /app/.next/standalone ./frontend
+COPY --from=frontend-builder /app/.next/static ./frontend/.next/static
+COPY --from=frontend-builder /app/public ./frontend/public
+
+# Create storage directory
+RUN mkdir -p /app/storage && chmod 777 /app/storage
+
+# Entrypoint script
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Environment variables
+ENV NODE_ENV=production
+ENV PORT=3000
+
+# Expose ports
+EXPOSE 8080 3000
+
+ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
