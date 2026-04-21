@@ -19,7 +19,8 @@ export function Header() {
   const pathname = usePathname();
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
-  const showSidebarLayout = isAuthenticated && !isAuthPage;
+  const isLandingPage = pathname === "/";
+  const showSidebarLayout = isAuthenticated && !isAuthPage && !isLandingPage;
 
   return (
     <header className="app-header">
@@ -28,7 +29,7 @@ export function Header() {
           <>
             {/* Logo Area - Aligned with Sidebar */}
             <div className="w-64 h-full flex items-center px-6">
-              <Link href="/" className="flex items-center gap-2 group">
+              <Link href="/home" className="flex items-center gap-2 group">
                 <Image
                   src="/logo/logo.svg"
                   alt="Storable Logo"
@@ -58,7 +59,10 @@ export function Header() {
         ) : (
           /* Simplified Layout for Auth Pages / Landing */
           <div className="flex-1 flex items-center justify-between px-6 lg:px-8">
-            <Link href="/" className="flex items-center gap-2 group">
+            <Link
+              href={isAuthenticated ? "/home" : "/"}
+              className="flex items-center gap-2 group"
+            >
               <Image
                 src="/logo/logo.svg"
                 alt="Storable Logo"

@@ -27,7 +27,7 @@ export function Sidebar() {
 
   // Define the base navigation links available to all users
   const navLinks = [
-    { href: "/", label: "My Files", icon: Folder },
+    { href: "/home", label: "My Files", icon: Folder },
     { href: "/recent", label: "Recent", icon: Clock },
     { href: "/favorites", label: "Favorites", icon: Star },
     { href: "/shared", label: "Shared with me", icon: Users },
@@ -54,15 +54,11 @@ export function Sidebar() {
           const Icon = link.icon;
 
           // Determine if the current link is active
-          // For home, we need an exact match to avoid highlighting it for every page
+          // For home, we check if pathname starts with /home
           // For other links, we check if the pathname starts with the href
-          // For 'Admin Panel' (/admin), we also check if we are on any admin page except settings
           const isActive =
-            link.href === "/"
-              ? pathname === "/"
-              : pathname.startsWith(link.href) &&
-                (link.href !== "/admin" ||
-                  !pathname.startsWith("/admin/settings"));
+            pathname.startsWith(link.href) &&
+            (link.href !== "/admin" || !pathname.startsWith("/admin/settings"));
 
           return (
             <Link

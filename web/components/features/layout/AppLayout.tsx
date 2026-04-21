@@ -25,12 +25,14 @@ export function AppLayout({ children }: AppLayoutProps) {
   const pathname = usePathname();
 
   const isAuthPage = pathname === "/login" || pathname === "/register";
+  const isLandingPage = pathname === "/";
+  const shouldShowSidebar = isAuthenticated && !isAuthPage && !isLandingPage;
 
   return (
     <div className="flex min-h-screen flex-col bg-bg-main text-white">
       <Header />
       <div className="flex flex-1">
-        {isAuthenticated && !isAuthPage && <Sidebar />}
+        {shouldShowSidebar && <Sidebar />}
         <main className="min-w-0 flex-1 overflow-auto p-6">{children}</main>
       </div>
       <Footer />
