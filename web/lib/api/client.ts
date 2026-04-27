@@ -1,4 +1,4 @@
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
+const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 /**
  * A simple wrapper around fetch to handle common API logic.
@@ -10,6 +10,9 @@ export async function apiRequest<T>(
   endpoint: string,
   options?: RequestInit,
 ): Promise<T> {
+  if (!API_BASE_URL) {
+    throw new Error("NEXT_PUBLIC_API_URL is not defined in environment variables");
+  }
   const url = `${API_BASE_URL}${endpoint}`;
 
   const token =
@@ -40,7 +43,7 @@ export async function apiRequest<T>(
   return text ? JSON.parse(text) : ({} as T);
 }
 
-export function getApiBaseUrl(): string {
+export function getApiBaseUrl(): string | undefined {
   return API_BASE_URL;
 }
 
