@@ -23,6 +23,7 @@ server:
   port: ${SERVER_PORT:8080}
 
 storable:
+  frontend-url: ${FRONTEND_URL:http://localhost:3000}
   storage:
     upload-dir: ${STORABLE_STORAGE_UPLOAD_DIR:storage}
   auth:
