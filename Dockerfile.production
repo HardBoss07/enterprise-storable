@@ -49,5 +49,8 @@ ENV PORT=3000
 # Ensure Next.js binds to all network interfaces inside the container
 ENV HOSTNAME="0.0.0.0"
 
+# Set default FRONTEND_URL for production
+ENV FRONTEND_URL="http://localhost:3000"
+
 EXPOSE 8080 3000
 ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]

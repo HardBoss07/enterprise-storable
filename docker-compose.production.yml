@@ -9,6 +9,9 @@ services:
     # 2. Portainer handles these via its "Environment Variables" UI
     # but keeping this here for local reference is fine
     env_file: .env
+    environment:
+      - FRONTEND_URL=${FRONTEND_URL:-http://localhost:3000}
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:8080}
     depends_on:
       db:
         condition: service_healthy
