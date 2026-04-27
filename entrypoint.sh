@@ -1,16 +1,10 @@
 #!/bin/sh
 
-# Start Backend in background
-echo "Starting Spring Boot Backend..."
-java -jar /app/backend.jar &
-BACKEND_PID=$!
+# Start the Spring Boot Backend in the background
+echo "Starting Spring Boot Backend on port 8080..."
+java -jar /app/backend.jar > /app/storage/backend.log 2>&1 &
 
-# Wait for backend to be ready if needed, or just start frontend
-echo "Starting Next.js Frontend..."
-# Standalone mode expects to be run from its directory
-cd /app/frontend && node server.js &
-FRONTEND_PID=$!
-
-# Exit if any of the processes die
-wait -n $BACKEND_PID $FRONTEND_PID
-exit $?
+# Start the Next.js Frontend
+echo "Starting Next.js Frontend on port 3000..."
+# standalone mode entry point is server.js
+exec node server.js

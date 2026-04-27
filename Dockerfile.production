@@ -16,34 +16,38 @@ RUN mvn clean install -DskipTests
 # --- Stage 2: Build Frontend ---
 FROM node:20-alpine AS frontend-builder
 WORKDIR /app
-# Copy the package files from the web subdirectory to the container root
 COPY web/package.json web/package-lock.json* ./
 RUN npm install
-# Copy everything else from the web subdirectory to the container root
 COPY web/ .
 ARG NEXT_PUBLIC_API_URL
 ENV NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL}
-# Set output to standalone in your next.config.js if not already done
+# Ensure next.config.js has: output: 'standalone'
 RUN npm run build
 
 # --- Stage 3: Final Production Image ---
 FROM eclipse-temurin:21-jre-alpine AS runner
-RUN apk add --no-cache nodejs npm tini
+# We add curl for the Docker Compose healthcheck to work
+RUN apk add --no-cache nodejs npm tini curl
 WORKDIR /app
 
 # Copy Backend
 COPY --from=backend-builder /app/storable-api/target/storable-api-*.jar ./backend.jar
 
-# Copy Frontend (Note the path change to match Next.js standalone output)
+# Copy Frontend Standalone Files
+# Note: standalone output includes its own minimal node_modules
 COPY --from=frontend-builder /app/.next/standalone ./
 COPY --from=frontend-builder /app/.next/static ./.next/static
 COPY --from=frontend-builder /app/public ./public
 
+# Setup storage and entrypoint
 RUN mkdir -p /app/storage && chmod 777 /app/storage
 COPY entrypoint.sh /app/entrypoint.sh
 RUN chmod +x /app/entrypoint.sh
 
 ENV NODE_ENV=production
 ENV PORT=3000
+# Ensure Next.js binds to all network interfaces inside the container
+ENV HOSTNAME="0.0.0.0"
+
 EXPOSE 8080 3000
 ENTRYPOINT ["/sbin/tini", "--", "/app/entrypoint.sh"]
