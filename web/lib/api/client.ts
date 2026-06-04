@@ -13,7 +13,13 @@ export async function apiRequest<T>(
   if (!API_BASE_URL) {
     throw new Error("NEXT_PUBLIC_API_URL is not defined in environment variables");
   }
-  const url = `${API_BASE_URL}${endpoint}`;
+
+  // Normalize URL construction to avoid double slashes
+  const baseUrl = API_BASE_URL.endsWith("/")
+    ? API_BASE_URL.slice(0, -1)
+    : API_BASE_URL;
+  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const url = `${baseUrl}${cleanEndpoint}`;
 
   const token =
     typeof window !== "undefined" ? localStorage.getItem("token") : null;

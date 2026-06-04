@@ -21,6 +21,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.cors.CorsUtils;
 import org.springframework.beans.factory.annotation.Value;
 
 @Configuration
@@ -45,6 +46,8 @@ public class SecurityConfig {
             .cors(cors -> cors.configurationSource(corsConfigurationSource()))
             .authorizeHttpRequests(auth ->
                 auth
+                    .requestMatchers(CorsUtils::isPreFlightRequest)
+                    .permitAll()
                     .requestMatchers("/api/auth/**", "/api/files/health")
                     .permitAll()
                     .requestMatchers("/api/admin/**")
@@ -83,14 +86,23 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of(frontendUrl));
+        
+        // Use allowedOriginPatterns to support wildcards even with allowCredentials(true)
+        if (frontendUrl == null || frontendUrl.isEmpty() || "*".equals(frontendUrl)) {
+            configuration.setAllowedOriginPatterns(List.of("*"));
+        } else {
+            configuration.setAllowedOrigins(List.of(frontendUrl));
+        }
+
         configuration.setAllowedMethods(
             Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS")
         );
         configuration.setAllowedHeaders(
-            Arrays.asList("Authorization", "Content-Type")
+            Arrays.asList("Authorization", "Content-Type", "X-Requested-With", "Accept", "Origin")
         );
         configuration.setAllowCredentials(true);
+        configuration.setMaxAge(3600L);
+        
         UrlBasedCorsConfigurationSource source =
             new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
