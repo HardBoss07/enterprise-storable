@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { FileNode } from "@/types/api";
-import { getFileList, getFilePath, getHomeFolder } from "@/lib/api/file";
-import { apiRequest } from "@/lib/api/client";
+import { useState, useEffect } from 'react';
+import { FileNode } from '@/types/api';
+import { getFileList, getFilePath, getHomeFolder } from '@/lib/api/file';
+import { apiRequest } from '@/lib/api/client';
 
 interface UseMoveModalProps {
   isOpen: boolean;
@@ -16,16 +16,12 @@ interface UseMoveModalProps {
  * @param {UseMoveModalProps} props - The hook properties.
  * @returns {object} State and handlers for the move modal.
  */
-export function useMoveModal({
-  isOpen,
-  nodeToMove,
-  onClose,
-}: UseMoveModalProps) {
+export function useMoveModal({ isOpen, nodeToMove, onClose }: UseMoveModalProps) {
   const [currentFolderId, setCurrentFolderId] = useState<number | null>(null);
   const [folders, setFolders] = useState<FileNode[]>([]);
   const [path, setPath] = useState<FileNode[]>([]);
   const [loading, setLoading] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<FileNode[]>([]);
   const [searching, setSearching] = useState(false);
 
@@ -37,12 +33,12 @@ export function useMoveModal({
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         onClose();
       }
     };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
   /**
@@ -55,7 +51,7 @@ export function useMoveModal({
       setCurrentFolderId(home.id);
       await fetchFolders(home.id);
     } catch (err) {
-      console.error("Failed to fetch home folder:", err);
+      console.error('Failed to fetch home folder:', err);
     } finally {
       setLoading(false);
     }
@@ -75,7 +71,7 @@ export function useMoveModal({
       const pathArr = await getFilePath(folderId || 0);
       setPath(pathArr);
     } catch (err) {
-      console.error("Failed to fetch folders:", err);
+      console.error('Failed to fetch folders:', err);
     } finally {
       setLoading(false);
     }
@@ -88,7 +84,7 @@ export function useMoveModal({
   const handleFolderClick = (folderId: number) => {
     setCurrentFolderId(folderId);
     fetchFolders(folderId);
-    setSearchQuery("");
+    setSearchQuery('');
   };
 
   /**
@@ -104,12 +100,10 @@ export function useMoveModal({
 
     setSearching(true);
     try {
-      const response = await apiRequest<FileNode[]>(
-        `/api/files/search?query=${query}&kind=folder`,
-      );
+      const response = await apiRequest<FileNode[]>(`/api/files/search?query=${query}&kind=folder`);
       setSearchResults(response.filter((f) => f.id !== nodeToMove.id));
     } catch (err) {
-      console.error("Search failed:", err);
+      console.error('Search failed:', err);
     } finally {
       setSearching(false);
     }

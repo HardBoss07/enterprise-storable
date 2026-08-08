@@ -1,11 +1,7 @@
-import FileBrowser from "@/components/features/file-browser/FileBrowser";
-import { PageContainer } from "@/components/ui/PageContainer";
+import FileBrowser from '@/components/features/file-browser/FileBrowser';
+import { PageContainer } from '@/components/ui/PageContainer';
 
-export default function Home({
-  searchParams,
-}: {
-  searchParams: Promise<{ folderId?: string }>;
-}) {
+export default function Home({ searchParams }: { searchParams: Promise<{ folderId?: string }> }) {
   return (
     <PageContainer title="All Files">
       <HomeContent searchParams={searchParams} />
@@ -13,11 +9,7 @@ export default function Home({
   );
 }
 
-async function HomeContent({
-  searchParams,
-}: {
-  searchParams: Promise<{ folderId?: string }>;
-}) {
+async function HomeContent({ searchParams }: { searchParams: Promise<{ folderId?: string }> }) {
   const { folderId } = await searchParams;
   const initialFolderId = folderId ? parseInt(folderId, 10) : null;
 

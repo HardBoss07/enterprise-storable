@@ -1,7 +1,7 @@
-import { useState, useEffect } from "react";
-import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/context/ToastContext";
-import { userApi } from "@/lib/api/user";
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
+import { userApi } from '@/lib/api/user';
 
 /**
  * Custom hook for handling user settings logic.
@@ -13,10 +13,10 @@ export function useSettings() {
   const { user, logout } = useAuth();
   const { showToast } = useToast();
 
-  const [email, setEmail] = useState(user?.email || "");
-  const [currentPassword, setCurrentPassword] = useState("");
-  const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
+  const [email, setEmail] = useState(user?.email || '');
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [isUpdatingEmail, setIsUpdatingEmail] = useState(false);
   const [isUpdatingPassword, setIsUpdatingPassword] = useState(false);
   const [isDeletingAccount, setIsDeletingAccount] = useState(false);
@@ -40,12 +40,9 @@ export function useSettings() {
     setIsUpdatingEmail(true);
     try {
       await userApi.changeEmail({ newEmail: email });
-      showToast("Email updated successfully.", "success");
+      showToast('Email updated successfully.', 'success');
     } catch (error: any) {
-      showToast(
-        error.response?.data?.message || "Failed to update email.",
-        "error",
-      );
+      showToast(error.response?.data?.message || 'Failed to update email.', 'error');
     } finally {
       setIsUpdatingEmail(false);
     }
@@ -58,32 +55,29 @@ export function useSettings() {
   const handleUpdatePassword = async (event: React.FormEvent) => {
     event.preventDefault();
     if (!currentPassword || !newPassword || !confirmPassword) {
-      showToast("All password fields are required.", "error");
+      showToast('All password fields are required.', 'error');
       return;
     }
 
     if (newPassword !== confirmPassword) {
-      showToast("Passwords do not match.", "error");
+      showToast('Passwords do not match.', 'error');
       return;
     }
 
     if (newPassword.length < 8) {
-      showToast("New password must be at least 8 characters long.", "error");
+      showToast('New password must be at least 8 characters long.', 'error');
       return;
     }
 
     setIsUpdatingPassword(true);
     try {
       await userApi.changePassword({ currentPassword, newPassword });
-      showToast("Password updated successfully.", "success");
-      setCurrentPassword("");
-      setNewPassword("");
-      setConfirmPassword("");
+      showToast('Password updated successfully.', 'success');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
     } catch (error: any) {
-      showToast(
-        error.response?.data?.message || "Failed to update password.",
-        "error",
-      );
+      showToast(error.response?.data?.message || 'Failed to update password.', 'error');
     } finally {
       setIsUpdatingPassword(false);
     }
@@ -97,14 +91,11 @@ export function useSettings() {
     setIsDeletingAccount(true);
     try {
       await userApi.deleteAccount({ password });
-      showToast("Account deleted. Farewell.", "success");
+      showToast('Account deleted. Farewell.', 'success');
       setIsDeleteModalOpen(false);
       logout();
     } catch (error: any) {
-      showToast(
-        error.response?.data?.message || "Failed to delete account.",
-        "error",
-      );
+      showToast(error.response?.data?.message || 'Failed to delete account.', 'error');
     } finally {
       setIsDeletingAccount(false);
     }

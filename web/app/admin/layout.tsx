@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/context/AuthContext";
-import { useRouter } from "next/navigation";
-import { useEffect, ReactNode } from "react";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import { useAuth } from '@/context/AuthContext';
+import { useRouter } from 'next/navigation';
+import { useEffect, ReactNode } from 'react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const { user, isAuthenticated } = useAuth();
@@ -13,39 +13,37 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (isAuthenticated && user?.role !== "ADMIN") {
-      router.push("/");
+    if (isAuthenticated && user?.role !== 'ADMIN') {
+      router.push('/');
     }
   }, [isAuthenticated, user, router]);
 
-  if (!isAuthenticated || user?.role !== "ADMIN") {
+  if (!isAuthenticated || user?.role !== 'ADMIN') {
     return null;
   }
 
   const tabs = [
-    { name: "User Management", href: "/admin/users" },
-    { name: "Global Settings", href: "/admin/settings" },
+    { name: 'User Management', href: '/admin/users' },
+    { name: 'Global Settings', href: '/admin/settings' },
   ];
 
   return (
-    <div className="flex flex-col h-full bg-bg-main text-text-primary">
-      <header className="p-6 border-b border-surface-300 bg-bg-sidebar">
+    <div className="bg-bg-main text-text-primary flex h-full flex-col">
+      <header className="border-surface-300 bg-bg-sidebar border-b p-6">
         <h1 className="text-2xl font-black tracking-tighter">Admin Panel</h1>
-        <p className="text-text-muted text-sm mt-1">
-          Manage users and system-wide configurations.
-        </p>
+        <p className="text-text-muted mt-1 text-sm">Manage users and system-wide configurations.</p>
       </header>
 
-      <nav className="flex px-6 border-b border-surface-300 bg-bg-sidebar">
+      <nav className="border-surface-300 bg-bg-sidebar flex border-b px-6">
         {tabs.map((tab) => (
           <Link
             key={tab.href}
             href={tab.href}
             className={cn(
-              "px-4 py-3 text-sm font-bold transition-all border-b-2",
+              'border-b-2 px-4 py-3 text-sm font-bold transition-all',
               pathname === tab.href
-                ? "border-primary text-primary bg-primary/5"
-                : "border-transparent text-text-muted hover:text-text-primary hover:bg-surface-100",
+                ? 'border-primary text-primary bg-primary/5'
+                : 'text-text-muted hover:text-text-primary hover:bg-surface-100 border-transparent',
             )}
           >
             {tab.name}

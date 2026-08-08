@@ -30,11 +30,6 @@ public class AdminSessionController {
     public ResponseEntity<Map<String, String>> revokeAllSessions() {
         log.warn("ADMIN action: Revoking all user sessions globally.");
         sessionService.revokeAllSessions();
-        return ResponseEntity.ok(
-            Map.of(
-                "message",
-                "All sessions have been revoked. Users will need to log in again."
-            )
-        );
+        return ResponseEntity.ok(Map.of("message", "All sessions have been revoked. Users will need to log in again."));
     }
 }

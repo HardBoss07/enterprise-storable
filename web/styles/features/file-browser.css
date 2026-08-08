@@ -1,27 +1,27 @@
 @layer components {
   /* --- Navigation & Breadcrumbs --- */
   .breadcrumb-nav {
-    @apply flex items-center flex-wrap bg-surface-100/40 backdrop-blur-md border border-surface-300 rounded-lg px-2 py-1 text-text-muted;
+    @apply bg-surface-100/40 border-surface-300 text-text-muted flex flex-wrap items-center rounded-lg border px-2 py-1 backdrop-blur-md;
   }
 
   .breadcrumb-item {
-    @apply text-text-secondary hover:text-primary hover:bg-surface-200 transition-all px-2.5 py-1.5 rounded-md text-sm font-medium truncate;
+    @apply text-text-secondary hover:text-primary hover:bg-surface-200 truncate rounded-md px-2.5 py-1.5 text-sm font-medium transition-all;
   }
 
   .breadcrumb-item-active {
-    @apply text-primary font-bold text-sm px-2 py-1 bg-surface-200/50 rounded-md border border-primary/20 truncate;
+    @apply text-primary bg-surface-200/50 border-primary/20 truncate rounded-md border px-2 py-1 text-sm font-bold;
   }
 
   /* --- Lists & Tables --- */
   .list-header {
-    @apply flex items-center p-2 text-text-muted text-sm font-bold border-b border-surface-300 mb-2;
+    @apply text-text-muted border-surface-300 mb-2 flex items-center border-b p-2 text-sm font-bold;
   }
 
   .table-header-grid {
-    @apply grid grid-cols-12 gap-4 p-2 text-text-muted text-sm font-bold border-b border-surface-300 mb-2;
+    @apply text-text-muted border-surface-300 mb-2 grid grid-cols-12 gap-4 border-b p-2 text-sm font-bold;
   }
 
   .table-row-grid {
-    @apply grid grid-cols-12 gap-4 p-2 items-center rounded-lg hover:bg-white/5 transition-all duration-200 border border-transparent hover:border-surface-300/50;
+    @apply hover:border-surface-300/50 grid grid-cols-12 items-center gap-4 rounded-lg border border-transparent p-2 transition-all duration-200 hover:bg-white/5;
   }
 }

@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { FileNode } from "@/types/api";
-import { FileIcon } from "@/components/ui/FileIcon";
-import { format } from "date-fns";
+import { FileNode } from '@/types/api';
+import { FileIcon } from '@/components/ui/FileIcon';
+import { format } from 'date-fns';
 import {
   Download,
   Trash2,
@@ -12,12 +12,12 @@ import {
   Star,
   ExternalLink,
   Share2,
-} from "lucide-react";
-import { formatBytes } from "@/lib/utils";
-import { IconButton } from "@/components/ui/IconButton";
-import { StatusBadge } from "@/components/shared/StatusBadge";
-import { cn } from "@/lib/utils";
-import { useFileListItem } from "@/hooks/useFileListItem";
+} from 'lucide-react';
+import { formatBytes } from '@/lib/utils';
+import { IconButton } from '@/components/ui/IconButton';
+import { StatusBadge } from '@/components/shared/StatusBadge';
+import { cn } from '@/lib/utils';
+import { useFileListItem } from '@/hooks/useFileListItem';
 
 interface FileListItemProps {
   /** The file or folder node data. */
@@ -88,7 +88,7 @@ export function FileListItem({
    */
   const handleClick = (event: React.MouseEvent) => {
     // Prevent click if we're clicking any action button or renaming
-    if ((event.target as HTMLElement).closest(".action-btn") || isRenaming) {
+    if ((event.target as HTMLElement).closest('.action-btn') || isRenaming) {
       return;
     }
 
@@ -127,37 +127,37 @@ export function FileListItem({
   };
 
   // Permission checks
-  const canEdit = node.privilege === "EDIT" || node.privilege === "OWNER";
-  const canManage = node.privilege === "OWNER";
+  const canEdit = node.privilege === 'EDIT' || node.privilege === 'OWNER';
+  const canManage = node.privilege === 'OWNER';
   const isRootLevel = node.parentId === 1;
 
   // Map privileges to UI labels
   const privilegeLabels = {
-    VIEW: "Read Only",
-    EDIT: "Editor",
-    OWNER: "Owner",
+    VIEW: 'Read Only',
+    EDIT: 'Editor',
+    OWNER: 'Owner',
   };
 
   const privilegeColors = {
-    VIEW: "info" as const,
-    EDIT: "warning" as const,
-    OWNER: "success" as const,
+    VIEW: 'info' as const,
+    EDIT: 'warning' as const,
+    OWNER: 'success' as const,
   };
 
   return (
     <div
-      className="group flex items-center space-x-4 p-2 interactive-surface"
+      className="group interactive-surface flex items-center space-x-4 p-2"
       onClick={handleClick}
     >
       <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center">
         <FileIcon
-          extension={node.name.split(".").pop()}
+          extension={node.name.split('.').pop()}
           mime={node.mime}
           isFolder={node.folder}
           size={22}
         />
       </div>
-      <div className="flex h-10 flex-1 items-center min-w-0">
+      <div className="flex h-10 min-w-0 flex-1 items-center">
         {isRenaming ? (
           <input
             ref={inputRef}
@@ -166,14 +166,14 @@ export function FileListItem({
             onChange={(e) => setNewName(e.target.value)}
             onKeyDown={handleRenameKeyDown}
             onBlur={submitRename}
-            className="input-field h-8 w-full max-w-sm border-primary px-2 py-0 text-sm focus:ring-primary/30"
+            className="input-field border-primary focus:ring-primary/30 h-8 w-full max-w-sm px-2 py-0 text-sm"
           />
         ) : (
           <div className="flex items-center space-x-2 truncate">
-            <p className="m-0 truncate font-bold leading-none text-text-primary transition-colors group-hover:text-primary">
+            <p className="text-text-primary group-hover:text-primary m-0 truncate leading-none font-bold transition-colors">
               {node.name}
             </p>
-            {node.privilege && node.privilege !== "OWNER" && (
+            {node.privilege && node.privilege !== 'OWNER' && (
               <StatusBadge
                 variant={privilegeColors[node.privilege]}
                 className="h-4 px-1.5 py-0 text-[10px]"
@@ -191,18 +191,14 @@ export function FileListItem({
             icon={Star}
             onClick={handleToggleFavorite}
             className={cn(
-              "action-btn",
-              node.isFavorite
-                ? "text-accent"
-                : "text-text-muted hover:text-accent",
+              'action-btn',
+              node.isFavorite ? 'text-accent' : 'text-text-muted hover:text-accent',
             )}
             variant="ghost"
             size="sm"
             iconSize={14}
-            title={
-              node.isFavorite ? "Remove from Favorites" : "Add to Favorites"
-            }
-            iconProps={{ fill: node.isFavorite ? "currentColor" : "none" }}
+            title={node.isFavorite ? 'Remove from Favorites' : 'Add to Favorites'}
+            iconProps={{ fill: node.isFavorite ? 'currentColor' : 'none' }}
           />
           {!node.folder && (
             <IconButton
@@ -298,11 +294,11 @@ export function FileListItem({
           )}
         </div>
 
-        <div className="hidden w-40 text-sm text-text-muted sm:block">
-          {format(new Date(node.modifiedAt), "MMM d, yyyy HH:mm")}
+        <div className="text-text-muted hidden w-40 text-sm sm:block">
+          {format(new Date(node.modifiedAt), 'MMM d, yyyy HH:mm')}
         </div>
-        <div className="w-24 text-right text-sm text-text-muted">
-          {!node.folder && node.size !== null ? formatBytes(node.size) : "--"}
+        <div className="text-text-muted w-24 text-right text-sm">
+          {!node.folder && node.size !== null ? formatBytes(node.size) : '--'}
         </div>
       </div>
     </div>

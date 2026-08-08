@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from "react";
-import { FileNode } from "@/types/api";
+import { useState, useEffect, useRef } from 'react';
+import { FileNode } from '@/types/api';
 import {
   lookupUsers,
   getNodePrivileges,
@@ -9,8 +9,8 @@ import {
   UserLookup,
   AccessPrivilege,
   PrivilegeLevel,
-} from "@/lib/api/sharing";
-import { useToast } from "@/context/ToastContext";
+} from '@/lib/api/sharing';
+import { useToast } from '@/context/ToastContext';
 
 interface UseShareModalProps {
   node: FileNode;
@@ -26,7 +26,7 @@ interface UseShareModalProps {
  */
 export function useShareModal({ node, onClose }: UseShareModalProps) {
   const { showToast } = useToast();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState<UserLookup[]>([]);
   const [privileges, setPrivileges] = useState<AccessPrivilege[]>([]);
   const [loadingPrivileges, setLoadingPrivileges] = useState(true);
@@ -39,12 +39,12 @@ export function useShareModal({ node, onClose }: UseShareModalProps) {
 
   useEffect(() => {
     const handleEsc = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
+      if (event.key === 'Escape') {
         onClose();
       }
     };
-    window.addEventListener("keydown", handleEsc);
-    return () => window.removeEventListener("keydown", handleEsc);
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
   }, [onClose]);
 
   /**
@@ -56,8 +56,8 @@ export function useShareModal({ node, onClose }: UseShareModalProps) {
       const data = await getNodePrivileges(node.id);
       setPrivileges(data);
     } catch (error) {
-      console.error("Failed to fetch privileges:", error);
-      showToast("Failed to load sharing permissions", "error");
+      console.error('Failed to fetch privileges:', error);
+      showToast('Failed to load sharing permissions', 'error');
     } finally {
       setLoadingPrivileges(false);
     }
@@ -83,12 +83,11 @@ export function useShareModal({ node, onClose }: UseShareModalProps) {
         const results = await lookupUsers(value);
         // Filter out users who already have access
         const filtered = results.filter(
-          (u) =>
-            !privileges.some((p) => p.userId === u.id) && u.id !== node.ownerId,
+          (u) => !privileges.some((p) => p.userId === u.id) && u.id !== node.ownerId,
         );
         setSearchResults(filtered);
       } catch (error) {
-        console.error("Search failed:", error);
+        console.error('Search failed:', error);
       } finally {
         setSearching(false);
       }
@@ -101,14 +100,14 @@ export function useShareModal({ node, onClose }: UseShareModalProps) {
    */
   const handleAddShare = async (user: UserLookup) => {
     try {
-      await shareNode(node.id, user.id, "VIEW");
-      showToast(`Shared ${node.name} with ${user.username}`, "success");
-      setSearchQuery("");
+      await shareNode(node.id, user.id, 'VIEW');
+      showToast(`Shared ${node.name} with ${user.username}`, 'success');
+      setSearchQuery('');
       setSearchResults([]);
       fetchPrivileges();
     } catch (error) {
-      console.error("Sharing failed:", error);
-      showToast("Failed to share file", "error");
+      console.error('Sharing failed:', error);
+      showToast('Failed to share file', 'error');
     }
   };
 
@@ -120,11 +119,11 @@ export function useShareModal({ node, onClose }: UseShareModalProps) {
   const handleUpdateLevel = async (userId: string, level: PrivilegeLevel) => {
     try {
       await updatePrivilege(node.id, userId, level);
-      showToast("Permission updated", "success");
+      showToast('Permission updated', 'success');
       fetchPrivileges();
     } catch (error) {
-      console.error("Update failed:", error);
-      showToast("Failed to update permission", "error");
+      console.error('Update failed:', error);
+      showToast('Failed to update permission', 'error');
     }
   };
 
@@ -135,11 +134,11 @@ export function useShareModal({ node, onClose }: UseShareModalProps) {
   const handleRemovePrivilege = async (userId: string) => {
     try {
       await removePrivilege(node.id, userId);
-      showToast("Access removed", "success");
+      showToast('Access removed', 'success');
       fetchPrivileges();
     } catch (error) {
-      console.error("Removal failed:", error);
-      showToast("Failed to remove access", "error");
+      console.error('Removal failed:', error);
+      showToast('Failed to remove access', 'error');
     }
   };
 

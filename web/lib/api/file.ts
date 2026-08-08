@@ -1,5 +1,5 @@
-import { apiRequest, getApiBaseUrl, getToken } from "@/lib/api/client";
-import { FileNode, CreateFolderPayload } from "@/types/api";
+import { apiRequest, getApiBaseUrl, getToken } from '@/lib/api/client';
+import { FileNode, CreateFolderPayload } from '@/types/api';
 
 /**
  * Fetches the children of a given file node.
@@ -20,7 +20,7 @@ export async function getFileMetadata(nodeId: number): Promise<FileNode> {
  * Fetches the home folder for the current user.
  */
 export async function getHomeFolder(): Promise<FileNode> {
-  return apiRequest<FileNode>("/api/files/home");
+  return apiRequest<FileNode>('/api/files/home');
 }
 
 /**
@@ -33,12 +33,10 @@ export async function getFilePath(nodeId: number): Promise<FileNode[]> {
 /**
  * Creates a new folder.
  */
-export async function createFolder(
-  payload: CreateFolderPayload,
-): Promise<FileNode> {
-  return apiRequest<FileNode>("/api/files/folders", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+export async function createFolder(payload: CreateFolderPayload): Promise<FileNode> {
+  return apiRequest<FileNode>('/api/files/folders', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
       name: payload.name,
       parentId: payload.parentId || 0,
@@ -49,18 +47,15 @@ export async function createFolder(
 /**
  * Uploads a file to a specific folder.
  */
-export async function uploadFile(
-  file: File,
-  parentId: number | null,
-): Promise<FileNode> {
+export async function uploadFile(file: File, parentId: number | null): Promise<FileNode> {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append('file', file);
   if (parentId !== null) {
-    formData.append("parentId", parentId.toString());
+    formData.append('parentId', parentId.toString());
   }
 
-  return apiRequest<FileNode>("/api/files/upload", {
-    method: "POST",
+  return apiRequest<FileNode>('/api/files/upload', {
+    method: 'POST',
     body: formData,
   });
 }
@@ -80,7 +75,7 @@ export async function downloadFileAsBlob(nodeId: number): Promise<Blob> {
   const response = await fetch(getDownloadUrl(nodeId), {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error("Download failed");
+  if (!response.ok) throw new Error('Download failed');
   return response.blob();
 }
 
@@ -90,10 +85,10 @@ export async function downloadFileAsBlob(nodeId: number): Promise<Blob> {
 export async function softDeleteNode(nodeId: number): Promise<void> {
   const token = getToken();
   const response = await fetch(`${getApiBaseUrl()}/api/files/${nodeId}`, {
-    method: "DELETE",
+    method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error("Delete failed");
+  if (!response.ok) throw new Error('Delete failed');
 }
 
 /**
@@ -101,26 +96,20 @@ export async function softDeleteNode(nodeId: number): Promise<void> {
  */
 export async function restoreNode(nodeId: number): Promise<void> {
   const token = getToken();
-  const response = await fetch(
-    `${getApiBaseUrl()}/api/files/${nodeId}/restore`,
-    {
-      method: "POST",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    },
-  );
-  if (!response.ok) throw new Error("Restore failed");
+  const response = await fetch(`${getApiBaseUrl()}/api/files/${nodeId}/restore`, {
+    method: 'POST',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error('Restore failed');
 }
 
 /**
  * Renames a file or folder.
  */
-export async function renameNode(
-  nodeId: number,
-  newName: string,
-): Promise<FileNode> {
+export async function renameNode(nodeId: number, newName: string): Promise<FileNode> {
   return apiRequest<FileNode>(`/api/files/${nodeId}/rename`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ name: newName }),
   });
 }
@@ -130,20 +119,17 @@ export async function renameNode(
  */
 export async function duplicateFile(nodeId: number): Promise<FileNode> {
   return apiRequest<FileNode>(`/api/files/${nodeId}/duplicate`, {
-    method: "POST",
+    method: 'POST',
   });
 }
 
 /**
  * Moves a file or folder to a new destination.
  */
-export async function moveNode(
-  nodeId: number,
-  targetParentId: number | null,
-): Promise<FileNode> {
+export async function moveNode(nodeId: number, targetParentId: number | null): Promise<FileNode> {
   return apiRequest<FileNode>(`/api/files/${nodeId}/move`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ targetParentId: targetParentId || 0 }),
   });
 }
@@ -152,26 +138,23 @@ export async function moveNode(
  * Fetches the 5 most recently modified files for the current user.
  */
 export async function getRecentFiles(): Promise<FileNode[]> {
-  return apiRequest<FileNode[]>("/api/files/recent");
+  return apiRequest<FileNode[]>('/api/files/recent');
 }
 
 /**
  * Fetches all favorite nodes for the current user.
  */
 export async function getFavorites(): Promise<FileNode[]> {
-  return apiRequest<FileNode[]>("/api/files/favorites");
+  return apiRequest<FileNode[]>('/api/files/favorites');
 }
 
 /**
  * Toggles the favorite status of a node.
  */
-export async function toggleFavorite(
-  nodeId: number,
-  isFavorite: boolean,
-): Promise<FileNode> {
+export async function toggleFavorite(nodeId: number, isFavorite: boolean): Promise<FileNode> {
   return apiRequest<FileNode>(`/api/files/${nodeId}/favorite`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ isFavorite }),
   });
 }
@@ -179,11 +162,8 @@ export async function toggleFavorite(
 /**
  * Searches for nodes by name and kind for a specific owner.
  */
-export async function searchFiles(
-  query: string,
-  kind?: string,
-): Promise<FileNode[]> {
+export async function searchFiles(query: string, kind?: string): Promise<FileNode[]> {
   const params = new URLSearchParams({ query });
-  if (kind) params.append("kind", kind);
+  if (kind) params.append('kind', kind);
   return apiRequest<FileNode[]>(`/api/files/search?${params.toString()}`);
 }

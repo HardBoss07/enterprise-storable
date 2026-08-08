@@ -24,18 +24,13 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
     private final AdminService adminService;
 
-    private static final String ROOT_USER_ID =
-        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+    private static final String ROOT_USER_ID = "f43c0bcf-11e4-4629-b072-321ccd04e72a";
 
     /**
      * Changes a user's password after verifying the current one.
      */
     @Transactional
-    public void changePassword(
-        String userId,
-        String currentPassword,
-        String newPassword
-    ) {
+    public void changePassword(String userId, String currentPassword, String newPassword) {
         log.info("Changing password for user: {}", userId);
 
         User user = findUserById(userId);
@@ -93,33 +88,25 @@ public class UserService {
     private User findUserById(String userId) {
         return userPersistencePort
             .findById(userId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("User not found: " + userId)
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + userId));
     }
 
     private void validateCurrentPassword(User user, String password) {
         if (!passwordEncoder.matches(password, user.password())) {
-            throw new UnauthorizedAccessException(
-                "Incorrect current password."
-            );
+            throw new UnauthorizedAccessException("Incorrect current password.");
         }
     }
 
     private void validateEmailAvailability(String email) {
         if (userPersistencePort.existsByEmail(email)) {
-            throw new DuplicateResourceException(
-                "Email already exists: " + email
-            );
+            throw new DuplicateResourceException("Email already exists: " + email);
         }
     }
 
     private void validateDeletionTarget(String userId) {
         if (ROOT_USER_ID.equals(userId)) {
             log.warn("Attempted to delete the root admin user!");
-            throw new UnauthorizedAccessException(
-                "The root admin user cannot be deleted."
-            );
+            throw new UnauthorizedAccessException("The root admin user cannot be deleted.");
         }
     }
 }

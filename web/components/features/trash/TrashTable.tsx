@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { TrashItem } from "@/types/api";
-import { TrashTableRow } from "./TrashTableRow";
-import { cn } from "@/lib/utils";
+import { TrashItem } from '@/types/api';
+import { TrashTableRow } from './TrashTableRow';
+import { cn } from '@/lib/utils';
 
 interface TrashTableProps {
   /** List of trash items to display. */
@@ -22,14 +22,9 @@ interface TrashTableProps {
  * @param {TrashTableProps} props - The component props.
  * @returns {JSX.Element} The rendered TrashTable component.
  */
-export function TrashTable({
-  items,
-  onRestore,
-  onPermanentDelete,
-  className,
-}: TrashTableProps) {
+export function TrashTable({ items, onRestore, onPermanentDelete, className }: TrashTableProps) {
   return (
-    <div className={cn("card-surface overflow-hidden", className)}>
+    <div className={cn('card-surface overflow-hidden', className)}>
       <div className="table-header-grid">
         <div className="col-span-4 ml-10 flex items-center">Name</div>
         <div className="col-span-3">Deleted At</div>
@@ -39,9 +34,7 @@ export function TrashTable({
 
       <div className="space-y-1">
         {items.length === 0 ? (
-          <div className="py-20 text-center text-text-muted">
-            Trash is empty.
-          </div>
+          <div className="text-text-muted py-20 text-center">Trash is empty.</div>
         ) : (
           items.map((item) => (
             <TrashTableRow

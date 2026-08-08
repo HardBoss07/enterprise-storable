@@ -13,14 +13,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface FileRepository extends JpaRepository<FileEntity, Long> {
-    @Query(
-        "SELECT COALESCE(SUM(f.size), 0) FROM FileEntity f WHERE f.ownerId = :ownerId AND f.isDeleted = false"
-    )
+    @Query("SELECT COALESCE(SUM(f.size), 0) FROM FileEntity f WHERE f.ownerId = :ownerId AND f.isDeleted = false")
     long sumSizeByOwnerId(@Param("ownerId") String ownerId);
 
-    List<FileEntity> findTop5ByOwnerIdAndIsDeletedFalseOrderByModifiedAtDesc(
-        String ownerId
-    );
+    List<FileEntity> findTop5ByOwnerIdAndIsDeletedFalseOrderByModifiedAtDesc(String ownerId);
 
     Optional<FileEntity> findByIdAndOwnerId(Long id, String ownerId);
 }

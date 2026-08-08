@@ -27,9 +27,5 @@ public interface SharingPersistencePort {
     List<Long> findSharedNodeIds(String userId);
 
     /** Record to represent sharing information in the domain. */
-    record AccessPrivilegeInfo(
-        Long nodeId,
-        String userId,
-        PrivilegeLevel level
-    ) {}
+    record AccessPrivilegeInfo(Long nodeId, String userId, PrivilegeLevel level) {}
 }

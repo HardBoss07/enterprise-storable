@@ -33,10 +33,7 @@ public class GlobalTimeProvider {
             this.cachedZoneId = ZoneId.of(timezone);
             log.info("Global timezone cache refreshed: {}", timezone);
         } catch (Exception e) {
-            log.error(
-                "Invalid timezone found in settings: {}. Defaulting to UTC.",
-                timezone
-            );
+            log.error("Invalid timezone found in settings: {}. Defaulting to UTC.", timezone);
             this.cachedZoneId = ZoneId.of("UTC");
         }
     }

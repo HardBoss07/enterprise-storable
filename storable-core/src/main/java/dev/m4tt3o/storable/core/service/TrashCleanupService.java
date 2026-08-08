@@ -31,24 +31,15 @@ public class TrashCleanupService {
     @Transactional
     public void cleanupExpiredTrash() {
         log.info("Starting scheduled trash cleanup...");
-        LocalDateTime cutoff = LocalDateTime.now(ZoneOffset.UTC).minusDays(
-            configService.getTrashRetentionDays()
-        );
+        LocalDateTime cutoff = LocalDateTime.now(ZoneOffset.UTC).minusDays(configService.getTrashRetentionDays());
 
         List<Storable> expiredNodes = folderPersistencePort
             .findAllTrash()
             .stream()
-            .filter(
-                node ->
-                    node.deletedAt() != null &&
-                    node.deletedAt().isBefore(cutoff)
-            )
+            .filter((node) -> node.deletedAt() != null && node.deletedAt().isBefore(cutoff))
             .toList();
 
-        log.info(
-            "Found {} expired nodes in trash. Permanently deleting...",
-            expiredNodes.size()
-        );
+        log.info("Found {} expired nodes in trash. Permanently deleting...", expiredNodes.size());
 
         for (Storable node : expiredNodes) {
             folderPersistencePort.deleteById(node.id(), node.ownerId());

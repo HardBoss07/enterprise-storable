@@ -27,10 +27,7 @@ public class FileApiMapper {
     public FileMetadataDto toDto(Storable storable, String userId) {
         if (storable == null) return null;
 
-        PrivilegeLevel privilege = sharingService.getHighestPrivilege(
-            storable.id(),
-            userId
-        );
+        PrivilegeLevel privilege = sharingService.getHighestPrivilege(storable.id(), userId);
 
         return switch (storable) {
             case File f -> toFileDto(f, privilege);
@@ -78,30 +75,21 @@ public class FileApiMapper {
         );
     }
 
-    public List<FileMetadataDto> toDtoList(
-        SequencedCollection<Storable> storables,
-        String userId
-    ) {
+    public List<FileMetadataDto> toDtoList(SequencedCollection<Storable> storables, String userId) {
         return storables
             .stream()
-            .map(s -> toDto(s, userId))
+            .map((s) -> toDto(s, userId))
             .toList();
     }
 
     public TrashMetadataDto toTrashDto(TrashItem trashItem, String userId) {
-        return new TrashMetadataDto(
-            toDto(trashItem.item(), userId),
-            trashItem.daysRemaining()
-        );
+        return new TrashMetadataDto(toDto(trashItem.item(), userId), trashItem.daysRemaining());
     }
 
-    public List<TrashMetadataDto> toTrashDtoList(
-        SequencedCollection<TrashItem> trashItems,
-        String userId
-    ) {
+    public List<TrashMetadataDto> toTrashDtoList(SequencedCollection<TrashItem> trashItems, String userId) {
         return trashItems
             .stream()
-            .map(ti -> toTrashDto(ti, userId))
+            .map((ti) -> toTrashDto(ti, userId))
             .toList();
     }
 
@@ -117,9 +105,7 @@ public class FileApiMapper {
         );
     }
 
-    public List<AccessPrivilegeDto> toAccessPrivilegeDtoList(
-        List<AccessPrivilege> privileges
-    ) {
+    public List<AccessPrivilegeDto> toAccessPrivilegeDtoList(List<AccessPrivilege> privileges) {
         return privileges.stream().map(this::toAccessPrivilegeDto).toList();
     }
 }

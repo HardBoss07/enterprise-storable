@@ -5,12 +5,12 @@
  * @returns A formatted string (e.g., "1.5 MB").
  */
 export function formatBytes(bytes: number, decimals = 2): string {
-  if (!bytes || bytes === 0) return "0 Bytes";
+  if (!bytes || bytes === 0) return '0 Bytes';
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ["Bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + " " + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
 }
 
 /**
@@ -18,7 +18,7 @@ export function formatBytes(bytes: number, decimals = 2): string {
  * @param dateString The date string to format.
  */
 export function formatDate(dateString: string): string {
-  if (!dateString) return "";
+  if (!dateString) return '';
   const date = new Date(dateString);
   const now = new Date();
   const diffInMs = now.getTime() - date.getTime();
@@ -27,14 +27,14 @@ export function formatDate(dateString: string): string {
   if (diffInHours < 24) {
     if (diffInHours < 1) {
       const diffInMins = Math.floor(diffInMs / (1000 * 60));
-      return diffInMins <= 1 ? "Just now" : `${diffInMins}m ago`;
+      return diffInMins <= 1 ? 'Just now' : `${diffInMins}m ago`;
     }
     return `${diffInHours}h ago`;
   }
 
   return date.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
+    month: 'short',
+    day: 'numeric',
   });
 }
 
@@ -43,8 +43,6 @@ export function formatDate(dateString: string): string {
  * @param classes An array of class names.
  * @returns A string of class names.
  */
-export function cn(
-  ...classes: (string | boolean | undefined | null)[]
-): string {
-  return classes.filter(Boolean).join(" ");
+export function cn(...classes: (string | boolean | undefined | null)[]): string {
+  return classes.filter(Boolean).join(' ');
 }

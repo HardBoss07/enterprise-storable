@@ -25,21 +25,15 @@ public class ConfigService {
     /** Retrieves the trash retention days from DB or default. */
     @Transactional(readOnly = true)
     public int getTrashRetentionDays() {
-        log.debug(
-            "Fetching trash retention days for key: {}",
-            TRASH_RETENTION_KEY
-        );
+        log.debug("Fetching trash retention days for key: {}", TRASH_RETENTION_KEY);
         try {
             return repository
                 .findById(TRASH_RETENTION_KEY)
-                .map(s -> {
+                .map((s) -> {
                     try {
                         return Integer.parseInt(s.getSettingValue());
                     } catch (NumberFormatException e) {
-                        log.error(
-                            "Invalid trash retention value in DB: {}",
-                            s.getSettingValue()
-                        );
+                        log.error("Invalid trash retention value in DB: {}", s.getSettingValue());
                         return storageProperties.getTrashRetentionDays();
                     }
                 })
@@ -51,12 +45,7 @@ public class ConfigService {
                     return storageProperties.getTrashRetentionDays();
                 });
         } catch (Exception e) {
-            log.error(
-                "Database error while fetching system setting {}: {}",
-                TRASH_RETENTION_KEY,
-                e.getMessage(),
-                e
-            );
+            log.error("Database error while fetching system setting {}: {}", TRASH_RETENTION_KEY, e.getMessage(), e);
             return storageProperties.getTrashRetentionDays(); // Fallback to default on DB error
         }
     }
@@ -67,9 +56,7 @@ public class ConfigService {
         log.info("Updating global trash retention days to: {}", days);
         SystemSetting setting = repository
             .findById(TRASH_RETENTION_KEY)
-            .orElse(
-                new SystemSetting(TRASH_RETENTION_KEY, String.valueOf(days))
-            );
+            .orElse(new SystemSetting(TRASH_RETENTION_KEY, String.valueOf(days)));
         setting.setSettingValue(String.valueOf(days));
         repository.save(setting);
     }
@@ -77,10 +64,7 @@ public class ConfigService {
     /** Retrieves the system timezone from DB or default. */
     @Transactional(readOnly = true)
     public String getSystemTimezone() {
-        return repository
-            .findById(SYSTEM_TIMEZONE_KEY)
-            .map(SystemSetting::getSettingValue)
-            .orElse("UTC");
+        return repository.findById(SYSTEM_TIMEZONE_KEY).map(SystemSetting::getSettingValue).orElse("UTC");
     }
 
     /** Updates the system timezone. */

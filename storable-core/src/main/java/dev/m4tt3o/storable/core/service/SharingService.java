@@ -15,20 +15,10 @@ public interface SharingService {
     List<UserLookupDto> lookupUsers(String query);
 
     /** Share a node with another user. */
-    AccessPrivilege shareNode(
-        Long nodeId,
-        String targetUserId,
-        PrivilegeLevel level,
-        String requesterId
-    );
+    AccessPrivilege shareNode(Long nodeId, String targetUserId, PrivilegeLevel level, String requesterId);
 
     /** Update an existing privilege. */
-    AccessPrivilege updatePrivilege(
-        Long nodeId,
-        String targetUserId,
-        PrivilegeLevel level,
-        String requesterId
-    );
+    AccessPrivilege updatePrivilege(Long nodeId, String targetUserId, PrivilegeLevel level, String requesterId);
 
     /** Remove a privilege. */
     void removePrivilege(Long nodeId, String targetUserId, String requesterId);
@@ -40,11 +30,7 @@ public interface SharingService {
     List<Storable> getSharedWithMe(String userId);
 
     /** Check if a user has a specific permission level on a node. */
-    boolean hasPermission(
-        Long nodeId,
-        String userId,
-        PrivilegeLevel requiredLevel
-    );
+    boolean hasPermission(Long nodeId, String userId, PrivilegeLevel requiredLevel);
 
     /** Get the highest privilege level a user has on a node. */
     PrivilegeLevel getHighestPrivilege(Long nodeId, String userId);

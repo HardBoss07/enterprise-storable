@@ -7,7 +7,5 @@ import jakarta.validation.constraints.NotBlank;
  * Request DTO for changing a user's email address.
  */
 public record ChangeEmailRequest(
-    @NotBlank(message = "New email is required")
-    @Email(message = "Invalid email format")
-    String newEmail
+    @NotBlank(message = "New email is required") @Email(message = "Invalid email format") String newEmail
 ) {}

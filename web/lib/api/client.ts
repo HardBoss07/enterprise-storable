@@ -6,23 +6,17 @@ const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL;
  * @param options Fetch options.
  * @returns The parsed JSON response.
  */
-export async function apiRequest<T>(
-  endpoint: string,
-  options?: RequestInit,
-): Promise<T> {
+export async function apiRequest<T>(endpoint: string, options?: RequestInit): Promise<T> {
   if (!API_BASE_URL) {
-    throw new Error("NEXT_PUBLIC_API_URL is not defined in environment variables");
+    throw new Error('NEXT_PUBLIC_API_URL is not defined in environment variables');
   }
 
   // Normalize URL construction to avoid double slashes
-  const baseUrl = API_BASE_URL.endsWith("/")
-    ? API_BASE_URL.slice(0, -1)
-    : API_BASE_URL;
-  const cleanEndpoint = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  const baseUrl = API_BASE_URL.endsWith('/') ? API_BASE_URL.slice(0, -1) : API_BASE_URL;
+  const cleanEndpoint = endpoint.startsWith('/') ? endpoint : `/${endpoint}`;
   const url = `${baseUrl}${cleanEndpoint}`;
 
-  const token =
-    typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 
   const headers = {
     ...options?.headers,
@@ -32,15 +26,13 @@ export async function apiRequest<T>(
   const response = await fetch(url, { ...options, headers });
 
   if (!response.ok) {
-    if (response.status === 401 && typeof window !== "undefined") {
+    if (response.status === 401 && typeof window !== 'undefined') {
       // Redirect to login if unauthorized and client-side
-      window.location.href = "/login";
+      window.location.href = '/login';
     }
     const errorData = await response.json().catch(() => ({}));
     throw new Error(
-      errorData.error ||
-        errorData.message ||
-        `API request failed with status ${response.status}`,
+      errorData.error || errorData.message || `API request failed with status ${response.status}`,
     );
   }
 
@@ -54,5 +46,5 @@ export function getApiBaseUrl(): string | undefined {
 }
 
 export function getToken(): string | null {
-  return typeof window !== "undefined" ? localStorage.getItem("token") : null;
+  return typeof window !== 'undefined' ? localStorage.getItem('token') : null;
 }

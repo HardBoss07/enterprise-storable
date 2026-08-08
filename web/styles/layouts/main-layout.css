@@ -1,21 +1,21 @@
 @layer components {
   .app-header {
-    @apply bg-bg-main text-white shadow-xl border-b border-surface-300;
+    @apply bg-bg-main border-surface-300 border-b text-white shadow-xl;
   }
 
   .app-sidebar {
-    @apply w-64 bg-bg-sidebar text-white p-4 border-r border-surface-300;
+    @apply bg-bg-sidebar border-surface-300 w-64 border-r p-4 text-white;
   }
 
   .app-footer {
-    @apply bg-bg-main text-text-muted border-t border-surface-300;
+    @apply bg-bg-main text-text-muted border-surface-300 border-t;
   }
 
   .nav-link {
-    @apply flex items-center gap-3 py-2.5 px-4 rounded-xl hover:bg-surface-200 hover:text-primary transition-all text-sm font-medium text-text-secondary;
+    @apply hover:bg-surface-200 hover:text-primary text-text-secondary flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all;
   }
 
   .sidebar-link-active {
-    @apply bg-primary/10 text-primary border border-primary/20 shadow-lg shadow-primary/5;
+    @apply bg-primary/10 text-primary border-primary/20 shadow-primary/5 border shadow-lg;
   }
 }

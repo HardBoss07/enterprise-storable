@@ -25,8 +25,7 @@ public class AdminService {
     private final FolderPersistencePort folderPersistencePort;
     private final StorageService storageService;
 
-    private static final String ROOT_USER_ID =
-        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+    private static final String ROOT_USER_ID = "f43c0bcf-11e4-4629-b072-321ccd04e72a";
 
     /**
      * Retrieves all users in the system.
@@ -34,11 +33,7 @@ public class AdminService {
     @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         log.info("Fetching all users for administration.");
-        return userPersistencePort
-            .searchUsers("")
-            .stream()
-            .map(this::toUserDto)
-            .toList();
+        return userPersistencePort.searchUsers("").stream().map(this::toUserDto).toList();
     }
 
     /**
@@ -77,28 +72,21 @@ public class AdminService {
         // 2. Delete user entry
         userPersistencePort.deleteById(userId);
 
-        log.info(
-            "User {} and all associated data deleted successfully.",
-            userId
-        );
+        log.info("User {} and all associated data deleted successfully.", userId);
     }
 
     private User findUserById(String userId) {
         return userPersistencePort
             .findById(userId)
-            .orElseThrow(() ->
-                new RuntimeException("User not found: " + userId)
-            );
+            .orElseThrow(() -> new RuntimeException("User not found: " + userId));
     }
 
     private void cleanUserPhysicalFiles(String userId) {
-        List<Storable> userNodes = folderPersistencePort.findStorableByOwnerId(
-            userId
-        );
+        List<Storable> userNodes = folderPersistencePort.findStorableByOwnerId(userId);
         userNodes
             .stream()
-            .filter(node -> node instanceof File f && f.storageKey() != null)
-            .map(node -> (File) node)
+            .filter((node) -> node instanceof File f && f.storageKey() != null)
+            .map((node) -> (File) node)
             .forEach(this::deletePhysicalFile);
     }
 
@@ -106,38 +94,25 @@ public class AdminService {
         try {
             storageService.delete(file.storageKey());
         } catch (Exception e) {
-            log.error(
-                "Failed to delete physical file for storageKey {}: {}",
-                file.storageKey(),
-                e.getMessage()
-            );
+            log.error("Failed to delete physical file for storageKey {}: {}", file.storageKey(), e.getMessage());
         }
     }
 
     private void validateRoleUpdateTarget(String userId) {
         if (ROOT_USER_ID.equals(userId)) {
             log.warn("Attempted to change the role of the root admin user!");
-            throw new RuntimeException(
-                "The root admin user's role cannot be changed."
-            );
+            throw new RuntimeException("The root admin user's role cannot be changed.");
         }
     }
 
     private void validateDeletionTarget(String userId) {
         if (ROOT_USER_ID.equals(userId)) {
             log.warn("Attempted to delete the root admin user!");
-            throw new RuntimeException(
-                "The root admin user cannot be deleted."
-            );
+            throw new RuntimeException("The root admin user cannot be deleted.");
         }
     }
 
     private UserDto toUserDto(User user) {
-        return new UserDto(
-            user.id(),
-            user.username(),
-            user.email(),
-            user.role()
-        );
+        return new UserDto(user.id(), user.username(), user.email(), user.role());
     }
 }

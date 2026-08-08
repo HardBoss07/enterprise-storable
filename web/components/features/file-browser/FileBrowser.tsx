@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useRef, useState } from "react";
-import { Breadcrumbs } from "@/components/shared/Breadcrumbs";
-import { FileList } from "./FileList";
-import { Upload, FolderPlus, RefreshCw } from "lucide-react";
-import { useFileBrowser } from "@/hooks/useFileBrowser";
-import { Button } from "@/components/ui/Button";
-import { IconButton } from "@/components/ui/IconButton";
-import { Spinner } from "@/components/ui/Spinner";
-import { useToast } from "@/context/ToastContext";
-import { MoveModal } from "./MoveModal";
-import { ShareModal } from "./ShareModal";
-import { FileNode } from "@/types/api";
-import { cn } from "@/lib/utils";
+import { useRef, useState } from 'react';
+import { Breadcrumbs } from '@/components/shared/Breadcrumbs';
+import { FileList } from './FileList';
+import { Upload, FolderPlus, RefreshCw } from 'lucide-react';
+import { useFileBrowser } from '@/hooks/useFileBrowser';
+import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
+import { Spinner } from '@/components/ui/Spinner';
+import { useToast } from '@/context/ToastContext';
+import { MoveModal } from './MoveModal';
+import { ShareModal } from './ShareModal';
+import { FileNode } from '@/types/api';
+import { cn } from '@/lib/utils';
 
 interface FileBrowserProps {
   /** Optional ID of the initial folder to display. */
@@ -71,16 +71,14 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
    * Handles the file input change event for uploads.
    * @param {React.ChangeEvent<HTMLInputElement>} event - The change event.
    */
-  const handleFileChange = async (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
+  const handleFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
       try {
         await uploadFile(file);
-        showToast(`Successfully uploaded ${file.name}`, "success");
+        showToast(`Successfully uploaded ${file.name}`, 'success');
       } catch (err) {
-        showToast("Failed to upload file", "error");
+        showToast('Failed to upload file', 'error');
       }
     }
   };
@@ -93,9 +91,9 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
   const handleRename = async (nodeId: number, newName: string) => {
     try {
       await renameFile(nodeId, newName);
-      showToast("Successfully renamed", "success");
+      showToast('Successfully renamed', 'success');
     } catch (err) {
-      showToast("Failed to rename", "error");
+      showToast('Failed to rename', 'error');
     } finally {
       setRenamingNodeId(null);
     }
@@ -108,11 +106,11 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
   const handleDuplicate = async (nodeId: number) => {
     try {
       const newNode = await duplicateFile(nodeId);
-      showToast("Successfully duplicated", "success");
+      showToast('Successfully duplicated', 'success');
       // Trigger rename for the new node to allow immediate customization
       setRenamingNodeId(newNode.id);
     } catch (err) {
-      showToast("Failed to duplicate", "error");
+      showToast('Failed to duplicate', 'error');
     }
   };
 
@@ -135,9 +133,9 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
     if (!movingNode) return;
     try {
       await moveFile(movingNode.id, targetParentId);
-      showToast(`Moved ${movingNode.name} successfully`, "success");
+      showToast(`Moved ${movingNode.name} successfully`, 'success');
     } catch (err) {
-      showToast("Failed to move item", "error");
+      showToast('Failed to move item', 'error');
     } finally {
       setMovingNode(null);
     }
@@ -145,7 +143,7 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
 
   return (
     <div className="card-surface relative">
-      <div className="mb-8 flex flex-col gap-6 md:flex-row md:items-center justify-between">
+      <div className="mb-8 flex flex-col justify-between gap-6 md:flex-row md:items-center">
         <Breadcrumbs path={path} onBreadcrumbClick={navigateToFolder} />
 
         <div className="flex items-center space-x-3">
@@ -158,11 +156,7 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
             Upload
           </Button>
 
-          <Button
-            onClick={handleCreateFolder}
-            variant="outline"
-            disabled={loading}
-          >
+          <Button onClick={handleCreateFolder} variant="outline" disabled={loading}>
             <FolderPlus size={18} className="mr-2" strokeWidth={2} />
             New Folder
           </Button>
@@ -172,16 +166,11 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
             onClick={() => refresh()}
             variant="secondary"
             title="Refresh"
-            className={cn(loading && "animate-spin")}
+            className={cn(loading && 'animate-spin')}
             isLoading={loading}
           />
 
-          <input
-            type="file"
-            ref={fileInputRef}
-            onChange={handleFileChange}
-            className="hidden"
-          />
+          <input type="file" ref={fileInputRef} onChange={handleFileChange} className="hidden" />
         </div>
       </div>
 
@@ -217,9 +206,7 @@ export function FileBrowser({ initialFolderId = null }: FileBrowserProps) {
           onMove={handleMoveConfirm}
         />
       )}
-      {sharingNode && (
-        <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />
-      )}
+      {sharingNode && <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />}
     </div>
   );
 }

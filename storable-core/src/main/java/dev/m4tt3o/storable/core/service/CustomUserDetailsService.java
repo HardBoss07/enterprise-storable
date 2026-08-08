@@ -19,13 +19,10 @@ public class CustomUserDetailsService implements UserDetailsService {
     private final UserPersistencePort userPersistencePort;
 
     @Override
-    public UserDetails loadUserByUsername(String username)
-        throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userPersistencePort
             .findByUsername(username)
-            .orElseThrow(() ->
-                new UsernameNotFoundException("User not found: " + username)
-            );
+            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         return CustomUserDetails.fromDomain(user);
     }

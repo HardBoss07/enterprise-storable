@@ -46,9 +46,7 @@ public class NodeMapper {
                 .parentId(fol.getParentId())
                 .children(new ArrayList<>()) // Children populated separately if needed
                 .build();
-            default -> throw new IllegalArgumentException(
-                "Unknown node type: " + entity.getClass()
-            );
+            default -> throw new IllegalArgumentException("Unknown node type: " + entity.getClass());
         };
     }
 

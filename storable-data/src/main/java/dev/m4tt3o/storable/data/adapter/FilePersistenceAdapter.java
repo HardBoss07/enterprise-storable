@@ -22,16 +22,12 @@ public class FilePersistenceAdapter implements FilePersistencePort {
 
     @Override
     public Optional<File> findById(Long id) {
-        return fileRepository
-            .findById(id)
-            .map(entity -> (File) NodeMapper.toDomain(entity));
+        return fileRepository.findById(id).map((entity) -> (File) NodeMapper.toDomain(entity));
     }
 
     @Override
     public Optional<File> findByIdAndOwner(Long id, String ownerId) {
-        return fileRepository
-            .findByIdAndOwnerId(id, ownerId)
-            .map(entity -> (File) NodeMapper.toDomain(entity));
+        return fileRepository.findByIdAndOwnerId(id, ownerId).map((entity) -> (File) NodeMapper.toDomain(entity));
     }
 
     @Override
@@ -44,9 +40,7 @@ public class FilePersistenceAdapter implements FilePersistencePort {
     @Override
     @Transactional
     public void deleteById(Long id, String ownerId) {
-        fileRepository
-            .findByIdAndOwnerId(id, ownerId)
-            .ifPresent(fileRepository::delete);
+        fileRepository.findByIdAndOwnerId(id, ownerId).ifPresent(fileRepository::delete);
     }
 
     @Override
@@ -54,7 +48,7 @@ public class FilePersistenceAdapter implements FilePersistencePort {
         return fileRepository
             .findTop5ByOwnerIdAndIsDeletedFalseOrderByModifiedAtDesc(ownerId)
             .stream()
-            .map(entity -> (File) NodeMapper.toDomain(entity))
+            .map((entity) -> (File) NodeMapper.toDomain(entity))
             .toList();
     }
 

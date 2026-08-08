@@ -8,10 +8,4 @@ import lombok.Builder;
  * This is the 'Source of Truth' for all modules.
  */
 @Builder
-public record User(
-    String id,
-    String username,
-    String password,
-    String email,
-    UserRole role
-) {}
+public record User(String id, String username, String password, String email, UserRole role) {}

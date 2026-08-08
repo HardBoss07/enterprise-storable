@@ -1,7 +1,7 @@
-import { useState, useEffect, useRef } from "react";
-import { FileNode } from "@/types/api";
-import { searchFiles } from "@/lib/api/file";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, useRef } from 'react';
+import { FileNode } from '@/types/api';
+import { searchFiles } from '@/lib/api/file';
+import { useRouter } from 'next/navigation';
 
 /**
  * Custom hook for handling search functionality.
@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
  * @returns {object} Search state and handlers.
  */
 export function useSearch() {
-  const [query, setQuery] = useState("");
+  const [query, setQuery] = useState('');
   const [results, setResults] = useState<FileNode[]>([]);
   const [loading, setLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -19,15 +19,12 @@ export function useSearch() {
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        searchRef.current &&
-        !searchRef.current.contains(event.target as Node)
-      ) {
+      if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
   useEffect(() => {
@@ -44,7 +41,7 @@ export function useSearch() {
         setResults(data.slice(0, 8)); // Show top 8 results
         setIsOpen(true);
       } catch (error) {
-        console.error("Search failed:", error);
+        console.error('Search failed:', error);
       } finally {
         setLoading(false);
       }
@@ -64,14 +61,14 @@ export function useSearch() {
       router.push(`/?folderId=${node.parentId}`);
     }
     setIsOpen(false);
-    setQuery("");
+    setQuery('');
   };
 
   /**
    * Clears the search query.
    */
   const handleClear = () => {
-    setQuery("");
+    setQuery('');
   };
 
   return {

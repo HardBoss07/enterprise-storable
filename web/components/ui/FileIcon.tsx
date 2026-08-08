@@ -1,11 +1,11 @@
-import { Folder } from "lucide-react";
-import { getFileConfig } from "@/lib/file-constants";
-import { cn } from "@/lib/utils";
+import { Folder } from 'lucide-react';
+import { getFileConfig } from '@/lib/file-constants';
+import { cn } from '@/lib/utils';
 
 /**
  * Props for the FileIcon component.
  */
-interface FileIconProps extends React.ComponentProps<"svg"> {
+interface FileIconProps extends React.ComponentProps<'svg'> {
   /** The file extension (e.g., "pdf", "docx") used to resolve the icon and color. */
   extension?: string | null;
   /** Fallback MIME type used if extension is not provided. */
@@ -34,16 +34,14 @@ export function FileIcon({
 }: FileIconProps) {
   // Folders use a standard folder icon with a fixed color
   if (isFolder) {
-    return (
-      <Folder className={cn("text-accent", className)} size={size} {...props} />
-    );
+    return <Folder className={cn('text-accent', className)} size={size} {...props} />;
   }
 
   // Determine which extension string to use for lookups
   // 1. Explicit extension prop
   // 2. Extracted from MIME type (fallback)
   // 3. Null (will use generic fallback)
-  const effectiveExtension = extension || (mime ? mime.split("/").pop() : null);
+  const effectiveExtension = extension || (mime ? mime.split('/').pop() : null);
 
   // Resolve configuration from constants
   const { icon: Icon, color } = getFileConfig(effectiveExtension);
@@ -65,6 +63,6 @@ export function FileIcon({
  * @param {React.ComponentProps<"svg">} props - The SVG properties.
  * @returns {JSX.Element} The rendered folder icon.
  */
-export function FolderIcon(props: React.ComponentProps<"svg">) {
+export function FolderIcon(props: React.ComponentProps<'svg'>) {
   return <Folder className="text-accent" {...props} />;
 }

@@ -1,39 +1,27 @@
-"use client";
+'use client';
 
-import { useEffect, useState, useMemo } from "react";
-import { GlobalSettingsDto } from "@/types/api";
-import {
-  getSettings,
-  updateSettings,
-  revokeAllSessions,
-} from "@/lib/api/admin";
-import { Button } from "@/components/ui/Button";
-import {
-  Save,
-  Clock,
-  Trash2,
-  Search,
-  Check,
-  ShieldAlert,
-  LogOut,
-} from "lucide-react";
-import { useToast } from "@/context/ToastContext";
-import { useConfirm } from "@/context/ConfirmContext";
-import { Spinner } from "@/components/ui/Spinner";
-import { cn } from "@/lib/utils";
+import { useEffect, useState, useMemo } from 'react';
+import { GlobalSettingsDto } from '@/types/api';
+import { getSettings, updateSettings, revokeAllSessions } from '@/lib/api/admin';
+import { Button } from '@/components/ui/Button';
+import { Save, Clock, Trash2, Search, Check, ShieldAlert, LogOut } from 'lucide-react';
+import { useToast } from '@/context/ToastContext';
+import { useConfirm } from '@/context/ConfirmContext';
+import { Spinner } from '@/components/ui/Spinner';
+import { cn } from '@/lib/utils';
 
 export default function GlobalSettingsPage() {
   const [settings, setSettings] = useState<GlobalSettingsDto | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [isRevoking, setIsRevoking] = useState(false);
-  const [tzSearch, setTzSearch] = useState("");
+  const [tzSearch, setTzSearch] = useState('');
   const [isTzOpen, setIsTzOpen] = useState(false);
   const { showToast } = useToast();
   const { confirm } = useConfirm();
 
   const allTimezones = useMemo(() => {
-    return (Intl as any).supportedValuesOf("timeZone") as string[];
+    return (Intl as any).supportedValuesOf('timeZone') as string[];
   }, []);
 
   const filteredTimezones = useMemo(() => {
@@ -49,7 +37,7 @@ export default function GlobalSettingsPage() {
         const data = await getSettings();
         setSettings(data);
       } catch (error) {
-        showToast("Failed to fetch settings", "error");
+        showToast('Failed to fetch settings', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -62,9 +50,9 @@ export default function GlobalSettingsPage() {
     try {
       setIsSaving(true);
       await updateSettings(settings);
-      showToast("Settings updated successfully", "success");
+      showToast('Settings updated successfully', 'success');
     } catch (error) {
-      showToast("Failed to update settings", "error");
+      showToast('Failed to update settings', 'error');
     } finally {
       setIsSaving(false);
     }
@@ -72,20 +60,20 @@ export default function GlobalSettingsPage() {
 
   const handleNuclearReset = async () => {
     const isConfirmed = await confirm({
-      title: "Nuclear Session Reset",
+      title: 'Nuclear Session Reset',
       message:
-        "This will immediately invalidate ALL active user sessions across the entire system. Every user (except the root admin) will be forcibly logged out and required to sign in again. Use this only in emergencies or security breaches.",
-      confirmLabel: "Invalidate All Sessions",
-      variant: "danger",
+        'This will immediately invalidate ALL active user sessions across the entire system. Every user (except the root admin) will be forcibly logged out and required to sign in again. Use this only in emergencies or security breaches.',
+      confirmLabel: 'Invalidate All Sessions',
+      variant: 'danger',
     });
 
     if (isConfirmed) {
       try {
         setIsRevoking(true);
         const response = await revokeAllSessions();
-        showToast(response.message, "success");
+        showToast(response.message, 'success');
       } catch (error) {
-        showToast("Failed to revoke sessions", "error");
+        showToast('Failed to revoke sessions', 'error');
       } finally {
         setIsRevoking(false);
       }
@@ -94,7 +82,7 @@ export default function GlobalSettingsPage() {
 
   if (isLoading || !settings) {
     return (
-      <div className="flex items-center justify-center h-64">
+      <div className="flex h-64 items-center justify-center">
         <Spinner size="lg" />
       </div>
     );
@@ -103,16 +91,16 @@ export default function GlobalSettingsPage() {
   return (
     <div className="max-w-2xl space-y-8">
       {/* Trash Retention Section */}
-      <section className="bg-bg-sidebar rounded-2xl border border-surface-300 p-6 shadow-2xl space-y-4">
-        <div className="flex items-center gap-3 text-text-primary">
-          <div className="p-2 rounded-lg bg-red-500/10 text-red-500">
+      <section className="bg-bg-sidebar border-surface-300 space-y-4 rounded-2xl border p-6 shadow-2xl">
+        <div className="text-text-primary flex items-center gap-3">
+          <div className="rounded-lg bg-red-500/10 p-2 text-red-500">
             <Trash2 size={20} />
           </div>
           <h2 className="text-lg font-bold tracking-tight">Trash Management</h2>
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-bold text-text-muted uppercase tracking-tighter">
+          <label className="text-text-muted block text-sm font-bold tracking-tighter uppercase">
             Trash Retention Days
           </label>
           <div className="flex items-center gap-4">
@@ -126,9 +114,9 @@ export default function GlobalSettingsPage() {
                   trashRetentionDays: parseInt(e.target.value) || 0,
                 })
               }
-              className="w-32 bg-surface-100 border border-surface-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-text-primary"
+              className="bg-surface-100 border-surface-300 focus:ring-primary text-text-primary w-32 rounded-xl border px-4 py-2 transition-all focus:ring-2 focus:outline-none"
             />
-            <span className="text-sm text-text-muted">
+            <span className="text-text-muted text-sm">
               Items older than this will be automatically purged from the trash.
             </span>
           </div>
@@ -136,34 +124,34 @@ export default function GlobalSettingsPage() {
       </section>
 
       {/* Timezone Section */}
-      <section className="bg-bg-sidebar rounded-2xl border border-surface-300 p-6 shadow-2xl space-y-4 relative">
-        <div className="flex items-center gap-3 text-text-primary">
-          <div className="p-2 rounded-lg bg-primary/10 text-primary">
+      <section className="bg-bg-sidebar border-surface-300 relative space-y-4 rounded-2xl border p-6 shadow-2xl">
+        <div className="text-text-primary flex items-center gap-3">
+          <div className="bg-primary/10 text-primary rounded-lg p-2">
             <Clock size={20} />
           </div>
           <h2 className="text-lg font-bold tracking-tight">System Timezone</h2>
         </div>
 
         <div className="space-y-2">
-          <label className="block text-sm font-bold text-text-muted uppercase tracking-tighter">
+          <label className="text-text-muted block text-sm font-bold tracking-tighter uppercase">
             Default Server Timezone
           </label>
 
           <div className="relative">
             <button
               onClick={() => setIsTzOpen(!isTzOpen)}
-              className="w-full text-left bg-surface-100 border border-surface-300 rounded-xl px-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-primary transition-all text-text-primary flex justify-between items-center"
+              className="bg-surface-100 border-surface-300 focus:ring-primary text-text-primary flex w-full items-center justify-between rounded-xl border px-4 py-2.5 text-left transition-all focus:ring-2 focus:outline-none"
             >
               <span className="font-medium">{settings.systemTimezone}</span>
               <Search size={16} className="text-text-muted" />
             </button>
 
             {isTzOpen && (
-              <div className="absolute z-50 w-full mt-2 bg-bg-sidebar border border-surface-300 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
-                <div className="p-2 border-b border-surface-300 bg-surface-100">
+              <div className="bg-bg-sidebar border-surface-300 animate-in fade-in zoom-in-95 absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border shadow-2xl duration-150">
+                <div className="border-surface-300 bg-surface-100 border-b p-2">
                   <div className="relative">
                     <Search
-                      className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+                      className="text-text-muted absolute top-1/2 left-3 -translate-y-1/2"
                       size={14}
                     />
                     <input
@@ -171,7 +159,7 @@ export default function GlobalSettingsPage() {
                       placeholder="Search timezones..."
                       value={tzSearch}
                       onChange={(e) => setTzSearch(e.target.value)}
-                      className="w-full bg-surface-200 border-none rounded-lg pl-9 pr-4 py-2 text-sm focus:ring-0 text-text-primary"
+                      className="bg-surface-200 text-text-primary w-full rounded-lg border-none py-2 pr-4 pl-9 text-sm focus:ring-0"
                     />
                   </div>
                 </div>
@@ -184,10 +172,10 @@ export default function GlobalSettingsPage() {
                         setIsTzOpen(false);
                       }}
                       className={cn(
-                        "w-full text-left px-4 py-2 text-sm flex items-center justify-between transition-colors hover:bg-surface-200",
+                        'hover:bg-surface-200 flex w-full items-center justify-between px-4 py-2 text-left text-sm transition-colors',
                         settings.systemTimezone === tz
-                          ? "text-primary bg-primary/5 font-bold"
-                          : "text-text-secondary",
+                          ? 'text-primary bg-primary/5 font-bold'
+                          : 'text-text-secondary',
                       )}
                     >
                       {tz}
@@ -198,33 +186,29 @@ export default function GlobalSettingsPage() {
               </div>
             )}
           </div>
-          <p className="text-xs text-text-muted">
-            This affects display dates and background tasks like trash cleanup
-            schedules.
+          <p className="text-text-muted text-xs">
+            This affects display dates and background tasks like trash cleanup schedules.
           </p>
         </div>
       </section>
 
       {/* Security Section */}
-      <section className="bg-bg-sidebar rounded-2xl border border-red-500/20 p-6 shadow-2xl space-y-6">
+      <section className="bg-bg-sidebar space-y-6 rounded-2xl border border-red-500/20 p-6 shadow-2xl">
         <div className="flex items-center gap-3 text-red-500">
-          <div className="p-2 rounded-lg bg-red-500/10">
+          <div className="rounded-lg bg-red-500/10 p-2">
             <ShieldAlert size={20} />
           </div>
-          <h2 className="text-lg font-bold tracking-tight">
-            Security & Sessions
-          </h2>
+          <h2 className="text-lg font-bold tracking-tight">Security & Sessions</h2>
         </div>
 
         <div className="space-y-4">
           <div className="space-y-2">
-            <h3 className="text-sm font-bold text-text-primary uppercase tracking-tighter">
+            <h3 className="text-text-primary text-sm font-bold tracking-tighter uppercase">
               Nuclear Session Reset
             </h3>
-            <p className="text-sm text-text-muted leading-relaxed">
-              In case of a security breach or system-wide maintenance, you can
-              instantly log out all active users. This will invalidate all
-              existing authentication tokens globally.
+            <p className="text-text-muted text-sm leading-relaxed">
+              In case of a security breach or system-wide maintenance, you can instantly log out all
+              active users. This will invalidate all existing authentication tokens globally.
             </p>
           </div>
 
@@ -232,16 +216,13 @@ export default function GlobalSettingsPage() {
             variant="ghost"
             onClick={handleNuclearReset}
             disabled={isRevoking}
-            className="w-full bg-red-500/5 hover:bg-red-500 text-red-500 hover:text-white border border-red-500/20 transition-all duration-300 font-bold py-6 group"
+            className="group w-full border border-red-500/20 bg-red-500/5 py-6 font-bold text-red-500 transition-all duration-300 hover:bg-red-500 hover:text-white"
           >
             {isRevoking ? (
               <Spinner size="sm" />
             ) : (
               <div className="flex items-center gap-3">
-                <LogOut
-                  size={20}
-                  className="group-hover:translate-x-1 transition-transform"
-                />
+                <LogOut size={20} className="transition-transform group-hover:translate-x-1" />
                 <span>Invalidate All User Sessions</span>
               </div>
             )}
@@ -250,11 +231,7 @@ export default function GlobalSettingsPage() {
       </section>
 
       <div className="flex justify-end pt-4 pb-12">
-        <Button
-          onClick={handleSave}
-          disabled={isSaving}
-          className="flex items-center gap-2 px-8"
-        >
+        <Button onClick={handleSave} disabled={isSaving} className="flex items-center gap-2 px-8">
           {isSaving ? <Spinner size="sm" /> : <Save size={20} />}
           Save Changes
         </Button>

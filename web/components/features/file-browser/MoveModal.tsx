@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { FileNode } from "@/types/api";
-import { Button } from "@/components/ui/Button";
-import { IconButton } from "@/components/ui/IconButton";
-import { Search, ChevronRight, X, Folder, Home } from "lucide-react";
-import { Spinner } from "@/components/ui/Spinner";
-import { useMoveModal } from "@/hooks/useMoveModal";
-import { cn } from "@/lib/utils";
+import { FileNode } from '@/types/api';
+import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
+import { Search, ChevronRight, X, Folder, Home } from 'lucide-react';
+import { Spinner } from '@/components/ui/Spinner';
+import { useMoveModal } from '@/hooks/useMoveModal';
+import { cn } from '@/lib/utils';
 
 interface MoveModalProps {
   /** Whether the modal is currently open. */
@@ -26,12 +26,7 @@ interface MoveModalProps {
  * @param {MoveModalProps} props - The component props.
  * @returns {JSX.Element | null} The rendered MoveModal component or null if not open.
  */
-export function MoveModal({
-  isOpen,
-  onClose,
-  onMove,
-  nodeToMove,
-}: MoveModalProps) {
+export function MoveModal({ isOpen, onClose, onMove, nodeToMove }: MoveModalProps) {
   const {
     currentFolderId,
     folders,
@@ -52,9 +47,7 @@ export function MoveModal({
       <div className="flex max-h-[80vh] w-full max-w-lg flex-col overflow-hidden rounded-xl border border-neutral-800 bg-neutral-900 shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-neutral-800 p-4">
-          <h3 className="text-lg font-semibold text-neutral-100">
-            Move "{nodeToMove.name}" to...
-          </h3>
+          <h3 className="text-lg font-semibold text-neutral-100">Move "{nodeToMove.name}" to...</h3>
           <IconButton icon={X} onClick={onClose} variant="ghost" size="sm" />
         </div>
 
@@ -62,7 +55,7 @@ export function MoveModal({
         <div className="bg-neutral-950/50 p-4">
           <div className="relative">
             <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-500"
+              className="absolute top-1/2 left-3 -translate-y-1/2 text-neutral-500"
               size={18}
             />
             <input
@@ -85,10 +78,7 @@ export function MoveModal({
               <Home size={14} />
             </button>
             {path.map((folder) => (
-              <div
-                key={folder.id}
-                className="flex shrink-0 items-center space-x-1"
-              >
+              <div key={folder.id} className="flex shrink-0 items-center space-x-1">
                 <ChevronRight size={14} className="text-neutral-600" />
                 <button
                   onClick={() => handleFolderClick(folder.id)}
@@ -156,10 +146,8 @@ export function MoveModal({
         {/* Footer */}
         <div className="flex items-center justify-between border-t border-neutral-800 bg-neutral-950/50 p-4">
           <div className="max-w-[200px] truncate text-sm text-neutral-400">
-            Target:{" "}
-            <span className="text-neutral-200">
-              {path[path.length - 1]?.name || "Home"}
-            </span>
+            Target:{' '}
+            <span className="text-neutral-200">{path[path.length - 1]?.name || 'Home'}</span>
           </div>
           <div className="flex space-x-3">
             <Button variant="ghost" onClick={onClose}>

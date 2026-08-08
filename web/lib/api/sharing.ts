@@ -1,7 +1,7 @@
-import { apiRequest } from "@/lib/api/client";
-import { FileNode } from "@/types/api";
+import { apiRequest } from '@/lib/api/client';
+import { FileNode } from '@/types/api';
 
-export type PrivilegeLevel = "VIEW" | "EDIT" | "OWNER";
+export type PrivilegeLevel = 'VIEW' | 'EDIT' | 'OWNER';
 
 export interface AccessPrivilege {
   id: number;
@@ -22,27 +22,21 @@ export interface UserLookup {
  * Fetches all nodes shared with the current user.
  */
 export async function getSharedWithMe(): Promise<FileNode[]> {
-  return apiRequest<FileNode[]>("/api/sharing/shared-with-me");
+  return apiRequest<FileNode[]>('/api/sharing/shared-with-me');
 }
 
 /**
  * Looks up users by email or username.
  */
 export async function lookupUsers(query: string): Promise<UserLookup[]> {
-  return apiRequest<UserLookup[]>(
-    `/api/sharing/users?query=${encodeURIComponent(query)}`,
-  );
+  return apiRequest<UserLookup[]>(`/api/sharing/users?query=${encodeURIComponent(query)}`);
 }
 
 /**
  * Fetches all privileges for a node.
  */
-export async function getNodePrivileges(
-  nodeId: number,
-): Promise<AccessPrivilege[]> {
-  return apiRequest<AccessPrivilege[]>(
-    `/api/sharing/nodes/${nodeId}/privileges`,
-  );
+export async function getNodePrivileges(nodeId: number): Promise<AccessPrivilege[]> {
+  return apiRequest<AccessPrivilege[]>(`/api/sharing/nodes/${nodeId}/privileges`);
 }
 
 /**
@@ -54,8 +48,8 @@ export async function shareNode(
   level: PrivilegeLevel,
 ): Promise<AccessPrivilege> {
   return apiRequest<AccessPrivilege>(`/api/sharing/nodes/${nodeId}/share`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ targetUserId, level }),
   });
 }
@@ -68,27 +62,18 @@ export async function updatePrivilege(
   targetUserId: string,
   level: PrivilegeLevel,
 ): Promise<AccessPrivilege> {
-  return apiRequest<AccessPrivilege>(
-    `/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`,
-    {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ targetUserId, level }),
-    },
-  );
+  return apiRequest<AccessPrivilege>(`/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ targetUserId, level }),
+  });
 }
 
 /**
  * Removes a privilege.
  */
-export async function removePrivilege(
-  nodeId: number,
-  targetUserId: string,
-): Promise<void> {
-  return apiRequest<void>(
-    `/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`,
-    {
-      method: "DELETE",
-    },
-  );
+export async function removePrivilege(nodeId: number, targetUserId: string): Promise<void> {
+  return apiRequest<void>(`/api/sharing/nodes/${nodeId}/privileges/${targetUserId}`, {
+    method: 'DELETE',
+  });
 }

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback } from "react";
-import { FileNode } from "@/types/api";
+import { useState, useEffect, useCallback } from 'react';
+import { FileNode } from '@/types/api';
 import {
   getFileList,
   createFolder,
@@ -13,7 +13,7 @@ import {
   duplicateFile,
   moveNode,
   toggleFavorite,
-} from "@/lib/api/file";
+} from '@/lib/api/file';
 
 /**
  * Hook for managing the file browser state and operations.
@@ -25,9 +25,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
   const [path, setPath] = useState<FileNode[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  const [currentFolderId, setCurrentFolderId] = useState<number | null>(
-    initialFolderId,
-  );
+  const [currentFolderId, setCurrentFolderId] = useState<number | null>(initialFolderId);
   const [homeFolderId, setHomeFolderId] = useState<number | null>(null);
   const [isCreatingFolder, setIsCreatingFolder] = useState<boolean>(false);
 
@@ -52,7 +50,7 @@ export function useFileBrowser(initialFolderId: number | null = null) {
           setCurrentFolderId(home.id);
         }
       } catch (err) {
-        console.error("Failed to fetch home folder:", err);
+        console.error('Failed to fetch home folder:', err);
       }
     };
     fetchHome();
@@ -72,8 +70,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       const pathArr = await getFilePath(currentFolderId);
       setPath(pathArr);
     } catch (err) {
-      console.error("Error fetching file data:", err);
-      setError("Failed to fetch file data.");
+      console.error('Error fetching file data:', err);
+      setError('Failed to fetch file data.');
     } finally {
       setLoading(false);
       setIsCreatingFolder(false); // Reset when navigating/refreshing
@@ -116,8 +114,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       setIsCreatingFolder(false);
       await fetchData();
     } catch (err) {
-      console.error("Failed to create folder:", err);
-      throw new Error("Failed to create folder");
+      console.error('Failed to create folder:', err);
+      throw new Error('Failed to create folder');
     }
   };
 
@@ -131,9 +129,9 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       await uploadFile(file, currentFolderId);
       await fetchData();
     } catch (err) {
-      console.error("Failed to upload file:", err);
+      console.error('Failed to upload file:', err);
       setLoading(false);
-      throw new Error("Failed to upload file");
+      throw new Error('Failed to upload file');
     }
   };
 
@@ -146,8 +144,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       await softDeleteNode(nodeId);
       await fetchData();
     } catch (err) {
-      console.error("Failed to delete file:", err);
-      throw new Error("Failed to delete file");
+      console.error('Failed to delete file:', err);
+      throw new Error('Failed to delete file');
     }
   };
 
@@ -161,8 +159,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       await renameNode(nodeId, newName);
       await fetchData();
     } catch (err) {
-      console.error("Failed to rename file:", err);
-      throw new Error("Failed to rename file");
+      console.error('Failed to rename file:', err);
+      throw new Error('Failed to rename file');
     }
   };
 
@@ -176,8 +174,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       await fetchData();
       return newNode;
     } catch (err) {
-      console.error("Failed to duplicate file:", err);
-      throw new Error("Failed to duplicate file");
+      console.error('Failed to duplicate file:', err);
+      throw new Error('Failed to duplicate file');
     }
   };
 
@@ -191,8 +189,8 @@ export function useFileBrowser(initialFolderId: number | null = null) {
       await moveNode(nodeId, targetParentId);
       await fetchData();
     } catch (err) {
-      console.error("Failed to move file:", err);
-      throw new Error("Failed to move file");
+      console.error('Failed to move file:', err);
+      throw new Error('Failed to move file');
     }
   };
 
@@ -205,12 +203,10 @@ export function useFileBrowser(initialFolderId: number | null = null) {
     try {
       await toggleFavorite(nodeId, isFavorite);
       // Optimistic update
-      setFiles((prev) =>
-        prev.map((f) => (f.id === nodeId ? { ...f, isFavorite } : f)),
-      );
+      setFiles((prev) => prev.map((f) => (f.id === nodeId ? { ...f, isFavorite } : f)));
     } catch (err) {
-      console.error("Failed to toggle favorite:", err);
-      throw new Error("Failed to toggle favorite");
+      console.error('Failed to toggle favorite:', err);
+      throw new Error('Failed to toggle favorite');
     }
   };
 

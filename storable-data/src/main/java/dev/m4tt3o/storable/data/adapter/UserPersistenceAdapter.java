@@ -26,9 +26,7 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 
     @Override
     public Optional<User> findByUsername(String username) {
-        return userRepository
-            .findByUsername(username)
-            .map(UserMapper::toDomain);
+        return userRepository.findByUsername(username).map(UserMapper::toDomain);
     }
 
     @Override
@@ -55,11 +53,7 @@ public class UserPersistenceAdapter implements UserPersistencePort {
 
     @Override
     public List<User> searchUsers(String query) {
-        return userRepository
-            .searchUsers(query)
-            .stream()
-            .map(UserMapper::toDomain)
-            .toList();
+        return userRepository.searchUsers(query).stream().map(UserMapper::toDomain).toList();
     }
 
     @Override

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { ReactNode } from "react";
+import { cn } from '@/lib/utils';
+import { ReactNode } from 'react';
 
 /**
  * Variants for the StatusBadge component.
@@ -10,7 +10,7 @@ import { ReactNode } from "react";
  * success: green (owner)
  * neutral: gray (default)
  */
-export type StatusBadgeVariant = "info" | "warning" | "success" | "neutral";
+export type StatusBadgeVariant = 'info' | 'warning' | 'success' | 'neutral';
 
 /**
  * Props for the StatusBadge component.
@@ -31,23 +31,15 @@ export interface StatusBadgeProps {
  * @param {StatusBadgeProps} props - The component props.
  * @returns {JSX.Element} The rendered StatusBadge component.
  */
-export function StatusBadge({
-  children,
-  variant = "neutral",
-  className,
-}: StatusBadgeProps) {
+export function StatusBadge({ children, variant = 'neutral', className }: StatusBadgeProps) {
   const variantClasses = {
-    neutral: "badge-neutral",
-    info: "badge-info",
-    warning: "badge-warning",
-    success: "badge-success",
+    neutral: 'badge-neutral',
+    info: 'badge-info',
+    warning: 'badge-warning',
+    success: 'badge-success',
   };
 
-  return (
-    <span className={cn("badge", variantClasses[variant], className)}>
-      {children}
-    </span>
-  );
+  return <span className={cn('badge', variantClasses[variant], className)}>{children}</span>;
 }
 
 export default StatusBadge;

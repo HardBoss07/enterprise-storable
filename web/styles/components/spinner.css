@@ -1,11 +1,11 @@
 @layer components {
   /* --- Spinner Components --- */
   .spinner-container {
-    @apply flex justify-center items-center;
+    @apply flex items-center justify-center;
   }
 
   .spinner-element {
-    @apply animate-spin rounded-full border-b-primary border-surface-300;
+    @apply border-b-primary border-surface-300 animate-spin rounded-full;
   }
 
   .spinner-sm {

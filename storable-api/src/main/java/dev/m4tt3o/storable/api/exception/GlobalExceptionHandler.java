@@ -21,14 +21,8 @@ public class GlobalExceptionHandler {
      * Handles the sealed StorableException hierarchy.
      */
     @ExceptionHandler(StorableException.class)
-    public ResponseEntity<ErrorResponse> handleStorableException(
-        StorableException e
-    ) {
-        log.warn(
-            "Domain Error [{}]: {}",
-            e.getErrorCode().getCode(),
-            e.getMessage()
-        );
+    public ResponseEntity<ErrorResponse> handleStorableException(StorableException e) {
+        log.warn("Domain Error [{}]: {}", e.getErrorCode().getCode(), e.getMessage());
 
         HttpStatus status = switch (e) {
             case ResourceNotFoundException ex -> HttpStatus.NOT_FOUND;
@@ -40,11 +34,7 @@ public class GlobalExceptionHandler {
         };
 
         return ResponseEntity.status(status).body(
-            new ErrorResponse(
-                e.getErrorCode(),
-                e.getMessage(),
-                e.getClass().getSimpleName()
-            )
+            new ErrorResponse(e.getErrorCode(), e.getMessage(), e.getClass().getSimpleName())
         );
     }
 
@@ -52,9 +42,7 @@ public class GlobalExceptionHandler {
      * Fallback for generic RuntimeExceptions.
      */
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ErrorResponse> handleRuntimeException(
-        RuntimeException e
-    ) {
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException e) {
         log.error("Unhandled Runtime Exception: ", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
             new ErrorResponse(
@@ -72,11 +60,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleException(Exception e) {
         log.error("Unhandled Exception: ", e);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
-            new ErrorResponse(
-                ErrorCode.INTERNAL_SERVER_ERROR,
-                "An unexpected error occurred.",
-                "Exception"
-            )
+            new ErrorResponse(ErrorCode.INTERNAL_SERVER_ERROR, "An unexpected error occurred.", "Exception")
         );
     }
 }

@@ -11,29 +11,17 @@ import org.springframework.security.core.userdetails.UserDetails;
 /**
  * Custom UserDetails implementation for Spring Security, using the User Domain Model.
  */
-public record CustomUserDetails(
-    String id,
-    String username,
-    String password,
-    UserRole role
-) implements UserDetails {
+public record CustomUserDetails(String id, String username, String password, UserRole role) implements UserDetails {
     /**
      * Factory method to create CustomUserDetails from a User Domain Model.
      */
     public static CustomUserDetails fromDomain(User user) {
-        return new CustomUserDetails(
-            user.id(),
-            user.username(),
-            user.password(),
-            user.role()
-        );
+        return new CustomUserDetails(user.id(), user.username(), user.password(), user.role());
     }
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singletonList(
-            new SimpleGrantedAuthority("ROLE_" + role.name())
-        );
+        return Collections.singletonList(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

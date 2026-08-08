@@ -29,14 +29,7 @@ public interface FileService {
     Folder createFolderRecursive(String path, String ownerId);
 
     /** Uploads a file and stores its metadata. */
-    File uploadFile(
-        InputStream inputStream,
-        String name,
-        String mime,
-        Long size,
-        Long parentId,
-        String ownerId
-    );
+    File uploadFile(InputStream inputStream, String name, String mime, Long size, Long parentId, String ownerId);
 
     /** Retrieves an input stream for downloading a file for a specific owner. */
     InputStream downloadFile(Long nodeId, String ownerId);

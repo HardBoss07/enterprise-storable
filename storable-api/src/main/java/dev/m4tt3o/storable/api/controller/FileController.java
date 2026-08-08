@@ -44,57 +44,27 @@ public class FileController {
     }
 
     @GetMapping("/{nodeId}")
-    public FileMetadataDto getMetadata(
-        @PathVariable Long nodeId,
-        @AuthenticationPrincipal String userId
-    ) {
-        log.info(
-            "Request to get metadata for node: {} by user ID: {}",
-            nodeId,
-            userId
-        );
-        return fileApiMapper.toDto(
-            fileService.getMetadata(nodeId, userId),
-            userId
-        );
+    public FileMetadataDto getMetadata(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to get metadata for node: {} by user ID: {}", nodeId, userId);
+        return fileApiMapper.toDto(fileService.getMetadata(nodeId, userId), userId);
     }
 
     @GetMapping("/{nodeId}/children")
-    public List<FileMetadataDto> getChildren(
-        @PathVariable Long nodeId,
-        @AuthenticationPrincipal String userId
-    ) {
-        log.info(
-            "Request to get children for node: {} by user ID: {}",
-            nodeId,
-            userId
-        );
-        SequencedCollection<Storable> children = fileService.getChildren(
-            nodeId,
-            userId
-        );
+    public List<FileMetadataDto> getChildren(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to get children for node: {} by user ID: {}", nodeId, userId);
+        SequencedCollection<Storable> children = fileService.getChildren(nodeId, userId);
         return fileApiMapper.toDtoList(children, userId);
     }
 
     @GetMapping("/home")
     public FileMetadataDto getHome(@AuthenticationPrincipal String userId) {
         log.info("Request to get home folder for user ID: {}", userId);
-        return fileApiMapper.toDto(
-            fileService.getHomeNode(userId, null),
-            userId
-        );
+        return fileApiMapper.toDto(fileService.getHomeNode(userId, null), userId);
     }
 
     @GetMapping("/{nodeId}/path")
-    public List<FileMetadataDto> getPath(
-        @PathVariable Long nodeId,
-        @AuthenticationPrincipal String userId
-    ) {
-        log.info(
-            "Request to get path for node: {} by user ID: {}",
-            nodeId,
-            userId
-        );
+    public List<FileMetadataDto> getPath(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to get path for node: {} by user ID: {}", nodeId, userId);
         List<Storable> path = fileService.getPath(nodeId, userId, null);
         return fileApiMapper.toDtoList(new java.util.ArrayList<>(path), userId);
     }
@@ -104,19 +74,8 @@ public class FileController {
         @RequestBody CreateFolderRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        log.info(
-            "Request to create folder: {} by user ID: {}",
-            request.name(),
-            userId
-        );
-        return fileApiMapper.toDto(
-            fileService.createFolder(
-                request.name(),
-                request.parentId(),
-                userId
-            ),
-            userId
-        );
+        log.info("Request to create folder: {} by user ID: {}", request.name(), userId);
+        return fileApiMapper.toDto(fileService.createFolder(request.name(), request.parentId(), userId), userId);
     }
 
     @PostMapping("/folders/recursive")
@@ -124,15 +83,8 @@ public class FileController {
         @RequestBody RecursiveFolderRequest request,
         @AuthenticationPrincipal String userId
     ) {
-        log.info(
-            "Request to recursively create folders for path: {} by user ID: {}",
-            request.path(),
-            userId
-        );
-        return fileApiMapper.toDto(
-            fileService.createFolderRecursive(request.path(), userId),
-            userId
-        );
+        log.info("Request to recursively create folders for path: {} by user ID: {}", request.path(), userId);
+        return fileApiMapper.toDto(fileService.createFolderRecursive(request.path(), userId), userId);
     }
 
     @PostMapping("/upload")
@@ -141,11 +93,7 @@ public class FileController {
         @RequestParam(value = "parentId", required = false) Long parentId,
         @AuthenticationPrincipal String userId
     ) throws IOException {
-        log.info(
-            "Request to upload file: {} by user ID: {}",
-            file.getOriginalFilename(),
-            userId
-        );
+        log.info("Request to upload file: {} by user ID: {}", file.getOriginalFilename(), userId);
         return fileApiMapper.toDto(
             fileService.uploadFile(
                 file.getInputStream(),
@@ -160,10 +108,7 @@ public class FileController {
     }
 
     @GetMapping("/{nodeId}/download")
-    public ResponseEntity<Resource> downloadFile(
-        @PathVariable Long nodeId,
-        @AuthenticationPrincipal String userId
-    ) {
+    public ResponseEntity<Resource> downloadFile(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
         log.info("Request to download node: {} by user ID: {}", nodeId, userId);
         Storable metadata = fileService.getMetadata(nodeId, userId);
         if (metadata == null) return ResponseEntity.notFound().build();
@@ -171,88 +116,52 @@ public class FileController {
         InputStream inputStream = fileService.downloadFile(nodeId, userId);
         Resource resource = new InputStreamResource(inputStream);
 
-        String mimeType = (metadata instanceof File f && f.mime() != null)
-            ? f.mime()
-            : "application/octet-stream";
-        long contentLength = (metadata instanceof File f && f.size() != null)
-            ? f.size()
-            : 0;
+        String mimeType = metadata instanceof File f && f.mime() != null ? f.mime() : "application/octet-stream";
+        long contentLength = metadata instanceof File f && f.size() != null ? f.size() : 0;
 
         return ResponseEntity.ok()
             .contentType(MediaType.parseMediaType(mimeType))
-            .header(
-                HttpHeaders.CONTENT_DISPOSITION,
-                "attachment; filename=\"" + metadata.name() + "\""
-            )
+            .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + metadata.name() + "\"")
             .contentLength(contentLength)
             .body(resource);
     }
 
     @DeleteMapping("/{nodeId}")
-    public ResponseEntity<Void> softDelete(
-        @PathVariable Long nodeId,
-        @AuthenticationPrincipal String userId
-    ) {
-        log.info(
-            "Request to soft delete node: {} by user ID: {}",
-            nodeId,
-            userId
-        );
+    public ResponseEntity<Void> softDelete(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to soft delete node: {} by user ID: {}", nodeId, userId);
         fileService.softDelete(nodeId, userId);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/{nodeId}/restore")
-    public ResponseEntity<Void> restore(
-        @PathVariable Long nodeId,
-        @AuthenticationPrincipal String userId
-    ) {
+    public ResponseEntity<Void> restore(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
         log.info("Request to restore node: {} by user ID: {}", nodeId, userId);
         fileService.restore(nodeId, userId);
         return ResponseEntity.ok().build();
     }
 
     @GetMapping("/trash")
-    public List<TrashMetadataDto> getTrash(
-        @AuthenticationPrincipal String userId
-    ) {
+    public List<TrashMetadataDto> getTrash(@AuthenticationPrincipal String userId) {
         log.info("Request to get trash for user ID: {}", userId);
-        return fileApiMapper.toTrashDtoList(
-            new java.util.ArrayList<>(fileService.getTrash(userId)),
-            userId
-        );
+        return fileApiMapper.toTrashDtoList(new java.util.ArrayList<>(fileService.getTrash(userId)), userId);
     }
 
     @GetMapping("/admin/trash")
     @PreAuthorize("hasRole('ADMIN')")
-    public List<TrashMetadataDto> getAllTrash(
-        @AuthenticationPrincipal String userId
-    ) {
+    public List<TrashMetadataDto> getAllTrash(@AuthenticationPrincipal String userId) {
         log.info("Admin request to get all trash by user ID: {}", userId);
-        return fileApiMapper.toTrashDtoList(
-            new java.util.ArrayList<>(fileService.getAllTrash()),
-            userId
-        );
+        return fileApiMapper.toTrashDtoList(new java.util.ArrayList<>(fileService.getAllTrash()), userId);
     }
 
     @DeleteMapping("/{nodeId}/permanent")
-    public ResponseEntity<Void> permanentlyDelete(
-        @PathVariable Long nodeId,
-        @AuthenticationPrincipal String userId
-    ) {
-        log.info(
-            "Request to permanently delete node: {} by user ID: {}",
-            nodeId,
-            userId
-        );
+    public ResponseEntity<Void> permanentlyDelete(@PathVariable Long nodeId, @AuthenticationPrincipal String userId) {
+        log.info("Request to permanently delete node: {} by user ID: {}", nodeId, userId);
         fileService.permanentlyDelete(nodeId, userId);
         return ResponseEntity.noContent().build();
     }
 
     @DeleteMapping("/trash/empty")
-    public ResponseEntity<Void> emptyTrash(
-        @AuthenticationPrincipal String userId
-    ) {
+    public ResponseEntity<Void> emptyTrash(@AuthenticationPrincipal String userId) {
         log.info("Request to empty trash by user ID: {}", userId);
         fileService.emptyTrash(userId);
         return ResponseEntity.noContent().build();
@@ -260,9 +169,7 @@ public class FileController {
 
     @GetMapping("/trash/retention")
     public ResponseEntity<Map<String, Integer>> getTrashRetention() {
-        return ResponseEntity.ok(
-            Map.of("days", fileService.getTrashRetentionDays())
-        );
+        return ResponseEntity.ok(Map.of("days", fileService.getTrashRetentionDays()));
     }
 
     @PatchMapping("/{nodeId}/rename")
@@ -272,16 +179,8 @@ public class FileController {
         @AuthenticationPrincipal String userId
     ) {
         String newName = body.get("name");
-        log.info(
-            "Request to rename node: {} to: {} by user ID: {}",
-            nodeId,
-            newName,
-            userId
-        );
-        return fileApiMapper.toDto(
-            fileService.rename(nodeId, newName, userId),
-            userId
-        );
+        log.info("Request to rename node: {} to: {} by user ID: {}", nodeId, newName, userId);
+        return fileApiMapper.toDto(fileService.rename(nodeId, newName, userId), userId);
     }
 
     @PostMapping("/{nodeId}/duplicate")
@@ -290,17 +189,9 @@ public class FileController {
         @RequestBody(required = false) Map<String, String> body,
         @AuthenticationPrincipal String userId
     ) {
-        String newName = (body != null) ? body.get("name") : null;
-        log.info(
-            "Request to duplicate node: {} with name: {} by user ID: {}",
-            nodeId,
-            newName,
-            userId
-        );
-        return fileApiMapper.toDto(
-            fileService.duplicate(nodeId, newName, userId),
-            userId
-        );
+        String newName = body != null ? body.get("name") : null;
+        log.info("Request to duplicate node: {} with name: {} by user ID: {}", nodeId, newName, userId);
+        return fileApiMapper.toDto(fileService.duplicate(nodeId, newName, userId), userId);
     }
 
     @PatchMapping("/{nodeId}/move")
@@ -310,16 +201,8 @@ public class FileController {
         @AuthenticationPrincipal String userId
     ) {
         Long targetParentId = body.get("targetParentId");
-        log.info(
-            "Request to move node: {} to: {} by user ID: {}",
-            nodeId,
-            targetParentId,
-            userId
-        );
-        return fileApiMapper.toDto(
-            fileService.move(nodeId, targetParentId, userId),
-            userId
-        );
+        log.info("Request to move node: {} to: {} by user ID: {}", nodeId, targetParentId, userId);
+        return fileApiMapper.toDto(fileService.move(nodeId, targetParentId, userId), userId);
     }
 
     @GetMapping("/search")
@@ -328,44 +211,25 @@ public class FileController {
         @RequestParam(value = "kind", required = false) String kind,
         @AuthenticationPrincipal String userId
     ) {
-        log.info(
-            "Request to search nodes with query: {} and kind: {} by user ID: {}",
-            query,
-            kind,
-            userId
-        );
-        return fileApiMapper.toDtoList(
-            new java.util.ArrayList<>(fileService.search(query, kind, userId)),
-            userId
-        );
+        log.info("Request to search nodes with query: {} and kind: {} by user ID: {}", query, kind, userId);
+        return fileApiMapper.toDtoList(new java.util.ArrayList<>(fileService.search(query, kind, userId)), userId);
     }
 
     @GetMapping("/recent")
-    public List<FileMetadataDto> getRecent(
-        @AuthenticationPrincipal String userId
-    ) {
+    public List<FileMetadataDto> getRecent(@AuthenticationPrincipal String userId) {
         log.info("Request to get recent files for user ID: {}", userId);
         List<File> recent = fileService.getRecentFiles(userId);
         SequencedCollection<Storable> storables = recent
             .stream()
-            .map(f -> (Storable) f)
-            .collect(
-                java.util.stream.Collectors.toCollection(
-                    java.util.ArrayList::new
-                )
-            );
+            .map((f) -> (Storable) f)
+            .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
         return fileApiMapper.toDtoList(storables, userId);
     }
 
     @GetMapping("/favorites")
-    public List<FileMetadataDto> getFavorites(
-        @AuthenticationPrincipal String userId
-    ) {
+    public List<FileMetadataDto> getFavorites(@AuthenticationPrincipal String userId) {
         log.info("Request to get favorites for user ID: {}", userId);
-        return fileApiMapper.toDtoList(
-            new java.util.ArrayList<>(fileService.getFavorites(userId)),
-            userId
-        );
+        return fileApiMapper.toDtoList(new java.util.ArrayList<>(fileService.getFavorites(userId)), userId);
     }
 
     @PatchMapping("/{nodeId}/favorite")
@@ -375,18 +239,8 @@ public class FileController {
         @AuthenticationPrincipal String userId
     ) {
         Boolean isFavorite = body.get("isFavorite");
-        if (isFavorite == null) throw new IllegalArgumentException(
-            "isFavorite field is required"
-        );
-        log.info(
-            "Request to toggle favorite for node: {} to: {} by user ID: {}",
-            nodeId,
-            isFavorite,
-            userId
-        );
-        return fileApiMapper.toDto(
-            fileService.toggleFavorite(nodeId, isFavorite, userId),
-            userId
-        );
+        if (isFavorite == null) throw new IllegalArgumentException("isFavorite field is required");
+        log.info("Request to toggle favorite for node: {} to: {} by user ID: {}", nodeId, isFavorite, userId);
+        return fileApiMapper.toDto(fileService.toggleFavorite(nodeId, isFavorite, userId), userId);
     }
 }

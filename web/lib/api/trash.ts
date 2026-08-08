@@ -1,11 +1,11 @@
-import { apiRequest, getApiBaseUrl, getToken } from "@/lib/api/client";
-import { TrashItem } from "@/types/api";
+import { apiRequest, getApiBaseUrl, getToken } from '@/lib/api/client';
+import { TrashItem } from '@/types/api';
 
 /**
  * Fetches all items in the trash for the current user.
  */
 export async function getTrashList(): Promise<TrashItem[]> {
-  return apiRequest<TrashItem[]>("/api/files/trash");
+  return apiRequest<TrashItem[]>('/api/files/trash');
 }
 
 /**
@@ -13,14 +13,11 @@ export async function getTrashList(): Promise<TrashItem[]> {
  */
 export async function deleteNodePermanently(nodeId: number): Promise<void> {
   const token = getToken();
-  const response = await fetch(
-    `${getApiBaseUrl()}/api/files/${nodeId}/permanent`,
-    {
-      method: "DELETE",
-      headers: token ? { Authorization: `Bearer ${token}` } : {},
-    },
-  );
-  if (!response.ok) throw new Error("Permanent delete failed");
+  const response = await fetch(`${getApiBaseUrl()}/api/files/${nodeId}/permanent`, {
+    method: 'DELETE',
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+  });
+  if (!response.ok) throw new Error('Permanent delete failed');
 }
 
 /**
@@ -29,10 +26,10 @@ export async function deleteNodePermanently(nodeId: number): Promise<void> {
 export async function emptyTrashBin(): Promise<void> {
   const token = getToken();
   const response = await fetch(`${getApiBaseUrl()}/api/files/trash/empty`, {
-    method: "DELETE",
+    method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error("Empty trash failed");
+  if (!response.ok) throw new Error('Empty trash failed');
 }
 
 /**
@@ -43,7 +40,7 @@ export async function getTrashRetentionConfig(): Promise<number> {
   const response = await fetch(`${getApiBaseUrl()}/api/files/trash/retention`, {
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error("Failed to fetch public retention config");
+  if (!response.ok) throw new Error('Failed to fetch public retention config');
   const data = await response.json();
   return data.days;
 }

@@ -34,8 +34,6 @@ public interface UserRepository extends JpaRepository<UserEntity, String> {
     /**
      * Search users by username or email.
      */
-    @Query(
-        "SELECT u FROM UserEntity u WHERE u.username LIKE %:query% OR u.email LIKE %:query%"
-    )
+    @Query("SELECT u FROM UserEntity u WHERE u.username LIKE %:query% OR u.email LIKE %:query%")
     java.util.List<UserEntity> searchUsers(String query);
 }

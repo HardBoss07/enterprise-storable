@@ -31,11 +31,7 @@ public class UserController {
         @Valid @RequestBody ChangePasswordRequest request
     ) {
         log.info("Request to change password for user ID: {}", userId);
-        userService.changePassword(
-            userId,
-            request.currentPassword(),
-            request.newPassword()
-        );
+        userService.changePassword(userId, request.currentPassword(), request.newPassword());
         return ResponseEntity.noContent().build();
     }
 
@@ -47,11 +43,7 @@ public class UserController {
         @AuthenticationPrincipal String userId,
         @Valid @RequestBody ChangeEmailRequest request
     ) {
-        log.info(
-            "Request to change email to {} for user ID: {}",
-            request.newEmail(),
-            userId
-        );
+        log.info("Request to change email to {} for user ID: {}", request.newEmail(), userId);
         userService.changeEmail(userId, request.newEmail());
         return ResponseEntity.noContent().build();
     }
@@ -64,10 +56,7 @@ public class UserController {
         @AuthenticationPrincipal String userId,
         @Valid @RequestBody DeleteAccountRequest request
     ) {
-        log.info(
-            "Nuclear Option: Request to PERMANENTLY delete account for user ID: {}",
-            userId
-        );
+        log.info("Nuclear Option: Request to PERMANENTLY delete account for user ID: {}", userId);
         userService.deleteAccount(userId, request.password());
         return ResponseEntity.noContent().build();
     }

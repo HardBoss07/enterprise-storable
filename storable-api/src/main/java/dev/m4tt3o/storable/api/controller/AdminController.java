@@ -44,10 +44,7 @@ public class AdminController {
 
     @PatchMapping("/users/{id}/role")
     /** Updates a user's role. */
-    public ResponseEntity<Void> updateUserRole(
-        @PathVariable String id,
-        @RequestBody String role
-    ) {
+    public ResponseEntity<Void> updateUserRole(@PathVariable String id, @RequestBody String role) {
         log.info("Admin request: Update user {} role to {}", id, role);
         // Remove extra quotes if role is passed as a raw string in JSON
         String cleanedRole = role.replace("\"", "");
@@ -70,9 +67,7 @@ public class AdminController {
 
     @PatchMapping("/settings")
     /** Updates global configuration settings. */
-    public ResponseEntity<Void> updateSettings(
-        @RequestBody GlobalSettingsDto settings
-    ) {
+    public ResponseEntity<Void> updateSettings(@RequestBody GlobalSettingsDto settings) {
         log.info("Admin request: Update global settings");
 
         if (settings.trashRetentionDays() < 0) {
@@ -80,10 +75,7 @@ public class AdminController {
         }
 
         if (!settings.isValidTimezone()) {
-            log.warn(
-                "Invalid timezone provided: {}",
-                settings.systemTimezone()
-            );
+            log.warn("Invalid timezone provided: {}", settings.systemTimezone());
             return ResponseEntity.badRequest().build();
         }
 

@@ -7,13 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AccessPrivilegeRepository
-    extends JpaRepository<AccessPrivilegeEntity, Long>
-{
-    Optional<AccessPrivilegeEntity> findByNodeIdAndUserId(
-        Long nodeId,
-        String userId
-    );
+public interface AccessPrivilegeRepository extends JpaRepository<AccessPrivilegeEntity, Long> {
+    Optional<AccessPrivilegeEntity> findByNodeIdAndUserId(Long nodeId, String userId);
 
     List<AccessPrivilegeEntity> findByNodeId(Long nodeId);
 

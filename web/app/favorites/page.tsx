@@ -1,24 +1,24 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { FileNode } from "@/types/api";
+import { useEffect, useState } from 'react';
+import { FileNode } from '@/types/api';
 import {
   getFavorites,
   toggleFavorite,
   softDeleteNode,
   renameNode,
   duplicateFile,
-} from "@/lib/api/file";
-import { PageContainer } from "@/components/ui/PageContainer";
-import FileList from "@/components/features/file-browser/FileList";
-import { Spinner } from "@/components/ui/Spinner";
-import { useToast } from "@/context/ToastContext";
-import { useRouter } from "next/navigation";
-import MoveModal from "@/components/features/file-browser/MoveModal";
-import { moveNode } from "@/lib/api/file";
-import { Star } from "lucide-react";
-import EmptyState from "@/components/shared/EmptyState";
-import ShareModal from "@/components/features/file-browser/ShareModal";
+} from '@/lib/api/file';
+import { PageContainer } from '@/components/ui/PageContainer';
+import FileList from '@/components/features/file-browser/FileList';
+import { Spinner } from '@/components/ui/Spinner';
+import { useToast } from '@/context/ToastContext';
+import { useRouter } from 'next/navigation';
+import MoveModal from '@/components/features/file-browser/MoveModal';
+import { moveNode } from '@/lib/api/file';
+import { Star } from 'lucide-react';
+import EmptyState from '@/components/shared/EmptyState';
+import ShareModal from '@/components/features/file-browser/ShareModal';
 
 /**
  * Favorites page component.
@@ -38,8 +38,8 @@ export default function FavoritesPage() {
       const data = await getFavorites();
       setFiles(data);
     } catch (error) {
-      console.error("Failed to fetch favorites:", error);
-      showToast("Failed to load favorites", "error");
+      console.error('Failed to fetch favorites:', error);
+      showToast('Failed to load favorites', 'error');
     } finally {
       setLoading(false);
     }
@@ -61,12 +61,9 @@ export default function FavoritesPage() {
       } else {
         fetchFavorites();
       }
-      showToast(
-        isFavorite ? "Added to favorites" : "Removed from favorites",
-        "success",
-      );
+      showToast(isFavorite ? 'Added to favorites' : 'Removed from favorites', 'success');
     } catch (error) {
-      showToast("Failed to update favorite status", "error");
+      showToast('Failed to update favorite status', 'error');
     }
   };
 
@@ -74,9 +71,9 @@ export default function FavoritesPage() {
     try {
       await softDeleteNode(nodeId);
       setFiles((prev) => prev.filter((f) => f.id !== nodeId));
-      showToast("Moved to trash", "success");
+      showToast('Moved to trash', 'success');
     } catch (error) {
-      showToast("Failed to delete item", "error");
+      showToast('Failed to delete item', 'error');
     }
   };
 
@@ -84,9 +81,9 @@ export default function FavoritesPage() {
     try {
       await renameNode(nodeId, newName);
       fetchFavorites();
-      showToast("Renamed successfully", "success");
+      showToast('Renamed successfully', 'success');
     } catch (error) {
-      showToast("Failed to rename item", "error");
+      showToast('Failed to rename item', 'error');
     }
   };
 
@@ -94,9 +91,9 @@ export default function FavoritesPage() {
     try {
       await duplicateFile(nodeId);
       fetchFavorites();
-      showToast("Duplicated successfully", "success");
+      showToast('Duplicated successfully', 'success');
     } catch (error) {
-      showToast("Failed to duplicate item", "error");
+      showToast('Failed to duplicate item', 'error');
     }
   };
 
@@ -112,9 +109,9 @@ export default function FavoritesPage() {
     try {
       await moveNode(movingNode.id, targetParentId);
       fetchFavorites();
-      showToast("Moved successfully", "success");
+      showToast('Moved successfully', 'success');
     } catch (error) {
-      showToast("Failed to move item", "error");
+      showToast('Failed to move item', 'error');
     } finally {
       setMovingNode(null);
     }
@@ -124,15 +121,12 @@ export default function FavoritesPage() {
     if (parentId) {
       router.push(`/?folderId=${parentId}`);
     } else {
-      router.push("/");
+      router.push('/');
     }
   };
 
   return (
-    <PageContainer
-      title="Favorites"
-      description="Manage your most important files and folders."
-    >
+    <PageContainer title="Favorites" description="Manage your most important files and folders.">
       <div className="card-surface">
         {loading ? (
           <Spinner size="lg" className="h-64" />
@@ -166,9 +160,7 @@ export default function FavoritesPage() {
         />
       )}
 
-      {sharingNode && (
-        <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />
-      )}
+      {sharingNode && <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />}
     </PageContainer>
   );
 }

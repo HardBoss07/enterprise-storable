@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import Link from "next/link";
-import { useAuth } from "@/context/AuthContext";
-import { SearchBar } from "@/components/shared/SearchBar";
-import { UserMenu } from "@/components/shared/UserMenu";
-import { usePathname } from "next/navigation";
-import { cn } from "@/lib/utils";
+import Image from 'next/image';
+import Link from 'next/link';
+import { useAuth } from '@/context/AuthContext';
+import { SearchBar } from '@/components/shared/SearchBar';
+import { UserMenu } from '@/components/shared/UserMenu';
+import { usePathname } from 'next/navigation';
+import { cn } from '@/lib/utils';
 
 /**
  * Organism: Application header for branding and user actions.
@@ -18,8 +18,8 @@ export function Header() {
   const { user, logout, isAuthenticated } = useAuth();
   const pathname = usePathname();
 
-  const isAuthPage = pathname === "/login" || pathname === "/register";
-  const isLandingPage = pathname === "/";
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+  const isLandingPage = pathname === '/';
   const showSidebarLayout = isAuthenticated && !isAuthPage && !isLandingPage;
 
   return (
@@ -28,21 +28,21 @@ export function Header() {
         {showSidebarLayout ? (
           <>
             {/* Logo Area - Aligned with Sidebar */}
-            <div className="w-64 h-full flex items-center px-6">
-              <Link href="/home" className="flex items-center gap-2 group">
+            <div className="flex h-full w-64 items-center px-6">
+              <Link href="/home" className="group flex items-center gap-2">
                 <Image
                   src="/logo/logo.svg"
                   alt="Storable Logo"
                   width={130}
                   height={30}
-                  className="group-hover:opacity-80 transition-opacity"
+                  className="transition-opacity group-hover:opacity-80"
                   priority
                 />
               </Link>
             </div>
 
             {/* Content Area - Aligned with Main Content */}
-            <div className="flex-1 flex items-center justify-between px-6 lg:px-8">
+            <div className="flex flex-1 items-center justify-between px-6 lg:px-8">
               <div className="flex items-center gap-8">
                 {user && (
                   <div className="hidden md:flex">
@@ -58,17 +58,14 @@ export function Header() {
           </>
         ) : (
           /* Simplified Layout for Auth Pages / Landing */
-          <div className="flex-1 flex items-center justify-between px-6 lg:px-8">
-            <Link
-              href={isAuthenticated ? "/home" : "/"}
-              className="flex items-center gap-2 group"
-            >
+          <div className="flex flex-1 items-center justify-between px-6 lg:px-8">
+            <Link href={isAuthenticated ? '/home' : '/'} className="group flex items-center gap-2">
               <Image
                 src="/logo/logo.svg"
                 alt="Storable Logo"
                 width={130}
                 height={30}
-                className="group-hover:opacity-80 transition-opacity"
+                className="transition-opacity group-hover:opacity-80"
                 priority
               />
             </Link>

@@ -1,19 +1,19 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 /* Base Styles */
-@import "../styles/base/variables.css";
-@import "../styles/base/reset.css";
+@import '../styles/base/variables.css';
+@import '../styles/base/reset.css';
 
 /* Layouts */
-@import "../styles/layouts/main-layout.css";
+@import '../styles/layouts/main-layout.css';
 
 /* Components */
-@import "../styles/components/buttons.css";
-@import "../styles/components/inputs.css";
-@import "../styles/components/spinner.css";
-@import "../styles/components/badges.css";
-@import "../styles/components/surfaces.css";
+@import '../styles/components/buttons.css';
+@import '../styles/components/inputs.css';
+@import '../styles/components/spinner.css';
+@import '../styles/components/badges.css';
+@import '../styles/components/surfaces.css';
 
 /* Features */
-@import "../styles/features/file-browser.css";
-@import "../styles/features/trash.css";
+@import '../styles/features/file-browser.css';
+@import '../styles/features/trash.css';

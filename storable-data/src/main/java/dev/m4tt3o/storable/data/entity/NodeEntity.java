@@ -17,10 +17,7 @@ import org.hibernate.annotations.UpdateTimestamp;
 @Entity
 @Table(name = "nodes")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
-@DiscriminatorColumn(
-    name = "kind",
-    discriminatorType = DiscriminatorType.STRING
-)
+@DiscriminatorColumn(name = "kind", discriminatorType = DiscriminatorType.STRING)
 @Getter
 @Setter
 @SuperBuilder

@@ -1,11 +1,11 @@
-import { apiRequest, getApiBaseUrl, getToken } from "@/lib/api/client";
-import { UserDto, GlobalSettingsDto, UpdateUserRolePayload } from "@/types/api";
+import { apiRequest, getApiBaseUrl, getToken } from '@/lib/api/client';
+import { UserDto, GlobalSettingsDto, UpdateUserRolePayload } from '@/types/api';
 
 /**
  * Retrieves all users (ADMIN only).
  */
 export async function getUsers(): Promise<UserDto[]> {
-  return apiRequest<UserDto[]>("/api/admin/users");
+  return apiRequest<UserDto[]>('/api/admin/users');
 }
 
 /**
@@ -14,21 +14,19 @@ export async function getUsers(): Promise<UserDto[]> {
 export async function removeUser(userId: string): Promise<void> {
   const token = getToken();
   const response = await fetch(`${getApiBaseUrl()}/api/admin/users/${userId}`, {
-    method: "DELETE",
+    method: 'DELETE',
     headers: token ? { Authorization: `Bearer ${token}` } : {},
   });
-  if (!response.ok) throw new Error("User deletion failed");
+  if (!response.ok) throw new Error('User deletion failed');
 }
 
 /**
  * Updates a user's role (ADMIN only).
  */
-export async function changeUserRole(
-  payload: UpdateUserRolePayload,
-): Promise<void> {
+export async function changeUserRole(payload: UpdateUserRolePayload): Promise<void> {
   await apiRequest<void>(`/api/admin/users/${payload.userId}/role`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(payload.role),
   });
 }
@@ -37,18 +35,16 @@ export async function changeUserRole(
  * Retrieves global system settings (ADMIN only).
  */
 export async function getSettings(): Promise<GlobalSettingsDto> {
-  return apiRequest<GlobalSettingsDto>("/api/admin/settings");
+  return apiRequest<GlobalSettingsDto>('/api/admin/settings');
 }
 
 /**
  * Updates global system settings (ADMIN only).
  */
-export async function updateSettings(
-  settings: GlobalSettingsDto,
-): Promise<void> {
-  await apiRequest<void>("/api/admin/settings", {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
+export async function updateSettings(settings: GlobalSettingsDto): Promise<void> {
+  await apiRequest<void>('/api/admin/settings', {
+    method: 'PATCH',
+    headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(settings),
   });
 }
@@ -65,7 +61,7 @@ export async function updateRetentionDays(days: number): Promise<void> {
  * Nuclear Session Reset: Revokes all active user sessions globally (ADMIN only).
  */
 export async function revokeAllSessions(): Promise<{ message: string }> {
-  return apiRequest<{ message: string }>("/api/admin/sessions/revoke-all", {
-    method: "POST",
+  return apiRequest<{ message: string }>('/api/admin/sessions/revoke-all', {
+    method: 'POST',
   });
 }

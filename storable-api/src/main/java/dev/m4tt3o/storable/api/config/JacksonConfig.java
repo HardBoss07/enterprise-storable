@@ -25,11 +25,8 @@ public class JacksonConfig {
 
     @Bean
     public Jackson2ObjectMapperBuilderCustomizer jacksonCustomizer() {
-        return builder -> {
-            builder.serializerByType(
-                LocalDateTime.class,
-                new GlobalLocalDateTimeSerializer(globalTimeProvider)
-            );
+        return (builder) -> {
+            builder.serializerByType(LocalDateTime.class, new GlobalLocalDateTimeSerializer(globalTimeProvider));
         };
     }
 
@@ -37,20 +34,14 @@ public class JacksonConfig {
      * Serializer that converts LocalDateTime from UTC to the global system timezone.
      */
     @RequiredArgsConstructor
-    private static class GlobalLocalDateTimeSerializer
-        extends JsonSerializer<LocalDateTime>
-    {
+    private static class GlobalLocalDateTimeSerializer extends JsonSerializer<LocalDateTime> {
 
         private final GlobalTimeProvider globalTimeProvider;
-        private static final DateTimeFormatter FORMATTER =
-            DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 
         @Override
-        public void serialize(
-            LocalDateTime value,
-            JsonGenerator gen,
-            SerializerProvider serializers
-        ) throws IOException {
+        public void serialize(LocalDateTime value, JsonGenerator gen, SerializerProvider serializers)
+            throws IOException {
             if (value == null) {
                 gen.writeNull();
                 return;

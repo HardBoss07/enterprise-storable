@@ -14,9 +14,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class JwtService {
 
-    @Value(
-        "${storable.security.jwt.secret-key:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}"
-    )
+    @Value("${storable.security.jwt.secret-key:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}")
     private String secretKey;
 
     @Value("${storable.security.jwt.expiration:604800000}") // 1 week
@@ -30,26 +28,16 @@ public class JwtService {
         return extractClaim(token, Claims::getIssuedAt);
     }
 
-    public <T> T extractClaim(
-        String token,
-        Function<Claims, T> claimsResolver
-    ) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }
 
-    public String generateToken(
-        String username,
-        Map<String, Object> extraClaims
-    ) {
+    public String generateToken(String username, Map<String, Object> extraClaims) {
         return buildToken(extraClaims, username, jwtExpiration);
     }
 
-    private String buildToken(
-        Map<String, Object> extraClaims,
-        String subject,
-        long expiration
-    ) {
+    private String buildToken(Map<String, Object> extraClaims, String subject, long expiration) {
         return Jwts.builder()
             .claims(extraClaims)
             .subject(subject)
@@ -61,7 +49,7 @@ public class JwtService {
 
     public boolean isTokenValid(String token, String username) {
         final String extractedUsername = extractUsername(token);
-        return (extractedUsername.equals(username)) && !isTokenExpired(token);
+        return extractedUsername.equals(username) && !isTokenExpired(token);
     }
 
     private boolean isTokenExpired(String token) {
@@ -73,11 +61,7 @@ public class JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts.parser()
-            .verifyWith(getSignInKey())
-            .build()
-            .parseSignedClaims(token)
-            .getPayload();
+        return Jwts.parser().verifyWith(getSignInKey()).build().parseSignedClaims(token).getPayload();
     }
 
     private SecretKey getSignInKey() {

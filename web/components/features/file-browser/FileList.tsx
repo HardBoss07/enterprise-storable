@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import { FileNode } from "@/types/api";
-import { FileListItem } from "./FileListItem";
-import { useMemo, useState, useEffect, useRef } from "react";
-import { FileIcon } from "@/components/ui/FileIcon";
-import { cn } from "@/lib/utils";
+import { FileNode } from '@/types/api';
+import { FileListItem } from './FileListItem';
+import { useMemo, useState, useEffect, useRef } from 'react';
+import { FileIcon } from '@/components/ui/FileIcon';
+import { cn } from '@/lib/utils';
 
 interface FileListProps {
   /** The list of file nodes to display. */
@@ -60,12 +60,12 @@ export function FileList({
   renamingNodeId,
   onCancelRename,
 }: FileListProps) {
-  const [newFolderName, setNewFolderName] = useState("");
+  const [newFolderName, setNewFolderName] = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (isCreatingFolder) {
-      setNewFolderName("");
+      setNewFolderName('');
       inputRef.current?.focus();
     }
   }, [isCreatingFolder]);
@@ -75,9 +75,9 @@ export function FileList({
    * @param {React.KeyboardEvent} event - The keyboard event.
    */
   const handleKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter" && newFolderName.trim()) {
+    if (event.key === 'Enter' && newFolderName.trim()) {
       onCreateFolder?.(newFolderName.trim());
-    } else if (event.key === "Escape") {
+    } else if (event.key === 'Escape') {
       onCancelCreateFolder?.();
     }
   };
@@ -95,7 +95,7 @@ export function FileList({
       // 2. Alphabetical order (case-insensitive)
       return a.name.localeCompare(b.name, undefined, {
         numeric: true,
-        sensitivity: "base",
+        sensitivity: 'base',
       });
     });
   }, [files]);
@@ -109,7 +109,7 @@ export function FileList({
       </div>
 
       {isCreatingFolder && (
-        <div className="flex animate-pulse items-center space-x-4 rounded-lg border border-primary/20 bg-primary/10 p-2">
+        <div className="border-primary/20 bg-primary/10 flex animate-pulse items-center space-x-4 rounded-lg border p-2">
           <div className="flex h-10 w-10 items-center justify-center">
             <FileIcon isFolder={true} size={22} />
           </div>
@@ -126,12 +126,12 @@ export function FileList({
             />
           </div>
           <div className="hidden w-40 sm:block" />
-          <div className="w-24 text-right text-text-muted">--</div>
+          <div className="text-text-muted w-24 text-right">--</div>
         </div>
       )}
 
       {sortedFiles.length === 0 && !isCreatingFolder ? (
-        <div className="flex h-48 flex-col items-center justify-center text-text-muted">
+        <div className="text-text-muted flex h-48 flex-col items-center justify-center">
           <p>This folder is empty</p>
         </div>
       ) : (

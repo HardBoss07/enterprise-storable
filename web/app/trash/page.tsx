@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useTrash } from "@/hooks/useTrash";
-import { Spinner } from "@/components/ui/Spinner";
-import { Button } from "@/components/ui/Button";
-import { Trash2, AlertCircle, Info } from "lucide-react";
-import { EmptyState } from "@/components/shared/EmptyState";
-import { TrashTable } from "@/components/features/trash/TrashTable";
-import { RetentionSettings } from "@/components/features/trash/RetentionSettings";
-import { PageContainer } from "@/components/ui/PageContainer";
+import { useTrash } from '@/hooks/useTrash';
+import { Spinner } from '@/components/ui/Spinner';
+import { Button } from '@/components/ui/Button';
+import { Trash2, AlertCircle, Info } from 'lucide-react';
+import { EmptyState } from '@/components/shared/EmptyState';
+import { TrashTable } from '@/components/features/trash/TrashTable';
+import { RetentionSettings } from '@/components/features/trash/RetentionSettings';
+import { PageContainer } from '@/components/ui/PageContainer';
 
 /**
  * Trash Page: Implements the purely declarative UI layer for the soft-delete system.
@@ -31,11 +31,10 @@ export default function TrashPage() {
   } = useTrash();
 
   const CLASSES = {
-    subtitle: "text-text-muted text-sm mt-1",
-    actions: "flex items-center space-x-3",
-    emptyTrashBtn: "text-red-500 border-red-500/30 hover:bg-red-500/10",
-    errorBox:
-      "bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-md flex items-center",
+    subtitle: 'text-text-muted text-sm mt-1',
+    actions: 'flex items-center space-x-3',
+    emptyTrashBtn: 'text-red-500 border-red-500/30 hover:bg-red-500/10',
+    errorBox: 'bg-red-900/50 border border-red-500 text-red-200 p-4 rounded-md flex items-center',
   };
 
   if (loading) return <Spinner size="lg" className="h-64" />;
@@ -63,11 +62,7 @@ export default function TrashPage() {
       )}
 
       {trashItems.length > 0 && (
-        <Button
-          onClick={handleEmptyTrash}
-          variant="outline"
-          className={CLASSES.emptyTrashBtn}
-        >
+        <Button onClick={handleEmptyTrash} variant="outline" className={CLASSES.emptyTrashBtn}>
           Empty Trash
         </Button>
       )}

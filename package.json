@@ -1,4 +1,12 @@
 {
+  "name": "enterprise-storable-root",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Global formatting and management toolchain for Enterprise Storable fullstack app",
+  "scripts": {
+    "format": "prettier --write \".\"",
+    "format:check": "prettier --check \".\""
+  },
   "devDependencies": {
     "prettier": "^3.8.1",
     "prettier-plugin-java": "^2.10.3",

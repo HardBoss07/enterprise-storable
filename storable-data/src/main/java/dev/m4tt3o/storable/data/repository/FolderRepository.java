@@ -10,16 +10,9 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface FolderRepository extends JpaRepository<FolderEntity, Long> {
-    Optional<FolderEntity> findByNameAndParentIdAndOwnerIdAndIsDeletedFalse(
-        String name,
-        Long parentId,
-        String ownerId
-    );
+    Optional<FolderEntity> findByNameAndParentIdAndOwnerIdAndIsDeletedFalse(String name, Long parentId, String ownerId);
 
-    boolean existsByNameAndParentIdAndIsDeletedFalse(
-        String name,
-        Long parentId
-    );
+    boolean existsByNameAndParentIdAndIsDeletedFalse(String name, Long parentId);
 
     Optional<FolderEntity> findByIdAndOwnerId(Long id, String ownerId);
 }

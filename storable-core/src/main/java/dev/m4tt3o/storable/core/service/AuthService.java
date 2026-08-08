@@ -71,37 +71,23 @@ public class AuthService {
 
         User user = userPersistencePort
             .findByUsername(request.username())
-            .orElseThrow(() ->
-                new UnauthorizedAccessException("Invalid username or password.")
-            );
+            .orElseThrow(() -> new UnauthorizedAccessException("Invalid username or password."));
 
         if (!passwordEncoder.matches(request.password(), user.password())) {
-            throw new UnauthorizedAccessException(
-                "Invalid username or password."
-            );
+            throw new UnauthorizedAccessException("Invalid username or password.");
         }
 
         String token = generateAuthToken(user);
 
-        return new AuthResponse(
-            token,
-            user.username(),
-            user.email(),
-            user.id(),
-            user.role().name()
-        );
+        return new AuthResponse(token, user.username(), user.email(), user.id(), user.role().name());
     }
 
     private void validateUserRegistration(RegisterRequest request) {
         if (userPersistencePort.existsByUsername(request.username())) {
-            throw new DuplicateResourceException(
-                "Username already exists: " + request.username()
-            );
+            throw new DuplicateResourceException("Username already exists: " + request.username());
         }
         if (userPersistencePort.existsByEmail(request.email())) {
-            throw new DuplicateResourceException(
-                "Email already exists: " + request.email()
-            );
+            throw new DuplicateResourceException("Email already exists: " + request.email());
         }
     }
 
@@ -117,9 +103,6 @@ public class AuthService {
     }
 
     private String generateAuthToken(User user) {
-        return jwtService.generateToken(
-            user.username(),
-            Map.of("role", user.role().name(), "id", user.id())
-        );
+        return jwtService.generateToken(user.username(), Map.of("role", user.role().name(), "id", user.id()));
     }
 }

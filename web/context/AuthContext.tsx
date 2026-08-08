@@ -1,13 +1,7 @@
-"use client";
+'use client';
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode,
-} from "react";
-import { useRouter } from "next/navigation";
+import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface User {
   id: string;
@@ -39,11 +33,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     // Load from local storage on mount
-    const token = localStorage.getItem("token");
-    const username = localStorage.getItem("username");
-    const email = localStorage.getItem("email");
-    const userId = localStorage.getItem("userId");
-    const role = localStorage.getItem("role");
+    const token = localStorage.getItem('token');
+    const username = localStorage.getItem('username');
+    const email = localStorage.getItem('email');
+    const userId = localStorage.getItem('userId');
+    const role = localStorage.getItem('role');
 
     if (token && username && email && userId && role) {
       setUser({ token, username, email, id: userId, role });
@@ -58,34 +52,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     role: string,
     isFirstLogin: boolean = false,
   ) => {
-    localStorage.setItem("token", token);
-    localStorage.setItem("username", username);
-    localStorage.setItem("email", email);
-    localStorage.setItem("userId", userId);
-    localStorage.setItem("role", role);
+    localStorage.setItem('token', token);
+    localStorage.setItem('username', username);
+    localStorage.setItem('email', email);
+    localStorage.setItem('userId', userId);
+    localStorage.setItem('role', role);
     setUser({ token, username, email, id: userId, role });
 
     if (isFirstLogin) {
-      router.push("/setup/change-password");
+      router.push('/setup/change-password');
     } else {
-      router.push("/home");
+      router.push('/home');
     }
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("username");
-    localStorage.removeItem("email");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("role");
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('email');
+    localStorage.removeItem('userId');
+    localStorage.removeItem('role');
     setUser(null);
-    router.push("/login");
+    router.push('/login');
   };
 
   return (
-    <AuthContext.Provider
-      value={{ user, login, logout, isAuthenticated: !!user }}
-    >
+    <AuthContext.Provider value={{ user, login, logout, isAuthenticated: !!user }}>
       {children}
     </AuthContext.Provider>
   );
@@ -94,7 +86,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 export function useAuth() {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error("useAuth must be used within an AuthProvider");
+    throw new Error('useAuth must be used within an AuthProvider');
   }
   return context;
 }

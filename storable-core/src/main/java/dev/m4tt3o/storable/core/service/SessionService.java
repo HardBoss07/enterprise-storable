@@ -18,8 +18,7 @@ public class SessionService {
     private final SystemSettingPort systemSettingPort;
 
     private static final String SESSIONS_REVOKED_AT_KEY = "sessions_revoked_at";
-    private static final String ROOT_USER_ID =
-        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+    private static final String ROOT_USER_ID = "f43c0bcf-11e4-4629-b072-321ccd04e72a";
 
     // In-memory cache for faster access
     private Instant sessionsRevokedAt = null;
@@ -30,10 +29,7 @@ public class SessionService {
     public void revokeAllSessions() {
         log.warn("Revoking all user sessions globally (Nuclear Reset).");
         Instant now = Instant.now();
-        systemSettingPort.saveSetting(
-            SESSIONS_REVOKED_AT_KEY,
-            String.valueOf(now.toEpochMilli())
-        );
+        systemSettingPort.saveSetting(SESSIONS_REVOKED_AT_KEY, String.valueOf(now.toEpochMilli()));
         this.sessionsRevokedAt = now;
     }
 
@@ -64,19 +60,14 @@ public class SessionService {
             return sessionsRevokedAt;
         }
 
-        Optional<String> setting = systemSettingPort.getSetting(
-            SESSIONS_REVOKED_AT_KEY
-        );
+        Optional<String> setting = systemSettingPort.getSetting(SESSIONS_REVOKED_AT_KEY);
         if (setting.isPresent()) {
             try {
                 long millis = Long.parseLong(setting.get());
                 sessionsRevokedAt = Instant.ofEpochMilli(millis);
                 return sessionsRevokedAt;
             } catch (NumberFormatException e) {
-                log.error(
-                    "Failed to parse sessions_revoked_at setting: {}",
-                    setting.get()
-                );
+                log.error("Failed to parse sessions_revoked_at setting: {}", setting.get());
             }
         }
 

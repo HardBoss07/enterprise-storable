@@ -35,30 +35,20 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             username = jwtService.extractUsername(jwt);
             if (
                 username != null &&
-                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() ==
-                null
+                org.springframework.security.core.context.SecurityContextHolder.getContext().getAuthentication() == null
             ) {
                 org.springframework.security.core.userdetails.UserDetails userDetails =
                     this.userDetailsService.loadUserByUsername(username);
 
                 if (jwtService.isTokenValid(jwt, userDetails.getUsername())) {
                     String userId = null;
-                    if (
-                        userDetails instanceof
-                            dev.m4tt3o.storable.core.security.CustomUserDetails custom
-                    ) {
+                    if (userDetails instanceof dev.m4tt3o.storable.core.security.CustomUserDetails custom) {
                         userId = custom.id();
                     }
 
                     java.util.Date issuedAt = jwtService.extractIssuedAt(jwt);
 
-                    if (
-                        userId != null &&
-                        sessionService.isSessionValid(
-                            userId,
-                            issuedAt.toInstant()
-                        )
-                    ) {
+                    if (userId != null && sessionService.isSessionValid(userId, issuedAt.toInstant())) {
                         org.springframework.security.authentication.UsernamePasswordAuthenticationToken authToken =
                             new org.springframework.security.authentication.UsernamePasswordAuthenticationToken(
                                 userId,

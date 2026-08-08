@@ -41,20 +41,12 @@ public class FileServiceImpl implements FileService {
     private final SharingService sharingService;
     private final UserPersistencePort userPersistencePort;
 
-    private static final String ADMIN_ID =
-        "f43c0bcf-11e4-4629-b072-321ccd04e72a";
+    private static final String ADMIN_ID = "f43c0bcf-11e4-4629-b072-321ccd04e72a";
     private static final Long ROOT_ID = 1L;
 
     @Override
-    public SequencedCollection<Storable> getChildren(
-        Long nodeId,
-        String ownerId
-    ) {
-        log.info(
-            "Retrieving children for node ID: {} and owner: {}",
-            nodeId,
-            ownerId
-        );
+    public SequencedCollection<Storable> getChildren(Long nodeId, String ownerId) {
+        log.info("Retrieving children for node ID: {} and owner: {}", nodeId, ownerId);
         Long targetId = resolveTargetId(nodeId);
 
         validatePermission(
@@ -69,14 +61,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public Storable getMetadata(Long nodeId, String ownerId) {
-        log.info(
-            "Retrieving metadata for node ID: {} and owner: {}",
-            nodeId,
-            ownerId
-        );
-        if (
-            !sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.VIEW)
-        ) {
+        log.info("Retrieving metadata for node ID: {} and owner: {}", nodeId, ownerId);
+        if (!sharingService.hasPermission(nodeId, ownerId, PrivilegeLevel.VIEW)) {
             return null;
         }
         return folderPersistencePort.findStorableById(nodeId).orElse(null);
@@ -115,11 +101,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public Folder createFolderRecursive(String path, String ownerId) {
-        log.info(
-            "Creating recursive folders for path: {} and owner: {}",
-            path,
-            ownerId
-        );
+        log.info("Creating recursive folders for path: {} and owner: {}", path, ownerId);
         if (path == null || path.isBlank()) return null;
 
         String[] parts = path.split("/");
@@ -128,11 +110,7 @@ public class FileServiceImpl implements FileService {
 
         for (String part : parts) {
             if (part.isBlank()) continue;
-            Optional<Folder> existing = folderPersistencePort.findFolder(
-                part,
-                currentParentId,
-                ownerId
-            );
+            Optional<Folder> existing = folderPersistencePort.findFolder(part, currentParentId, ownerId);
             if (existing.isPresent()) {
                 lastFolder = existing.get();
                 currentParentId = lastFolder.id();
@@ -182,11 +160,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public InputStream downloadFile(Long nodeId, String ownerId) {
-        log.info(
-            "Downloading file with node ID: {} for owner: {}",
-            nodeId,
-            ownerId
-        );
+        log.info("Downloading file with node ID: {} for owner: {}", nodeId, ownerId);
         validatePermission(
             nodeId,
             ownerId,
@@ -196,70 +170,44 @@ public class FileServiceImpl implements FileService {
 
         Storable storable = folderPersistencePort
             .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("File not found: " + nodeId)
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("File not found: " + nodeId));
 
         if (storable instanceof File file) {
             return storageService.load(file.storageKey());
         }
-        throw new InternalStorableException(
-            "Cannot download a folder: " + nodeId
-        );
+        throw new InternalStorableException("Cannot download a folder: " + nodeId);
     }
 
     @Override
     public Folder getHomeNode(String ownerId, String username) {
-        log.info(
-            "Retrieving home node for owner: {} and username: {}",
-            ownerId,
-            username
-        );
+        log.info("Retrieving home node for owner: {} and username: {}", ownerId, username);
         if (ADMIN_ID.equals(ownerId)) {
             return (Folder) folderPersistencePort
                 .findStorableById(ROOT_ID)
-                .orElseThrow(() ->
-                    new InternalStorableException("System root folder missing.")
-                );
+                .orElseThrow(() -> new InternalStorableException("System root folder missing."));
         }
 
         String effectiveUsername = resolveUsername(ownerId, username);
         return folderPersistencePort
             .findFolder(effectiveUsername, ROOT_ID, ownerId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException(
-                    "Home folder not found for user: " + effectiveUsername
-                )
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("Home folder not found for user: " + effectiveUsername));
     }
 
     @Override
-    public List<Storable> getPath(
-        Long nodeId,
-        String ownerId,
-        String username
-    ) {
+    public List<Storable> getPath(Long nodeId, String ownerId, String username) {
         log.info("Retrieving path for node: {} and user: {}", nodeId, username);
         List<Storable> pathArr = new ArrayList<>();
         Long tempId = resolveTargetId(nodeId);
 
         while (tempId != null) {
-            if (
-                !sharingService.hasPermission(
-                    tempId,
-                    ownerId,
-                    PrivilegeLevel.VIEW
-                )
-            ) break;
+            if (!sharingService.hasPermission(tempId, ownerId, PrivilegeLevel.VIEW)) break;
 
             final Long currentId = tempId;
             Storable node = folderPersistencePort
                 .findStorableById(currentId)
                 .orElseGet(() ->
                     currentId.equals(ROOT_ID)
-                        ? folderPersistencePort
-                              .findStorableByIdAndOwner(ROOT_ID, ADMIN_ID)
-                              .orElse(null)
+                        ? folderPersistencePort.findStorableByIdAndOwner(ROOT_ID, ADMIN_ID).orElse(null)
                         : null
                 );
 
@@ -284,14 +232,10 @@ public class FileServiceImpl implements FileService {
 
         Storable node = folderPersistencePort
             .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("Node not found: " + nodeId)
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("Node not found: " + nodeId));
 
         if (ROOT_ID.equals(node.parentId())) {
-            throw new UnauthorizedAccessException(
-                "Access denied: Cannot delete a root-level directory."
-            );
+            throw new UnauthorizedAccessException("Access denied: Cannot delete a root-level directory.");
         }
 
         folderPersistencePort.softDelete(nodeId, ownerId);
@@ -313,31 +257,19 @@ public class FileServiceImpl implements FileService {
     @Override
     public List<TrashItem> getTrash(String ownerId) {
         log.info("Retrieving trash for owner: {}", ownerId);
-        return folderPersistencePort
-            .findTrash(ownerId)
-            .stream()
-            .map(this::toTrashItem)
-            .toList();
+        return folderPersistencePort.findTrash(ownerId).stream().map(this::toTrashItem).toList();
     }
 
     @Override
     public List<TrashItem> getAllTrash() {
         log.info("Retrieving all trash for ADMIN");
-        return folderPersistencePort
-            .findAllTrash()
-            .stream()
-            .map(this::toTrashItem)
-            .toList();
+        return folderPersistencePort.findAllTrash().stream().map(this::toTrashItem).toList();
     }
 
     @Override
     @Transactional
     public void permanentlyDelete(Long nodeId, String ownerId) {
-        log.info(
-            "Permanently deleting node: {} for owner: {}",
-            nodeId,
-            ownerId
-        );
+        log.info("Permanently deleting node: {} for owner: {}", nodeId, ownerId);
         validatePermission(
             nodeId,
             ownerId,
@@ -362,12 +294,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public Storable rename(Long nodeId, String newName, String ownerId) {
-        log.info(
-            "Renaming node: {} to: {} for owner: {}",
-            nodeId,
-            newName,
-            ownerId
-        );
+        log.info("Renaming node: {} to: {} for owner: {}", nodeId, newName, ownerId);
         validatePermission(
             nodeId,
             ownerId,
@@ -377,14 +304,10 @@ public class FileServiceImpl implements FileService {
 
         Storable node = folderPersistencePort
             .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("Node not found: " + nodeId)
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("Node not found: " + nodeId));
 
         if (ROOT_ID.equals(node.parentId())) {
-            throw new UnauthorizedAccessException(
-                "Access denied: Cannot rename root-level directories."
-            );
+            throw new UnauthorizedAccessException("Access denied: Cannot rename root-level directories.");
         }
 
         String finalName = validateAndResolveNewName(node, newName);
@@ -428,12 +351,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public File duplicate(Long nodeId, String newName, String ownerId) {
-        log.info(
-            "Duplicating node: {} with new name: {} for owner: {}",
-            nodeId,
-            newName,
-            ownerId
-        );
+        log.info("Duplicating node: {} with new name: {} for owner: {}", nodeId, newName, ownerId);
         validatePermission(
             nodeId,
             ownerId,
@@ -443,14 +361,10 @@ public class FileServiceImpl implements FileService {
 
         Storable original = folderPersistencePort
             .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("Node not found: " + nodeId)
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("Node not found: " + nodeId));
 
         if (original instanceof Folder) {
-            throw new InternalStorableException(
-                "Duplicating folders is not supported yet."
-            );
+            throw new InternalStorableException("Duplicating folders is not supported yet.");
         }
 
         File originalFile = (File) original;
@@ -473,12 +387,7 @@ public class FileServiceImpl implements FileService {
     @Override
     @Transactional
     public Storable move(Long nodeId, Long targetParentId, String ownerId) {
-        log.info(
-            "Moving node: {} to: {} for owner: {}",
-            nodeId,
-            targetParentId,
-            ownerId
-        );
+        log.info("Moving node: {} to: {} for owner: {}", nodeId, targetParentId, ownerId);
         validatePermission(
             nodeId,
             ownerId,
@@ -494,26 +403,18 @@ public class FileServiceImpl implements FileService {
 
         Storable node = folderPersistencePort
             .findStorableById(nodeId)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("Node not found: " + nodeId)
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("Node not found: " + nodeId));
 
         if (ROOT_ID.equals(node.parentId())) {
-            throw new UnauthorizedAccessException(
-                "Access denied: Cannot move root-level directories."
-            );
+            throw new UnauthorizedAccessException("Access denied: Cannot move root-level directories.");
         }
 
         if (node instanceof Folder && isSubfolder(nodeId, targetParentId)) {
-            throw new DuplicateResourceException(
-                "Cannot move a folder into its own subfolder."
-            );
+            throw new DuplicateResourceException("Cannot move a folder into its own subfolder.");
         }
 
         if (nodeId.equals(targetParentId)) {
-            throw new InternalStorableException(
-                "Cannot move a node to itself."
-            );
+            throw new InternalStorableException("Cannot move a node to itself.");
         }
 
         return switch (node) {
@@ -553,12 +454,7 @@ public class FileServiceImpl implements FileService {
 
     @Override
     public List<Storable> search(String query, String kind, String ownerId) {
-        log.info(
-            "Searching for nodes with query: {} and kind: {} for owner: {}",
-            query,
-            kind,
-            ownerId
-        );
+        log.info("Searching for nodes with query: {} and kind: {} for owner: {}", query, kind, ownerId);
         return ADMIN_ID.equals(ownerId)
             ? folderPersistencePort.searchGlobal(query, kind)
             : folderPersistencePort.search(query, kind, ownerId);
@@ -578,17 +474,8 @@ public class FileServiceImpl implements FileService {
 
     @Override
     @Transactional
-    public Storable toggleFavorite(
-        Long nodeId,
-        boolean isFavorite,
-        String ownerId
-    ) {
-        log.info(
-            "Toggling favorite for node: {} to: {} for owner: {}",
-            nodeId,
-            isFavorite,
-            ownerId
-        );
+    public Storable toggleFavorite(Long nodeId, boolean isFavorite, String ownerId) {
+        log.info("Toggling favorite for node: {} to: {} for owner: {}", nodeId, isFavorite, ownerId);
         validatePermission(
             nodeId,
             ownerId,
@@ -596,25 +483,16 @@ public class FileServiceImpl implements FileService {
             "Access denied: You don't have permission to favorite this node."
         );
 
-        return folderPersistencePort.toggleFavorite(
-            nodeId,
-            isFavorite,
-            ownerId
-        );
+        return folderPersistencePort.toggleFavorite(nodeId, isFavorite, ownerId);
     }
 
     // Helper Methods (Atomic & Small)
 
     private Long resolveTargetId(Long nodeId) {
-        return (nodeId == null || nodeId == 0) ? ROOT_ID : nodeId;
+        return nodeId == null || nodeId == 0 ? ROOT_ID : nodeId;
     }
 
-    private void validatePermission(
-        Long nodeId,
-        String userId,
-        PrivilegeLevel level,
-        String errorMessage
-    ) {
+    private void validatePermission(Long nodeId, String userId, PrivilegeLevel level, String errorMessage) {
         if (!sharingService.hasPermission(nodeId, userId, level)) {
             throw new UnauthorizedAccessException(errorMessage);
         }
@@ -622,9 +500,7 @@ public class FileServiceImpl implements FileService {
 
     private void validateNameAvailability(String name, Long parentId) {
         if (folderPersistencePort.existsByNameAndParent(name, parentId)) {
-            throw new DuplicateResourceException(
-                "A file or folder with this name already exists."
-            );
+            throw new DuplicateResourceException("A file or folder with this name already exists.");
         }
     }
 
@@ -633,16 +509,12 @@ public class FileServiceImpl implements FileService {
         return userPersistencePort
             .findById(ownerId)
             .map(User::username)
-            .orElseThrow(() ->
-                new ResourceNotFoundException("User not found: " + ownerId)
-            );
+            .orElseThrow(() -> new ResourceNotFoundException("User not found: " + ownerId));
     }
 
     private String validateAndResolveNewName(Storable node, String newName) {
         if (newName.matches(".*[\\\\/:*?\"<>|].*")) {
-            throw new InternalStorableException(
-                "Filename contains invalid characters."
-            );
+            throw new InternalStorableException("Filename contains invalid characters.");
         }
 
         if (node instanceof File file) {
@@ -651,9 +523,7 @@ public class FileServiceImpl implements FileService {
             if (lastDotIndex != -1) {
                 String extension = originalName.substring(lastDotIndex);
                 int newLastDotIndex = newName.lastIndexOf('.');
-                String baseName = (newLastDotIndex != -1)
-                    ? newName.substring(0, newLastDotIndex)
-                    : newName;
+                String baseName = newLastDotIndex != -1 ? newName.substring(0, newLastDotIndex) : newName;
                 return baseName + extension;
             }
         }
@@ -669,21 +539,12 @@ public class FileServiceImpl implements FileService {
 
         String originalName = original.name();
         int lastDotIndex = originalName.lastIndexOf('.');
-        String extension = (lastDotIndex != -1)
-            ? originalName.substring(lastDotIndex)
-            : "";
-        String baseName = (lastDotIndex != -1)
-            ? originalName.substring(0, lastDotIndex)
-            : originalName;
+        String extension = lastDotIndex != -1 ? originalName.substring(lastDotIndex) : "";
+        String baseName = lastDotIndex != -1 ? originalName.substring(0, lastDotIndex) : originalName;
 
         String finalName = originalName;
         int counter = 1;
-        while (
-            folderPersistencePort.existsByNameAndParent(
-                finalName,
-                original.parentId()
-            )
-        ) {
+        while (folderPersistencePort.existsByNameAndParent(finalName, original.parentId())) {
             finalName = baseName + " " + counter + extension;
             counter++;
         }
@@ -691,18 +552,12 @@ public class FileServiceImpl implements FileService {
     }
 
     private boolean isSubfolder(Long folderId, Long targetParentId) {
-        if (
-            targetParentId == null ||
-            targetParentId == 0 ||
-            ROOT_ID.equals(targetParentId)
-        ) return false;
+        if (targetParentId == null || targetParentId == 0 || ROOT_ID.equals(targetParentId)) return false;
         if (folderId.equals(targetParentId)) return true;
 
         Long currentId = targetParentId;
         while (currentId != null && !ROOT_ID.equals(currentId)) {
-            Optional<Storable> parent = folderPersistencePort.findStorableById(
-                currentId
-            );
+            Optional<Storable> parent = folderPersistencePort.findStorableById(currentId);
             if (parent.isEmpty()) break;
             currentId = parent.get().parentId();
             if (folderId.equals(currentId)) return true;
@@ -713,40 +568,26 @@ public class FileServiceImpl implements FileService {
     private TrashItem toTrashItem(Storable storable) {
         long daysRemaining = 0;
         if (storable.deletedAt() != null) {
-            LocalDateTime expiryDate = storable
-                .deletedAt()
-                .plusDays(configService.getTrashRetentionDays());
-            daysRemaining = ChronoUnit.DAYS.between(
-                LocalDateTime.now(ZoneOffset.UTC),
-                expiryDate
-            );
+            LocalDateTime expiryDate = storable.deletedAt().plusDays(configService.getTrashRetentionDays());
+            daysRemaining = ChronoUnit.DAYS.between(LocalDateTime.now(ZoneOffset.UTC), expiryDate);
             if (daysRemaining < 0) daysRemaining = 0;
         }
         return new TrashItem(storable, daysRemaining);
     }
 
-    private List<Storable> truncatePathForUser(
-        List<Storable> pathArr,
-        String ownerId,
-        String username
-    ) {
+    private List<Storable> truncatePathForUser(List<Storable> pathArr, String ownerId, String username) {
         if (ADMIN_ID.equals(ownerId)) return pathArr;
 
         String effectiveUsername = resolveUsername(ownerId, username);
         int homeIndex = -1;
         for (int i = 0; i < pathArr.size(); i++) {
             Storable node = pathArr.get(i);
-            if (
-                effectiveUsername.equals(node.name()) &&
-                ROOT_ID.equals(node.parentId())
-            ) {
+            if (effectiveUsername.equals(node.name()) && ROOT_ID.equals(node.parentId())) {
                 homeIndex = i;
                 break;
             }
         }
 
-        return (homeIndex != -1)
-            ? pathArr.subList(homeIndex + 1, pathArr.size())
-            : pathArr;
+        return homeIndex != -1 ? pathArr.subList(homeIndex + 1, pathArr.size()) : pathArr;
     }
 }

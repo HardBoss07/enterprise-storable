@@ -1,5 +1,5 @@
-import React from "react";
-import { cn } from "@/lib/utils";
+import React from 'react';
+import { cn } from '@/lib/utils';
 
 /**
  * Interface for the PageContainer component props.
@@ -26,7 +26,7 @@ interface PageContainerProps {
  */
 export const PageContainer = ({
   children,
-  className = "",
+  className = '',
   title,
   description,
   actions,
@@ -34,7 +34,7 @@ export const PageContainer = ({
   return (
     <div
       className={cn(
-        "flex flex-col h-full w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-6",
+        'mx-auto flex h-full w-full max-w-[1600px] flex-col px-4 py-6 sm:px-6 lg:px-8',
         className,
       )}
     >
@@ -42,13 +42,9 @@ export const PageContainer = ({
         <div className="mb-8 flex items-center justify-between">
           <div>
             {title && (
-              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">
-                {title}
-              </h1>
+              <h1 className="text-2xl font-bold tracking-tight text-white sm:text-3xl">{title}</h1>
             )}
-            {description && (
-              <p className="mt-2 text-sm text-neutral-400">{description}</p>
-            )}
+            {description && <p className="mt-2 text-sm text-neutral-400">{description}</p>}
           </div>
           {actions && <div className="flex items-center gap-3">{actions}</div>}
         </div>

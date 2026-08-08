@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Settings, Save } from "lucide-react";
-import { Button } from "@/components/ui/Button";
-import { IconButton } from "@/components/ui/IconButton";
-import { cn } from "@/lib/utils";
+import { Settings, Save } from 'lucide-react';
+import { Button } from '@/components/ui/Button';
+import { IconButton } from '@/components/ui/IconButton';
+import { cn } from '@/lib/utils';
 
 interface RetentionSettingsProps {
   /** Current retention days in state. */

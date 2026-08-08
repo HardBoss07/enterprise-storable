@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useAuth } from "@/context/AuthContext";
-import { Header } from "@/components/features/layout/Header";
-import { Sidebar } from "@/components/features/layout/Sidebar";
-import { Footer } from "@/components/features/layout/Footer";
-import { usePathname } from "next/navigation";
-import { ReactNode } from "react";
-import { cn } from "@/lib/utils";
+import { useAuth } from '@/context/AuthContext';
+import { Header } from '@/components/features/layout/Header';
+import { Sidebar } from '@/components/features/layout/Sidebar';
+import { Footer } from '@/components/features/layout/Footer';
+import { usePathname } from 'next/navigation';
+import { ReactNode } from 'react';
+import { cn } from '@/lib/utils';
 
 interface AppLayoutProps {
   /** The content to be rendered within the layout. */
@@ -24,12 +24,12 @@ export function AppLayout({ children }: AppLayoutProps) {
   const { isAuthenticated } = useAuth();
   const pathname = usePathname();
 
-  const isAuthPage = pathname === "/login" || pathname === "/register";
-  const isLandingPage = pathname === "/";
+  const isAuthPage = pathname === '/login' || pathname === '/register';
+  const isLandingPage = pathname === '/';
   const shouldShowSidebar = isAuthenticated && !isAuthPage && !isLandingPage;
 
   return (
-    <div className="flex min-h-screen flex-col bg-bg-main text-white">
+    <div className="bg-bg-main flex min-h-screen flex-col text-white">
       <Header />
       <div className="flex flex-1">
         {shouldShowSidebar && <Sidebar />}

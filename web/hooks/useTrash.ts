@@ -1,18 +1,18 @@
-"use client";
+'use client';
 
-import { useState, useEffect, useCallback, useMemo } from "react";
-import { TrashItem } from "@/types/api";
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { TrashItem } from '@/types/api';
 import {
   getTrashList,
   deleteNodePermanently,
   emptyTrashBin,
   getTrashRetentionConfig,
-} from "@/lib/api/trash";
-import { restoreNode } from "@/lib/api/file";
-import { updateRetentionDays } from "@/lib/api/admin";
-import { useAuth } from "@/context/AuthContext";
-import { useToast } from "@/context/ToastContext";
-import { useConfirm } from "@/context/ConfirmContext";
+} from '@/lib/api/trash';
+import { restoreNode } from '@/lib/api/file';
+import { updateRetentionDays } from '@/lib/api/admin';
+import { useAuth } from '@/context/AuthContext';
+import { useToast } from '@/context/ToastContext';
+import { useConfirm } from '@/context/ConfirmContext';
 
 /**
  * Custom hook for managing Trash page logic and state.
@@ -31,7 +31,7 @@ export function useTrash() {
   const [isEditingRetention, setIsEditingRetention] = useState(false);
   const [isSavingRetention, setIsSavingRetention] = useState(false);
 
-  const isAdmin = useMemo(() => user?.role === "ADMIN", [user]);
+  const isAdmin = useMemo(() => user?.role === 'ADMIN', [user]);
 
   /**
    * Fetches trash items and global retention settings.
@@ -40,15 +40,12 @@ export function useTrash() {
     setLoading(true);
     setError(null);
     try {
-      const [items, days] = await Promise.all([
-        getTrashList(),
-        getTrashRetentionConfig(),
-      ]);
+      const [items, days] = await Promise.all([getTrashList(), getTrashRetentionConfig()]);
       setTrashItems(items);
       setRetentionDays(days);
     } catch (err) {
-      console.error("Failed to fetch trash:", err);
-      setError("Failed to load trash contents.");
+      console.error('Failed to fetch trash:', err);
+      setError('Failed to load trash contents.');
     } finally {
       setLoading(false);
     }
@@ -65,10 +62,10 @@ export function useTrash() {
   const handleRestore = async (id: number) => {
     try {
       await restoreNode(id);
-      showToast("Item restored successfully.", "success");
+      showToast('Item restored successfully.', 'success');
       await fetchTrashData();
     } catch (err) {
-      showToast("Failed to restore item.", "error");
+      showToast('Failed to restore item.', 'error');
     }
   };
 
@@ -79,19 +76,19 @@ export function useTrash() {
    */
   const handlePermanentDelete = async (id: number, name: string) => {
     const confirmed = await confirm({
-      title: "Delete Permanently",
+      title: 'Delete Permanently',
       message: `Are you sure you want to permanently delete ${name}? This action cannot be undone.`,
-      confirmLabel: "Delete Permanently",
-      variant: "danger",
+      confirmLabel: 'Delete Permanently',
+      variant: 'danger',
     });
 
     if (confirmed) {
       try {
         await deleteNodePermanently(id);
-        showToast(`Permanently deleted ${name}.`, "success");
+        showToast(`Permanently deleted ${name}.`, 'success');
         await fetchTrashData();
       } catch (err) {
-        showToast("Failed to delete item.", "error");
+        showToast('Failed to delete item.', 'error');
       }
     }
   };
@@ -101,20 +98,20 @@ export function useTrash() {
    */
   const handleEmptyTrash = async () => {
     const confirmed = await confirm({
-      title: "Empty Trash",
+      title: 'Empty Trash',
       message:
-        "Are you sure you want to permanently delete ALL items in the trash? This action cannot be undone.",
-      confirmLabel: "Empty Trash",
-      variant: "danger",
+        'Are you sure you want to permanently delete ALL items in the trash? This action cannot be undone.',
+      confirmLabel: 'Empty Trash',
+      variant: 'danger',
     });
 
     if (confirmed) {
       try {
         await emptyTrashBin();
-        showToast("Trash emptied successfully.", "success");
+        showToast('Trash emptied successfully.', 'success');
         await fetchTrashData();
       } catch (err) {
-        showToast("Failed to empty trash.", "error");
+        showToast('Failed to empty trash.', 'error');
       }
     }
   };
@@ -127,10 +124,10 @@ export function useTrash() {
     try {
       await updateRetentionDays(retentionDays);
       setIsEditingRetention(false);
-      showToast("Retention period updated successfully.", "success");
+      showToast('Retention period updated successfully.', 'success');
       await fetchTrashData();
     } catch (err) {
-      showToast("Failed to update retention period.", "error");
+      showToast('Failed to update retention period.', 'error');
     } finally {
       setIsSavingRetention(false);
     }

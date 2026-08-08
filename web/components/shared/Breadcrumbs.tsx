@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { FileNode } from "@/types/api";
-import { Home, ChevronRight } from "lucide-react";
-import { IconButton } from "@/components/ui/IconButton";
-import { cn } from "@/lib/utils";
+import { FileNode } from '@/types/api';
+import { Home, ChevronRight } from 'lucide-react';
+import { IconButton } from '@/components/ui/IconButton';
+import { cn } from '@/lib/utils';
 
 interface BreadcrumbsProps {
   /** The list of parent folder nodes representing the current path. */
@@ -28,7 +28,7 @@ export function Breadcrumbs({ path, onBreadcrumbClick }: BreadcrumbsProps) {
         variant="ghost"
         title="Home"
         iconSize={18}
-        className="hover:scale-110 transition-transform"
+        className="transition-transform hover:scale-110"
       />
 
       {path.map((node, index) => {
@@ -36,10 +36,7 @@ export function Breadcrumbs({ path, onBreadcrumbClick }: BreadcrumbsProps) {
 
         return (
           <div key={node.id} className="flex items-center">
-            <ChevronRight
-              size={16}
-              className="mx-1 text-neutral-600 shrink-0"
-            />
+            <ChevronRight size={16} className="mx-1 shrink-0 text-neutral-600" />
             {isLast ? (
               <span className="breadcrumb-item-active max-w-[150px] truncate sm:max-w-[250px]">
                 {node.name}

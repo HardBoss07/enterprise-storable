@@ -33,31 +33,18 @@ public class FolderPersistenceAdapter implements FolderPersistencePort {
     }
 
     @Override
-    public Optional<Storable> findStorableByIdAndOwner(
-        Long id,
-        String ownerId
-    ) {
-        return nodeRepository
-            .findByIdAndOwnerId(id, ownerId)
-            .map(NodeMapper::toDomain);
+    public Optional<Storable> findStorableByIdAndOwner(Long id, String ownerId) {
+        return nodeRepository.findByIdAndOwnerId(id, ownerId).map(NodeMapper::toDomain);
     }
 
     @Override
     public List<Storable> findStorableByIds(List<Long> ids) {
-        return nodeRepository
-            .findAllById(ids)
-            .stream()
-            .map(NodeMapper::toDomain)
-            .toList();
+        return nodeRepository.findAllById(ids).stream().map(NodeMapper::toDomain).toList();
     }
 
     @Override
     public List<Storable> findStorableByOwnerId(String ownerId) {
-        return nodeRepository
-            .findByOwnerId(ownerId)
-            .stream()
-            .map(NodeMapper::toDomain)
-            .toList();
+        return nodeRepository.findByOwnerId(ownerId).stream().map(NodeMapper::toDomain).toList();
     }
 
     @Override
@@ -66,11 +53,7 @@ public class FolderPersistenceAdapter implements FolderPersistencePort {
             .findByParentIdAndIsDeletedFalse(parentId)
             .stream()
             .map(NodeMapper::toDomain)
-            .collect(
-                java.util.stream.Collectors.toCollection(
-                    java.util.ArrayList::new
-                )
-            );
+            .collect(java.util.stream.Collectors.toCollection(java.util.ArrayList::new));
     }
 
     @Override
@@ -83,14 +66,12 @@ public class FolderPersistenceAdapter implements FolderPersistencePort {
     @Override
     @Transactional
     public void deleteById(Long id, String ownerId) {
-        nodeRepository
-            .findByIdAndOwnerId(id, ownerId)
-            .ifPresent(entity -> {
-                if (entity instanceof FolderEntity) {
-                    permanentlyDeleteChildren(entity.getId());
-                }
-                nodeRepository.delete(entity);
-            });
+        nodeRepository.findByIdAndOwnerId(id, ownerId).ifPresent((entity) -> {
+            if (entity instanceof FolderEntity) {
+                permanentlyDeleteChildren(entity.getId());
+            }
+            nodeRepository.delete(entity);
+        });
     }
 
     private void permanentlyDeleteChildren(Long parentId) {
@@ -106,14 +87,12 @@ public class FolderPersistenceAdapter implements FolderPersistencePort {
     @Override
     @Transactional
     public void softDelete(Long id, String ownerId) {
-        nodeRepository
-            .findByIdAndOwnerId(id, ownerId)
-            .ifPresent(entity -> {
-                entity.setDeleted(true);
-                entity.setDeletedAt(LocalDateTime.now(ZoneOffset.UTC));
-                nodeRepository.save(entity);
-                softDeleteChildren(entity.getId());
-            });
+        nodeRepository.findByIdAndOwnerId(id, ownerId).ifPresent((entity) -> {
+            entity.setDeleted(true);
+            entity.setDeletedAt(LocalDateTime.now(ZoneOffset.UTC));
+            nodeRepository.save(entity);
+            softDeleteChildren(entity.getId());
+        });
     }
 
     private void softDeleteChildren(Long parentId) {
@@ -133,14 +112,12 @@ public class FolderPersistenceAdapter implements FolderPersistencePort {
     @Override
     @Transactional
     public void restore(Long id, String ownerId) {
-        nodeRepository
-            .findByIdAndOwnerId(id, ownerId)
-            .ifPresent(entity -> {
-                entity.setDeleted(false);
-                entity.setDeletedAt(null);
-                nodeRepository.save(entity);
-                restoreChildren(entity.getId());
-            });
+        nodeRepository.findByIdAndOwnerId(id, ownerId).ifPresent((entity) -> {
+            entity.setDeleted(false);
+            entity.setDeletedAt(null);
+            nodeRepository.save(entity);
+            restoreChildren(entity.getId());
+        });
     }
 
     private void restoreChildren(Long parentId) {
@@ -159,28 +136,18 @@ public class FolderPersistenceAdapter implements FolderPersistencePort {
 
     @Override
     public List<Storable> findTrash(String ownerId) {
-        return nodeRepository
-            .findByOwnerIdAndIsDeletedTrue(ownerId)
-            .stream()
-            .map(NodeMapper::toDomain)
-            .toList();
+        return nodeRepository.findByOwnerIdAndIsDeletedTrue(ownerId).stream().map(NodeMapper::toDomain).toList();
     }
 
     @Override
     public List<Storable> findAllTrash() {
-        return nodeRepository
-            .findAllDeleted()
-            .stream()
-            .map(NodeMapper::toDomain)
-            .toList();
+        return nodeRepository.findAllDeleted().stream().map(NodeMapper::toDomain).toList();
     }
 
     @Override
     @Transactional
     public void emptyTrash(String ownerId) {
-        List<NodeEntity> trash = nodeRepository.findByOwnerIdAndIsDeletedTrue(
-            ownerId
-        );
+        List<NodeEntity> trash = nodeRepository.findByOwnerIdAndIsDeletedTrue(ownerId);
         for (NodeEntity entity : trash) {
             if (entity instanceof FolderEntity) {
                 permanentlyDeleteChildren(entity.getId());
@@ -190,62 +157,37 @@ public class FolderPersistenceAdapter implements FolderPersistencePort {
     }
 
     @Override
-    public Optional<Folder> findFolder(
-        String name,
-        Long parentId,
-        String ownerId
-    ) {
+    public Optional<Folder> findFolder(String name, Long parentId, String ownerId) {
         return folderRepository
-            .findByNameAndParentIdAndOwnerIdAndIsDeletedFalse(
-                name,
-                parentId,
-                ownerId
-            )
-            .map(entity -> (Folder) NodeMapper.toDomain(entity));
+            .findByNameAndParentIdAndOwnerIdAndIsDeletedFalse(name, parentId, ownerId)
+            .map((entity) -> (Folder) NodeMapper.toDomain(entity));
     }
 
     @Override
     public boolean existsByNameAndParent(String name, Long parentId) {
-        return folderRepository.existsByNameAndParentIdAndIsDeletedFalse(
-            name,
-            parentId
-        );
+        return folderRepository.existsByNameAndParentIdAndIsDeletedFalse(name, parentId);
     }
 
     @Override
     public List<Storable> search(String query, String kind, String ownerId) {
-        return nodeRepository
-            .search(query, ownerId)
-            .stream()
-            .map(NodeMapper::toDomain)
-            .toList();
+        return nodeRepository.search(query, ownerId).stream().map(NodeMapper::toDomain).toList();
     }
 
     @Override
     public List<Storable> searchGlobal(String query, String kind) {
-        return nodeRepository
-            .searchGlobal(query)
-            .stream()
-            .map(NodeMapper::toDomain)
-            .toList();
+        return nodeRepository.searchGlobal(query).stream().map(NodeMapper::toDomain).toList();
     }
 
     @Override
     @Transactional
-    public Storable toggleFavorite(
-        Long id,
-        boolean isFavorite,
-        String ownerId
-    ) {
+    public Storable toggleFavorite(Long id, boolean isFavorite, String ownerId) {
         return nodeRepository
             .findByIdAndOwnerId(id, ownerId)
-            .map(entity -> {
+            .map((entity) -> {
                 entity.setFavorite(isFavorite);
                 return NodeMapper.toDomain(nodeRepository.save(entity));
             })
-            .orElseThrow(() ->
-                new RuntimeException("Node not found or access denied: " + id)
-            );
+            .orElseThrow(() -> new RuntimeException("Node not found or access denied: " + id));
     }
 
     @Override

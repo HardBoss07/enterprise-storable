@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { LucideIcon } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { LucideIcon } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 /**
  * Props for the EmptyState component.
@@ -34,12 +34,10 @@ export function EmptyState({
   children,
 }: EmptyStateProps) {
   return (
-    <div className={cn("empty-state-container", className)}>
+    <div className={cn('empty-state-container', className)}>
       <Icon className="mb-4 text-neutral-600" size={48} />
       <p className="text-neutral-400">{title}</p>
-      {description && (
-        <p className="mt-1 text-sm text-neutral-500">{description}</p>
-      )}
+      {description && <p className="mt-1 text-sm text-neutral-500">{description}</p>}
       {children && <div className="mt-6">{children}</div>}
     </div>
   );

@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { PageContainer } from "@/components/ui/PageContainer";
-import { FileNode } from "@/types/api";
-import { getSharedWithMe } from "@/lib/api/sharing";
-import FileList from "@/components/features/file-browser/FileList";
-import EmptyState from "@/components/shared/EmptyState";
-import { Users } from "lucide-react";
-import { Spinner } from "@/components/ui/Spinner";
-import { useRouter } from "next/navigation";
-import ShareModal from "@/components/features/file-browser/ShareModal";
-import { useAuth } from "@/context/AuthContext";
+import { useEffect, useState } from 'react';
+import { PageContainer } from '@/components/ui/PageContainer';
+import { FileNode } from '@/types/api';
+import { getSharedWithMe } from '@/lib/api/sharing';
+import FileList from '@/components/features/file-browser/FileList';
+import EmptyState from '@/components/shared/EmptyState';
+import { Users } from 'lucide-react';
+import { Spinner } from '@/components/ui/Spinner';
+import { useRouter } from 'next/navigation';
+import ShareModal from '@/components/features/file-browser/ShareModal';
+import { useAuth } from '@/context/AuthContext';
 
 /**
  * Shared with me page.
@@ -30,7 +30,7 @@ export default function SharedPage() {
       const filtered = data.filter((file) => file.ownerId !== user?.id);
       setFiles(filtered);
     } catch (error) {
-      console.error("Failed to fetch shared files:", error);
+      console.error('Failed to fetch shared files:', error);
     } finally {
       setLoading(false);
     }
@@ -52,7 +52,7 @@ export default function SharedPage() {
           <Spinner size="lg" />
         </div>
       ) : files.length > 0 ? (
-        <div className="bg-surface-100 rounded-2xl border border-surface-300 overflow-hidden shadow-sm p-4">
+        <div className="bg-surface-100 border-surface-300 overflow-hidden rounded-2xl border p-4 shadow-sm">
           <FileList
             files={files}
             onFolderClick={handleFolderClick}
@@ -72,9 +72,7 @@ export default function SharedPage() {
         />
       )}
 
-      {sharingNode && (
-        <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />
-      )}
+      {sharingNode && <ShareModal node={sharingNode} onClose={() => setSharingNode(null)} />}
     </PageContainer>
   );
 }

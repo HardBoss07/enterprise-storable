@@ -1,19 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { cn } from "@/lib/utils";
-import { useAuth } from "@/context/AuthContext";
-import { usePathname } from "next/navigation";
-import {
-  Folder,
-  Clock,
-  Trash2,
-  Shield,
-  Settings,
-  Star,
-  Users,
-  UserCircle,
-} from "lucide-react";
+import Link from 'next/link';
+import { cn } from '@/lib/utils';
+import { useAuth } from '@/context/AuthContext';
+import { usePathname } from 'next/navigation';
+import { Folder, Clock, Trash2, Shield, Settings, Star, Users, UserCircle } from 'lucide-react';
 
 /**
  * Organism: Application sidebar for navigation.
@@ -27,25 +18,25 @@ export function Sidebar() {
 
   // Define the base navigation links available to all users
   const navLinks = [
-    { href: "/home", label: "My Files", icon: Folder },
-    { href: "/recent", label: "Recent", icon: Clock },
-    { href: "/favorites", label: "Favorites", icon: Star },
-    { href: "/shared", label: "Shared with me", icon: Users },
-    { href: "/trash", label: "Trash", icon: Trash2 },
+    { href: '/home', label: 'My Files', icon: Folder },
+    { href: '/recent', label: 'Recent', icon: Clock },
+    { href: '/favorites', label: 'Favorites', icon: Star },
+    { href: '/shared', label: 'Shared with me', icon: Users },
+    { href: '/trash', label: 'Trash', icon: Trash2 },
   ];
 
   // Add administrative links if the user has the ADMIN role
-  if (user?.role === "ADMIN") {
-    navLinks.push({ href: "/admin", label: "Admin Panel", icon: Shield });
+  if (user?.role === 'ADMIN') {
+    navLinks.push({ href: '/admin', label: 'Admin Panel', icon: Shield });
     navLinks.push({
-      href: "/admin/settings",
-      label: "System Settings",
+      href: '/admin/settings',
+      label: 'System Settings',
       icon: Settings,
     });
   }
 
   // Account settings should always be the final item
-  navLinks.push({ href: "/settings", label: "Account", icon: UserCircle });
+  navLinks.push({ href: '/settings', label: 'Account', icon: UserCircle });
 
   return (
     <aside className="app-sidebar hidden md:block">
@@ -58,18 +49,15 @@ export function Sidebar() {
           // For other links, we check if the pathname starts with the href
           const isActive =
             pathname.startsWith(link.href) &&
-            (link.href !== "/admin" || !pathname.startsWith("/admin/settings"));
+            (link.href !== '/admin' || !pathname.startsWith('/admin/settings'));
 
           return (
             <Link
               key={link.href}
               href={link.href}
-              className={cn("nav-link", isActive && "sidebar-link-active")}
+              className={cn('nav-link', isActive && 'sidebar-link-active')}
             >
-              <Icon
-                size={18}
-                className={cn(isActive ? "text-primary" : "text-text-muted")}
-              />
+              <Icon size={18} className={cn(isActive ? 'text-primary' : 'text-text-muted')} />
               <span>{link.label}</span>
             </Link>
           );

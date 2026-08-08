@@ -24,22 +24,13 @@ public interface NodeRepository extends JpaRepository<NodeEntity, Long> {
     @Query("SELECT n FROM NodeEntity n WHERE n.isDeleted = true")
     List<NodeEntity> findAllDeleted();
 
-    @Query(
-        "SELECT n FROM NodeEntity n WHERE n.ownerId = :ownerId AND n.name LIKE %:query% AND n.isDeleted = false"
-    )
-    List<NodeEntity> search(
-        @Param("query") String query,
-        @Param("ownerId") String ownerId
-    );
+    @Query("SELECT n FROM NodeEntity n WHERE n.ownerId = :ownerId AND n.name LIKE %:query% AND n.isDeleted = false")
+    List<NodeEntity> search(@Param("query") String query, @Param("ownerId") String ownerId);
 
-    @Query(
-        "SELECT n FROM NodeEntity n WHERE n.name LIKE %:query% AND n.isDeleted = false"
-    )
+    @Query("SELECT n FROM NodeEntity n WHERE n.name LIKE %:query% AND n.isDeleted = false")
     List<NodeEntity> searchGlobal(@Param("query") String query);
 
-    List<NodeEntity> findByOwnerIdAndIsFavoriteTrueAndIsDeletedFalse(
-        String ownerId
-    );
+    List<NodeEntity> findByOwnerIdAndIsFavoriteTrueAndIsDeletedFalse(String ownerId);
 
     Optional<NodeEntity> findByIdAndOwnerId(Long id, String ownerId);
 }

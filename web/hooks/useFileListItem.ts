@@ -1,9 +1,9 @@
-import { useState, useEffect, useRef } from "react";
-import { FileNode } from "@/types/api";
-import { downloadFileAsBlob } from "@/lib/api/file";
-import { useToast } from "@/context/ToastContext";
-import { useConfirm } from "@/context/ConfirmContext";
-import { useAuth } from "@/context/AuthContext";
+import { useState, useEffect, useRef } from 'react';
+import { FileNode } from '@/types/api';
+import { downloadFileAsBlob } from '@/lib/api/file';
+import { useToast } from '@/context/ToastContext';
+import { useConfirm } from '@/context/ConfirmContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface UseFileListItemProps {
   node: FileNode;
@@ -47,12 +47,8 @@ export function useFileListItem({
     if (isRenaming) {
       // Strip extension for base name editing if it's a file
       if (!node.folder) {
-        const lastDotIndex = node.name.lastIndexOf(".");
-        setNewName(
-          lastDotIndex !== -1
-            ? node.name.substring(0, lastDotIndex)
-            : node.name,
-        );
+        const lastDotIndex = node.name.lastIndexOf('.');
+        setNewName(lastDotIndex !== -1 ? node.name.substring(0, lastDotIndex) : node.name);
       } else {
         setNewName(node.name);
       }
@@ -72,17 +68,17 @@ export function useFileListItem({
     try {
       const blob = await downloadFileAsBlob(node.id);
       const url = window.URL.createObjectURL(blob);
-      const a = document.createElement("a");
+      const a = document.createElement('a');
       a.href = url;
       a.download = node.name;
       document.body.appendChild(a);
       a.click();
       window.URL.revokeObjectURL(url);
       document.body.removeChild(a);
-      showToast(`Started downloading ${node.name}`, "success");
+      showToast(`Started downloading ${node.name}`, 'success');
     } catch (error) {
-      console.error("Download failed:", error);
-      showToast("Failed to download file. Please try again.", "error");
+      console.error('Download failed:', error);
+      showToast('Failed to download file. Please try again.', 'error');
     }
   };
 
@@ -91,10 +87,10 @@ export function useFileListItem({
    */
   const handleDelete = async () => {
     const confirmed = await confirm({
-      title: "Delete Item",
+      title: 'Delete Item',
       message: `Are you sure you want to delete ${node.name}? It will be moved to the trash.`,
-      confirmLabel: "Delete",
-      variant: "danger",
+      confirmLabel: 'Delete',
+      variant: 'danger',
     });
 
     if (confirmed) {
@@ -118,9 +114,9 @@ export function useFileListItem({
    * @param {React.KeyboardEvent} event - The keyboard event.
    */
   const handleRenameKeyDown = (event: React.KeyboardEvent) => {
-    if (event.key === "Enter") {
+    if (event.key === 'Enter') {
       submitRename();
-    } else if (event.key === "Escape") {
+    } else if (event.key === 'Escape') {
       setIsRenaming(false);
       setNewName(node.name);
       onCancelRename?.();
