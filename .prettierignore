@@ -1,3 +1,15 @@
-web/.next
-web/node_modules
+# Build outputs & dependencies
 **/target/
+**/dist/
+**/node_modules/
+**/.next/
+**/.mvn/
+
+# Binary / Executables
+backend/mvnw
+backend/mvnw.cmd
+*.png
+*.svg
+
+# Package locks (handled by npm)
+package-lock.json
